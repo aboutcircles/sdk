@@ -429,8 +429,8 @@ export abstract class CommonAvatar {
      * }
      * ```
      */
-    getTransactions: (limit: number = 50, sortOrder: 'ASC' | 'DESC' = 'DESC') => {
-      return this.rpc.transaction.getTransactionHistory(this.address, limit, sortOrder);
+    getTransactions: (limit: number = 50) => {
+      return this.rpc.transaction.getTransactionHistory(this.address, limit);
     },
   };
 

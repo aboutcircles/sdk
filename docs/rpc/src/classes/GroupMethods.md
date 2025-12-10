@@ -35,15 +35,15 @@ Defined in: [packages/rpc/src/methods/group.ts:11](https://github.com/aboutcircl
 ### findGroups()
 
 ```ts
-findGroups(limit, params?): Promise<GroupRow[]>;
+findGroups(limit, params?, cursor?): Promise<PagedResponse<GroupRow>>;
 ```
 
 Defined in: [packages/rpc/src/methods/group.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L44)
 
 Find groups with optional filters
 
-This is a convenience method that fetches all pages using cursor-based pagination
-and returns the combined results up to the specified limit.
+Uses the native RPC method for efficient server-side filtering and pagination.
+Fetches all results using cursor-based pagination up to the specified limit.
 
 #### Parameters
 
@@ -59,17 +59,28 @@ Maximum number of groups to return (default: 50)
 
 Optional query parameters to filter groups
 
+##### cursor?
+
+`string` | `null`
+
+Cursor for pagination (null for first page)
+
 #### Returns
 
-`Promise`\<`GroupRow`[]\>
+`Promise`\<`PagedResponse`\<`GroupRow`\>\>
 
-Array of group rows
+Paged response with groups and pagination info
 
 #### Example
 
 ```typescript
-// Find all groups
-const allGroups = await rpc.group.findGroups(50);
+// Find first page of all groups
+const response = await rpc.group.findGroups(50);
+console.log(response.results);
+if (response.hasMore) {
+  // Get next page
+  const nextResponse = await rpc.group.findGroups(50, undefined, response.nextCursor);
+}
 
 // Find groups by name prefix
 const groups = await rpc.group.findGroups(50, {
@@ -92,15 +103,15 @@ const multiOwnerGroups = await rpc.group.findGroups(50, {
 ### getGroupMemberships()
 
 ```ts
-getGroupMemberships(
-   avatar, 
-   limit, 
-sortOrder): PagedQuery<GroupMembershipRow>;
+getGroupMemberships(avatar, limit, cursor?): Promise<PagedResponse<GroupMembershipRow>>;
 ```
 
 Defined in: [packages/rpc/src/methods/group.ts:89](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L89)
 
-Get group memberships for an avatar using cursor-based pagination
+Get group memberships for an avatar
+
+Uses the native RPC method for efficient server-side queries.
+Fetches all results using cursor-based pagination up to the specified limit.
 
 #### Parameters
 
@@ -114,29 +125,38 @@ Avatar address to query group memberships for
 
 `number` = `50`
 
-Number of memberships per page (default: 50)
+Maximum number of memberships to return (default: 50)
 
-##### sortOrder
+##### cursor?
 
-Sort order for results (default: 'DESC')
+`string` | `null`
 
-`"ASC"` | `"DESC"`
+Cursor for pagination (null for first page)
 
 #### Returns
 
-[`PagedQuery`](PagedQuery.md)\<`GroupMembershipRow`\>
+`Promise`\<`PagedResponse`\<`GroupMembershipRow`\>\>
 
-PagedQuery instance for iterating through memberships
+Paged response with group memberships and pagination info
 
 #### Example
 
 ```typescript
-const query = rpc.group.getGroupMemberships(
+// Get first page of memberships
+const response = await rpc.group.getGroupMemberships(
   '0xde374ece6fa50e781e81aac78e811b33d16912c7',
   50
 );
-await query.queryNextPage();
-console.log(query.currentPage.results);
+console.log(response.results);
+
+// Get next page if available
+if (response.hasMore) {
+  const nextResponse = await rpc.group.getGroupMemberships(
+    '0xde374ece6fa50e781e81aac78e811b33d16912c7',
+    50,
+    response.nextCursor
+  );
+}
 ```
 
 ***
@@ -149,14 +169,10 @@ getGroupHolders(groupAddress, limit): PagedQuery<GroupTokenHolderRow>;
 
 Defined in: [packages/rpc/src/methods/group.ts:154](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L154)
 
-Get holders of a group token using cursor-based pagination
+Get holders of a group token
 
 Returns a PagedQuery instance that can be used to fetch holders page by page.
-Results are ordered by totalBalance DESC (highest first), with holder address as tie-breaker.
-
-Note: Pagination uses holder address as cursor because totalBalance (BigInt) values
-cannot be reliably passed through JSON-RPC filters. This means pagination boundaries
-are based on holder addresses, not balances.
+Results are ordered by balance descending.
 
 #### Parameters
 
@@ -164,26 +180,26 @@ are based on holder addresses, not balances.
 
 `` `0x${string}` ``
 
-The address of the group token
+Group address (which is also the token address)
 
 ##### limit
 
 `number` = `100`
 
-Number of holders per page (default: 100)
+Maximum number of holders per page (default: 100)
 
 #### Returns
 
 [`PagedQuery`](PagedQuery.md)\<[`GroupTokenHolderRow`](../interfaces/GroupTokenHolderRow.md)\>
 
-PagedQuery instance for iterating through group token holders
+PagedQuery instance for iterating through holders
 
 #### Example
 
 ```typescript
 const query = rpc.group.getGroupHolders('0xGroupAddress...', 50);
 
-// Get first page (ordered by totalBalance DESC)
+// Get first page (ordered by balance DESC)
 await query.queryNextPage();
 console.log(query.currentPage.results[0]); // Holder with highest balance
 
@@ -198,18 +214,15 @@ if (query.currentPage.hasMore) {
 ### getGroupMembers()
 
 ```ts
-getGroupMembers(
-   groupAddress, 
-   limit, 
-sortOrder): PagedQuery<GroupMembershipRow>;
+getGroupMembers(groupAddress, limit, cursor?): Promise<PagedResponse<GroupMembershipRow>>;
 ```
 
 Defined in: [packages/rpc/src/methods/group.ts:222](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L222)
 
-Get members of a group using cursor-based pagination
+Get members of a group
 
-Returns a PagedQuery instance that can be used to fetch members page by page
-using cursor-based pagination.
+Uses the native RPC method for efficient server-side queries.
+Fetches all results using cursor-based pagination up to the specified limit.
 
 #### Parameters
 
@@ -217,39 +230,40 @@ using cursor-based pagination.
 
 `` `0x${string}` ``
 
-The address of the group to query members for
+Group address to query members for
 
 ##### limit
 
 `number` = `100`
 
-Number of members per page (default: 100)
+Maximum number of members to return (default: 100)
 
-##### sortOrder
+##### cursor?
 
-Sort order for results (default: 'DESC')
+`string` | `null`
 
-`"ASC"` | `"DESC"`
+Cursor for pagination (null for first page)
 
 #### Returns
 
-[`PagedQuery`](PagedQuery.md)\<`GroupMembershipRow`\>
+`Promise`\<`PagedResponse`\<`GroupMembershipRow`\>\>
 
-PagedQuery instance for iterating through group members
+Paged response with group members and pagination info
 
 #### Example
 
 ```typescript
-const query = rpc.group.getGroupMembers('0xGroupAddress...', 100);
-
-// Get first page
-await query.queryNextPage();
-console.log(query.currentPage.results);
+// Get first page of members
+const response = await rpc.group.getGroupMembers('0xGroupAddress...', 100);
+console.log(`Group has ${response.results.length} members`);
 
 // Get next page if available
-if (query.currentPage.hasMore) {
-  await query.queryNextPage();
-  console.log(query.currentPage.results);
+if (response.hasMore) {
+  const nextResponse = await rpc.group.getGroupMembers(
+    '0xGroupAddress...',
+    100,
+    response.nextCursor
+  );
 }
 ```
 

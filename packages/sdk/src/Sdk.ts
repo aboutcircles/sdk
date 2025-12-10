@@ -500,10 +500,9 @@ export class Sdk {
      */
     getHolders: (
       tokenAddress: Address,
-      limit: number = 100,
-      sortOrder: SortOrder = 'DESC'
+      limit: number = 100
     ) => {
-      return this.rpc.token.getTokenHolders(tokenAddress, limit, sortOrder);
+      return this.rpc.token.getTokenHolders(tokenAddress, limit);
     },
   };
 
@@ -528,7 +527,6 @@ export class Sdk {
      *
      * @param groupAddress The address of the group to query members for
      * @param limit Number of members per page (default: 100)
-     * @param sortOrder Sort order for results (default: 'DESC')
      * @returns PagedQuery instance for iterating through group members
      *
      * @example
@@ -550,10 +548,9 @@ export class Sdk {
      */
     getMembers: (
       groupAddress: Address,
-      limit: number = 100,
-      sortOrder: 'ASC' | 'DESC' = 'DESC'
+      limit: number = 100
     ) => {
-      return this.rpc.group.getGroupMembers(groupAddress, limit, sortOrder);
+      return this.rpc.group.getGroupMembers(groupAddress, limit);
     },
 
     /**

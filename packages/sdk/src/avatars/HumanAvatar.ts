@@ -811,8 +811,8 @@ export class HumanAvatar extends CommonAvatar {
      * }
      * ```
      */
-    getGroupMemberships: (limit: number = 50, sortOrder: 'ASC' | 'DESC' = 'DESC') => {
-      return this.rpc.group.getGroupMemberships(this.address, limit, sortOrder);
+    getGroupMemberships: (limit: number = 50) => {
+      return this.rpc.group.getGroupMemberships(this.address, limit);
     },
 
     /**
@@ -839,14 +839,7 @@ export class HumanAvatar extends CommonAvatar {
      */
     getGroupMembershipsWithDetails: async (limit: number = 50): Promise<GroupRow[]> => {
       // Get memberships for this avatar using pagination
-      const query = this.rpc.group.getGroupMemberships(this.address, limit);
-      const memberships: GroupMembershipRow[] = [];
-
-      // Fetch all memberships
-      while (await query.queryNextPage()) {
-        memberships.push(...query.currentPage!.results);
-        if (!query.currentPage!.hasMore) break;
-      }
+      const memberships = await this.rpc.group.getGroupMemberships(this.address, limit);
 
       if (memberships.length === 0) {
         return [];
