@@ -134,7 +134,7 @@ export class TrustMethods {
    * Get aggregated trust relations for an address
    * Groups trust relations by counterpart and determines relationship type
    *
-   * Note: This method fetches ALL trust relations for aggregation.
+   * Uses the server-side aggregation RPC method for optimal performance.
    *
    * @param avatar - Avatar address to query trust relations for
    * @returns Aggregated trust relations with relationship types
@@ -153,54 +153,11 @@ export class TrustMethods {
   async getAggregatedTrustRelations(avatar: Address): Promise<AggregatedTrustRelation[]> {
     const normalized = normalizeAddress(avatar);
 
-    // Fetch all trust relations by paginating
-    const query = this.getTrustRelations(normalized, 1000);
-    const trustListRows: TrustRelation[] = [];
-
-    while (await query.queryNextPage()) {
-      trustListRows.push(...query.currentPage!.results);
-      if (!query.currentPage!.hasMore) break;
-    }
-
-    // Group trust list rows by counterpart avatar
-    const trustBucket: Record<Address, TrustRelation[]> = {};
-
-    trustListRows.forEach((row) => {
-      // Normalize addresses for comparison (both are already checksummed from getTrustRelations)
-      const trusterNorm = normalizeAddress(row.truster);
-      const trusteeNorm = normalizeAddress(row.trustee);
-      const counterpart = trusterNorm !== normalized ? row.truster : row.trustee;
-
-      if (!trustBucket[counterpart]) {
-        trustBucket[counterpart] = [];
-      }
-      trustBucket[counterpart].push(row);
-    });
-
-    // Determine trust relations
-    const result = Object.entries(trustBucket)
-      .filter(([address]) => normalizeAddress(address as Address) !== normalized)
-      .map(([address, rows]) => {
-        const maxTimestamp = Math.max(...rows.map((o) => o.timestamp));
-
-        let relation: TrustRelationType;
-        if (rows.length === 2) {
-          relation = 'mutuallyTrusts';
-        } else if (normalizeAddress(rows[0]?.trustee) === normalized) {
-          relation = 'trustedBy';
-        } else if (normalizeAddress(rows[0]?.truster) === normalized) {
-          relation = 'trusts';
-        } else {
-          throw new Error(`Unexpected trust list row. Couldn't determine trust relation.`);
-        }
-
-        return {
-          subjectAvatar: normalized,
-          relation,
-          objectAvatar: address as Address,
-          timestamp: maxTimestamp,
-        };
-      });
+    // Use server-side aggregation for optimal performance (single RPC call)
+    const result = await this.client.call<[Address], AggregatedTrustRelation[]>(
+      'circles_getAggregatedTrustRelations',
+      [normalized]
+    );
 
     return checksumAddresses(result);
   }

@@ -1,5 +1,5 @@
 import type { RpcClient } from '../client';
-import type { Address, AvatarInfo, TokenBalance, CirclesQueryResponse } from '@aboutcircles/sdk-types';
+import type { Address, AvatarInfo, CirclesQueryResponse, ValidInvitersResponse } from '@aboutcircles/sdk-types';
 import { normalizeAddress, checksumAddresses } from '../utils';
 
 interface InviterRow {
@@ -71,6 +71,9 @@ export class InvitationMethods {
    * Get the list of avatars who have invited this avatar
    * Checks v2 trust relations and validates that inviters have enough balance
    *
+   * Uses the native RPC method for efficient server-side filtering and validation.
+   * Replaces 6-7 separate RPC calls with a single optimized query.
+   *
    * @param address - The address to check for invitations
    * @returns Array of avatar info for valid inviters
    *
@@ -80,89 +83,31 @@ export class InvitationMethods {
    * console.log(invitations); // Array of AvatarInfo
    * ```
    */
-  async getInvitations(address: Address): Promise<AvatarInfo[]> {
+  async getInvitations(address: Address, minimumBalance?: string): Promise<AvatarInfo[]> {
+    const response = await this.getValidInviters(address, minimumBalance);
+
+    const inviters = response.validInviters
+      .map((entry) => entry.avatarInfo)
+      .filter((info): info is AvatarInfo => info !== undefined && info !== null);
+
+    return checksumAddresses(inviters);
+  }
+
+  /**
+   * Fetch valid inviters along with balances and avatar info
+   *
+   * @param address - Address to find inviters for
+   * @param minimumBalance - Optional minimum balance to filter inviters
+   * @returns Valid inviters response as provided by the RPC host
+   */
+  async getValidInviters(address: Address, minimumBalance?: string): Promise<ValidInvitersResponse> {
     const normalized = normalizeAddress(address);
-    const MIN_TOKENS_REQUIRED = 96;
-
-    // Check if the avatar is still on v1
-    const avatarInfoResults = await this.client.call<[Address[]], AvatarInfo[]>(
-      'circles_getAvatarInfoBatch',
-      [[normalized]]
+    const response = await this.client.call<[Address, string?], ValidInvitersResponse>(
+      'circles_getValidInviters',
+      minimumBalance ? [normalized, minimumBalance] : [normalized]
     );
 
-    const avatarInfo = avatarInfoResults.length > 0 ? avatarInfoResults[0] : undefined;
-
-    if (avatarInfo?.version === 2) {
-      // Already on v2, no invitations needed
-      return [];
-    }
-
-    // Get trust relations where others trust this avatar
-    const response = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
-      {
-        Namespace: 'V_Crc',
-        Table: 'TrustRelations',
-        Columns: ['truster', 'trustee'],
-        Filter: [
-          {
-            Type: 'Conjunction',
-            ConjunctionType: 'And',
-            Predicates: [
-              {
-                Type: 'FilterPredicate',
-                FilterType: 'Equals',
-                Column: 'version',
-                Value: 2,
-              },
-              {
-                Type: 'FilterPredicate',
-                FilterType: 'Equals',
-                Column: 'trustee',
-                Value: normalized,
-              },
-            ],
-          },
-        ],
-        Order: [],
-      },
-    ]);
-
-    const trustRelations = this.transformQueryResponse<{ truster: Address; trustee: Address }>(response);
-    const v2Trusters = trustRelations.map((r) => r.truster);
-
-    if (v2Trusters.length === 0) {
-      return [];
-    }
-
-    // Get avatar info for all trusters
-    const trusterInfos = await this.client.call<[Address[]], AvatarInfo[]>(
-      'circles_getAvatarInfoBatch',
-      [v2Trusters]
-    );
-
-    const humanInviters: AvatarInfo[] = [];
-
-    for (const trusterInfo of trusterInfos) {
-      // Only humans can invite other humans
-      if (!trusterInfo?.isHuman) {
-        continue;
-      }
-
-      // Check if the inviter has enough tokens
-      const balances = await this.client.call<[Address], TokenBalance[]>(
-        'circles_getTokenBalances',
-        [trusterInfo.avatar]
-      );
-
-      const inviterOwnToken = balances.find((b) =>
-        normalizeAddress(b.tokenAddress) === normalizeAddress(trusterInfo.avatar)
-      );
-      if (inviterOwnToken && inviterOwnToken.circles >= MIN_TOKENS_REQUIRED) {
-        humanInviters.push(trusterInfo);
-      }
-    }
-
-    return checksumAddresses(humanInviters);
+    return checksumAddresses(response);
   }
 
   /**
