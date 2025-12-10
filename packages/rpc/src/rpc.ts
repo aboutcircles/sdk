@@ -45,7 +45,7 @@ import {
  *
  * // Get profile
  * const profile = await rpc.profile.getProfileByAddress('0xc3a1428c04c426cdf513c6fc8e09f55ddaf50cd7');
- * 
+ *
  * // Get consolidated profile view (Phase 3 SDK enablement)
  * const profileView = await rpc.sdk.getProfileView('0xde374ece6fa50e781e81aac78e811b33d16912c7');
  * ```

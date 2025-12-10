@@ -3,37 +3,6 @@ import type { Address, TransactionHistoryRow, EnrichedTransaction, PagedResponse
 import { normalizeAddress, checksumAddresses } from '../utils.js';
 
 /**
- * Calculate circle amounts for v2 transactions
- */
-function calculateCircleAmounts(value: string, timestamp: number): {
-  circles: number;
-  attoCircles: bigint;
-  staticCircles: number;
-  staticAttoCircles: bigint;
-  crc: number;
-  attoCrc: bigint;
-} {
-  // v2: value is attoCircles (demurraged)
-  const attoCircles = BigInt(value);
-  const circles = CirclesConverter.attoCirclesToCircles(attoCircles);
-
-  const attoCrc = CirclesConverter.attoCirclesToAttoCrc(attoCircles, BigInt(timestamp));
-  const crc = CirclesConverter.attoCirclesToCircles(attoCrc);
-
-  const staticAttoCircles = CirclesConverter.attoCirclesToAttoStaticCircles(attoCircles, BigInt(timestamp));
-  const staticCircles = CirclesConverter.attoCirclesToCircles(staticAttoCircles);
-
-  return {
-    attoCircles,
-    circles,
-    staticAttoCircles,
-    staticCircles,
-    attoCrc,
-    crc,
-  };
-}
-
-/**
  * Transaction history RPC methods
  */
 export class TransactionMethods {
