@@ -16,6 +16,22 @@ export type {
 
 // JSON-RPC types
 export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, QueryResponse } from './rpc.js';
+export type {
+  PagedResponse,
+  ProfileView,
+  TrustStats,
+  TrustNetworkSummary,
+  AggregatedTrustRelationsResponse,
+  TrustRelationInfo,
+  ValidInvitersResponse,
+  InviterInfo,
+  ParticipantInfo,
+  EnrichedTransaction,
+  ProfileSearchResponse
+} from './rpc-responses.js';
+export type {
+  TransactionHistoryRow
+} from './rows.js';
 
 // Query and filter types
 export type {
@@ -38,7 +54,7 @@ export type {
 export type { AvatarInfo, Profile, GroupProfile } from './avatar.js';
 
 // Token types
-export type { TokenBalance, TokenInfo, TokenHolder } from './token.js';
+export type { TokenBalance, TokenInfo, TokenHolder, TokenHolderRow } from './token.js';
 
 // Trust relation types
 export type { TrustRelation, TrustRelationType, AggregatedTrustRelation } from './trust.js';
