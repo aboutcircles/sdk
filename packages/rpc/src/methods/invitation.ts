@@ -1,9 +1,41 @@
 import type { RpcClient } from '../client';
-import type { Address, AvatarInfo, CirclesQueryResponse, ValidInvitersResponse } from '@aboutcircles/sdk-types';
+import type {
+  Address,
+  AvatarInfo,
+  CirclesQueryResponse,
+  ValidInvitersResponse,
+  TrustInvitation,
+  EscrowInvitation,
+  AtScaleInvitation,
+  Invitation,
+  AllInvitationsResponse
+} from '@aboutcircles/sdk-types';
 import { normalizeAddress, checksumAddresses } from '../utils';
 
 interface InviterRow {
   inviter: Address;
+}
+
+interface EscrowRow {
+  inviter: Address;
+  invitee: Address;
+  amount: string;
+  blockNumber: number;
+  timestamp: number;
+}
+
+interface AtScaleAccountRow {
+  account: Address;
+  blockNumber: number;
+  timestamp: number;
+}
+
+interface AtScaleRegisterHumanRow {
+  human: Address;
+  originInviter: Address;
+  proxyInviter: Address;
+  blockNumber: number;
+  timestamp: number;
 }
 
 /**
@@ -215,5 +247,283 @@ export class InvitationMethods {
       const pending = v2Trusted.filter((addr) => !registeredAvatarsSet.has(normalizeAddress(addr)));
       return checksumAddresses(pending);
     }
+  }
+
+  /**
+   * Get escrow-based invitations for an address
+   * Queries CrcV2_InvitationEscrow.InvitationEscrowed for active escrows
+   *
+   * @param address - The address to check for escrow invitations
+   * @returns Array of escrow invitations
+   *
+   * @example
+   * ```typescript
+   * const escrowInvites = await rpc.invitation.getEscrowInvitations('0xde374ece6fa50e781e81aac78e811b33d16912c7');
+   * console.log(escrowInvites); // Array of EscrowInvitation
+   * ```
+   */
+  async getEscrowInvitations(address: Address): Promise<EscrowInvitation[]> {
+    const normalized = normalizeAddress(address);
+
+    // Get all escrowed invitations for this invitee
+    const escrowedResponse = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
+      {
+        Namespace: 'CrcV2_InvitationEscrow',
+        Table: 'InvitationEscrowed',
+        Columns: ['inviter', 'invitee', 'amount', 'blockNumber', 'timestamp'],
+        Filter: [
+          {
+            Type: 'FilterPredicate',
+            FilterType: 'Equals',
+            Column: 'invitee',
+            Value: normalized,
+          },
+        ],
+        Order: [
+          {
+            Column: 'blockNumber',
+            SortOrder: 'DESC',
+          },
+        ],
+      },
+    ]);
+
+    const escrowed = this.transformQueryResponse<EscrowRow>(escrowedResponse);
+
+    // Get redeemed/revoked/refunded to filter out inactive escrows
+    const [redeemedResponse, revokedResponse, refundedResponse] = await Promise.all([
+      this.client.call<[any], CirclesQueryResponse>('circles_query', [
+        {
+          Namespace: 'CrcV2_InvitationEscrow',
+          Table: 'InvitationRedeemed',
+          Columns: ['inviter', 'invitee'],
+          Filter: [
+            {
+              Type: 'FilterPredicate',
+              FilterType: 'Equals',
+              Column: 'invitee',
+              Value: normalized,
+            },
+          ],
+          Order: [],
+        },
+      ]),
+      this.client.call<[any], CirclesQueryResponse>('circles_query', [
+        {
+          Namespace: 'CrcV2_InvitationEscrow',
+          Table: 'InvitationRevoked',
+          Columns: ['inviter', 'invitee'],
+          Filter: [
+            {
+              Type: 'FilterPredicate',
+              FilterType: 'Equals',
+              Column: 'invitee',
+              Value: normalized,
+            },
+          ],
+          Order: [],
+        },
+      ]),
+      this.client.call<[any], CirclesQueryResponse>('circles_query', [
+        {
+          Namespace: 'CrcV2_InvitationEscrow',
+          Table: 'InvitationRefunded',
+          Columns: ['inviter', 'invitee'],
+          Filter: [
+            {
+              Type: 'FilterPredicate',
+              FilterType: 'Equals',
+              Column: 'invitee',
+              Value: normalized,
+            },
+          ],
+          Order: [],
+        },
+      ]),
+    ]);
+
+    const redeemed = this.transformQueryResponse<{ inviter: Address; invitee: Address }>(redeemedResponse);
+    const revoked = this.transformQueryResponse<{ inviter: Address; invitee: Address }>(revokedResponse);
+    const refunded = this.transformQueryResponse<{ inviter: Address; invitee: Address }>(refundedResponse);
+
+    // Create set of inactive inviter addresses (normalized for comparison)
+    const inactiveInviters = new Set([
+      ...redeemed.map((r) => normalizeAddress(r.inviter)),
+      ...revoked.map((r) => normalizeAddress(r.inviter)),
+      ...refunded.map((r) => normalizeAddress(r.inviter)),
+    ]);
+
+    // Filter to only active escrows
+    const activeEscrows = escrowed.filter(
+      (e) => !inactiveInviters.has(normalizeAddress(e.inviter))
+    );
+
+    if (activeEscrows.length === 0) {
+      return [];
+    }
+
+    // Get avatar info for inviters
+    const inviterAddresses = activeEscrows.map((e) => e.inviter);
+    const avatarInfos = await this.client.call<[Address[]], (AvatarInfo | null)[]>(
+      'circles_getAvatarInfoBatch',
+      [inviterAddresses]
+    );
+
+    // Calculate escrow days (approximate based on timestamp)
+    const now = Math.floor(Date.now() / 1000);
+
+    const escrowInvitations: EscrowInvitation[] = activeEscrows.map((escrow, index) => {
+      const daysSinceEscrow = Math.floor((now - escrow.timestamp) / 86400);
+      return {
+        address: checksumAddresses(escrow.inviter),
+        source: 'escrow' as const,
+        escrowedAmount: escrow.amount,
+        escrowDays: daysSinceEscrow,
+        blockNumber: escrow.blockNumber,
+        timestamp: escrow.timestamp,
+        avatarInfo: avatarInfos[index] ? checksumAddresses(avatarInfos[index]) : undefined,
+      };
+    });
+
+    return escrowInvitations;
+  }
+
+  /**
+   * Get at-scale invitations for an address
+   * Queries CrcV2_InvitationsAtScale.AccountCreated for pre-created accounts
+   *
+   * @param address - The address to check for at-scale invitations
+   * @returns Array of at-scale invitations
+   *
+   * @example
+   * ```typescript
+   * const atScaleInvites = await rpc.invitation.getAtScaleInvitations('0xde374ece6fa50e781e81aac78e811b33d16912c7');
+   * console.log(atScaleInvites); // Array of AtScaleInvitation
+   * ```
+   */
+  async getAtScaleInvitations(address: Address): Promise<AtScaleInvitation[]> {
+    const normalized = normalizeAddress(address);
+
+    // Check if this address has a pre-created account (AccountCreated event)
+    const accountCreatedResponse = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
+      {
+        Namespace: 'CrcV2_InvitationsAtScale',
+        Table: 'AccountCreated',
+        Columns: ['account', 'blockNumber', 'timestamp'],
+        Filter: [
+          {
+            Type: 'FilterPredicate',
+            FilterType: 'Equals',
+            Column: 'account',
+            Value: normalized,
+          },
+        ],
+        Order: [
+          {
+            Column: 'blockNumber',
+            SortOrder: 'DESC',
+          },
+        ],
+        Limit: 1,
+      },
+    ]);
+
+    const accountCreated = this.transformQueryResponse<AtScaleAccountRow>(accountCreatedResponse);
+
+    if (accountCreated.length === 0) {
+      return [];
+    }
+
+    // Check if account has been claimed
+    const accountClaimedResponse = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
+      {
+        Namespace: 'CrcV2_InvitationsAtScale',
+        Table: 'AccountClaimed',
+        Columns: ['account'],
+        Filter: [
+          {
+            Type: 'FilterPredicate',
+            FilterType: 'Equals',
+            Column: 'account',
+            Value: normalized,
+          },
+        ],
+        Limit: 1,
+      },
+    ]);
+
+    const accountClaimed = this.transformQueryResponse<{ account: Address }>(accountClaimedResponse);
+
+    // If already claimed, no pending invitation
+    if (accountClaimed.length > 0) {
+      return [];
+    }
+
+    // Account is created but not claimed - this is a valid at-scale invitation
+    // Try to find the origin inviter from RegisterHuman events (if the account was used to register someone)
+    // For now, we return the invitation without origin info since the account hasn't been used yet
+
+    const account = accountCreated[0];
+
+    const atScaleInvitation: AtScaleInvitation = {
+      address: checksumAddresses(account.account),
+      source: 'atScale' as const,
+      blockNumber: account.blockNumber,
+      timestamp: account.timestamp,
+      originInviter: undefined, // Will be set when/if account is used for registration
+    };
+
+    return [atScaleInvitation];
+  }
+
+  /**
+   * Get all invitations from all sources (trust, escrow, at-scale)
+   * This is the recommended method to use for getting a complete view of available invitations
+   *
+   * @param address - The address to check for invitations
+   * @param minimumBalance - Optional minimum balance for trust-based invitations
+   * @returns All invitations from all sources
+   *
+   * @example
+   * ```typescript
+   * const allInvites = await rpc.invitation.getAllInvitations('0xde374ece6fa50e781e81aac78e811b33d16912c7');
+   * console.log(`Trust invites: ${allInvites.trustInvitations.length}`);
+   * console.log(`Escrow invites: ${allInvites.escrowInvitations.length}`);
+   * console.log(`At-scale invites: ${allInvites.atScaleInvitations.length}`);
+   * console.log(`Total: ${allInvites.all.length}`);
+   * ```
+   */
+  async getAllInvitations(address: Address, minimumBalance?: string): Promise<AllInvitationsResponse> {
+    const normalized = normalizeAddress(address);
+
+    // Fetch all invitation types in parallel
+    const [validInvitersResponse, escrowInvitations, atScaleInvitations] = await Promise.all([
+      this.getValidInviters(normalized, minimumBalance),
+      this.getEscrowInvitations(normalized),
+      this.getAtScaleInvitations(normalized),
+    ]);
+
+    // Transform trust-based invitations
+    const trustInvitations: TrustInvitation[] = validInvitersResponse.validInviters.map((inviter) => ({
+      address: inviter.address,
+      source: 'trust' as const,
+      balance: inviter.balance,
+      avatarInfo: inviter.avatarInfo,
+    }));
+
+    // Combine all invitations
+    const all: Invitation[] = [
+      ...trustInvitations,
+      ...escrowInvitations,
+      ...atScaleInvitations,
+    ];
+
+    return checksumAddresses({
+      address: normalized,
+      trustInvitations,
+      escrowInvitations,
+      atScaleInvitations,
+      all,
+    });
   }
 }

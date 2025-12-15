@@ -65,6 +65,9 @@ export class Sdk {
     getBalances: async (address: Address): Promise<TokenBalance[]> => {
       return await this.rpc.balance.getTokenBalances(address);
     },
+    getAllInvitations: async (address: Address, minimumBalance?: string) => {
+      return await this.rpc.invitation.getAllInvitations(address, minimumBalance);
+    },
   };
 
   /**

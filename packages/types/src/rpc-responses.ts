@@ -108,3 +108,77 @@ export interface EnrichedTransaction {
   fromProfile?: Profile;
   toProfile?: Profile;
 }
+
+/**
+ * Invitation source types - indicates how the invitation was created
+ */
+export type InvitationSource = 'trust' | 'escrow' | 'atScale';
+
+/**
+ * Base invitation info with source tracking
+ */
+export interface InvitationInfo {
+  /** The inviter's address */
+  address: Address;
+  /** How the invitation was created */
+  source: InvitationSource;
+  /** Avatar info for the inviter (if available) */
+  avatarInfo?: AvatarInfo;
+}
+
+/**
+ * Trust-based invitation - someone trusts you and has sufficient balance
+ */
+export interface TrustInvitation extends InvitationInfo {
+  source: 'trust';
+  /** Inviter's current CRC balance */
+  balance: string;
+}
+
+/**
+ * Escrow-based invitation - CRC tokens escrowed for you
+ */
+export interface EscrowInvitation extends InvitationInfo {
+  source: 'escrow';
+  /** Amount escrowed (in atto-circles) */
+  escrowedAmount: string;
+  /** Number of days the escrow has been active */
+  escrowDays: number;
+  /** Block number when escrow was created */
+  blockNumber: number;
+  /** Timestamp when escrow was created */
+  timestamp: number;
+}
+
+/**
+ * At-scale invitation - pre-created account via referral system
+ */
+export interface AtScaleInvitation extends InvitationInfo {
+  source: 'atScale';
+  /** The original inviter who funded the invitation */
+  originInviter?: Address;
+  /** Block number when account was created */
+  blockNumber: number;
+  /** Timestamp when account was created */
+  timestamp: number;
+}
+
+/**
+ * Union type for all invitation types
+ */
+export type Invitation = TrustInvitation | EscrowInvitation | AtScaleInvitation;
+
+/**
+ * Response containing all available invitations from all sources
+ */
+export interface AllInvitationsResponse {
+  address: Address;
+  /** Trust-based invitations (people who trust you with sufficient balance) */
+  trustInvitations: TrustInvitation[];
+  /** Escrow-based invitations (CRC escrowed for you) */
+  escrowInvitations: EscrowInvitation[];
+  /** At-scale invitations (pre-created accounts) */
+  atScaleInvitations: AtScaleInvitation[];
+  /** All invitations combined and sorted */
+  all: Invitation[];
+}
