@@ -27,7 +27,14 @@ export type {
   InviterInfo,
   ParticipantInfo,
   EnrichedTransaction,
-  ProfileSearchResponse
+  ProfileSearchResponse,
+  InvitationSource,
+  InvitationInfo,
+  TrustInvitation,
+  EscrowInvitation,
+  AtScaleInvitation,
+  Invitation,
+  AllInvitationsResponse
 } from './rpc-responses';
 export type {
   TransactionHistoryRow
