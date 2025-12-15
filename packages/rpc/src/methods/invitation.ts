@@ -480,6 +480,9 @@ export class InvitationMethods {
    * Get all invitations from all sources (trust, escrow, at-scale)
    * This is the recommended method to use for getting a complete view of available invitations
    *
+   * Uses the optimized `circles_getAllInvitations` RPC method which fetches all invitation
+   * types in a single round-trip with server-side SQL JOINs for efficiency.
+   *
    * @param address - The address to check for invitations
    * @param minimumBalance - Optional minimum balance for trust-based invitations
    * @returns All invitations from all sources
@@ -496,34 +499,12 @@ export class InvitationMethods {
   async getAllInvitations(address: Address, minimumBalance?: string): Promise<AllInvitationsResponse> {
     const normalized = normalizeAddress(address);
 
-    // Fetch all invitation types in parallel
-    const [validInvitersResponse, escrowInvitations, atScaleInvitations] = await Promise.all([
-      this.getValidInviters(normalized, minimumBalance),
-      this.getEscrowInvitations(normalized),
-      this.getAtScaleInvitations(normalized),
-    ]);
+    // Use the optimized RPC method that fetches all invitation types in a single call
+    const response = await this.client.call<[Address, string?], AllInvitationsResponse>(
+      'circles_getAllInvitations',
+      minimumBalance ? [normalized, minimumBalance] : [normalized]
+    );
 
-    // Transform trust-based invitations
-    const trustInvitations: TrustInvitation[] = validInvitersResponse.validInviters.map((inviter) => ({
-      address: inviter.address,
-      source: 'trust' as const,
-      balance: inviter.balance,
-      avatarInfo: inviter.avatarInfo,
-    }));
-
-    // Combine all invitations
-    const all: Invitation[] = [
-      ...trustInvitations,
-      ...escrowInvitations,
-      ...atScaleInvitations,
-    ];
-
-    return checksumAddresses({
-      address: normalized,
-      trustInvitations,
-      escrowInvitations,
-      atScaleInvitations,
-      all,
-    });
+    return checksumAddresses(response);
   }
 }
