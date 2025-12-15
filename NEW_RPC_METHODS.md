@@ -87,9 +87,27 @@ Use this for UI components that need names/avatars alongside each transfer.
 - `circles_getTransactionHistory(address, limit?, cursor?)`
 - Provides SDK-computed `value`, `circles`, `crc`, `staticCircles`, etc. All numeric fields are returned as strings.
 
+### Raw events (paginated)
+
+- `circles_events(address?, fromBlock?, toBlock?, eventTypes?, filterPredicates?, sortAscending?, limit?, cursor?)`
+- Now returns `PagedEventsResponse` with:
+  - `events`: array of event objects
+  - `hasMore`: boolean indicating more results available
+  - `nextCursor`: Base64 cursor for next page
+
+```ts
+// Paginate through all events for an address
+let cursor: string | null = null;
+do {
+  const page = await rpc.query.events(address, fromBlock, null, null, null, false, 100, cursor);
+  console.log(page.events);
+  cursor = page.nextCursor;
+} while (cursor);
+```
+
 ### Pagination format
 
-All transaction/group pagination cursors are Base64-encoded strings of `blockNumber:transactionIndex:logIndex` (plus `:batchIndex` for transaction history). Always treat `nextCursor` as opaque and echo it back unchanged.
+All transaction/group/event pagination cursors are Base64-encoded strings of `blockNumber:transactionIndex:logIndex` (plus `:batchIndex` for transaction history). Always treat `nextCursor` as opaque and echo it back unchanged.
 
 ---
 
@@ -136,6 +154,7 @@ const suggestions = await rpc.sdk.searchProfileByAddressOrName(
 - [x] Update invitation flows to use `getValidInviters` for balance-filtered lists.
 - [x] Switch group/transaction list views to `circles_findGroups` + `circles_getGroupMembers` + `circles_getTransactionHistory`.
 - [x] Use `searchProfileByAddressOrName` for address autocomplete inputs.
+- [x] Update `circles_events` usage to handle paginated `PagedEventsResponse` (returns `events`, `hasMore`, `nextCursor`).
 
 All items now ship in `sdk-v2` (packages `rpc`, `sdk`, and supporting docs/examples). Recent additions also brought in the remaining SDK enablement endpoints—`circles_getTrustNetworkSummary`, `circles_getAggregatedTrustRelationsEnriched`, `circles_getTransactionHistoryEnriched`, `circles_getTokenHolders`, and `circles_searchProfileByAddressOrName`—so the migration guide reflects the full surface of the current implementation.
 
