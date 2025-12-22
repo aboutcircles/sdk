@@ -841,19 +841,19 @@ export class HumanAvatar extends CommonAvatar {
       // Get memberships for this avatar using pagination
       const memberships = await this.rpc.group.getGroupMemberships(this.address, limit);
 
-      if (memberships.length === 0) {
+      if (memberships.results.length === 0) {
         return [];
       }
 
       // Extract group addresses
-      const groupAddresses = memberships.map((m: GroupMembershipRow) => m.group);
+      const groupAddresses = memberships.results.map((m: GroupMembershipRow) => m.group);
 
       // Fetch group details using groupAddressIn filter
       const groups = await this.rpc.group.findGroups(groupAddresses.length, {
         groupAddressIn: groupAddresses,
       });
 
-      return groups;
+      return groups.results;
     },
   };
 
