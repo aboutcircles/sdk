@@ -16,6 +16,29 @@ export type {
 
 // JSON-RPC types
 export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, QueryResponse } from './rpc';
+export type {
+  PagedResponse,
+  ProfileView,
+  TrustStats,
+  TrustNetworkSummary,
+  AggregatedTrustRelationsResponse,
+  TrustRelationInfo,
+  ValidInvitersResponse,
+  InviterInfo,
+  ParticipantInfo,
+  EnrichedTransaction,
+  ProfileSearchResponse,
+  InvitationSource,
+  InvitationInfo,
+  TrustInvitation,
+  EscrowInvitation,
+  AtScaleInvitation,
+  Invitation,
+  AllInvitationsResponse
+} from './rpc-responses';
+export type {
+  TransactionHistoryRow
+} from './rows';
 
 // Query and filter types
 export type {
@@ -38,7 +61,7 @@ export type {
 export type { AvatarInfo, Profile, GroupProfile } from './avatar';
 
 // Token types
-export type { TokenBalance, TokenInfo, TokenHolder } from './token';
+export type { TokenBalance, TokenInfo, TokenHolder, TokenHolderRow } from './token';
 
 // Trust relation types
 export type { TrustRelation, TrustRelationType, AggregatedTrustRelation } from './trust';

@@ -1,6 +1,6 @@
 [**Circles SDK**](../../../README.md)
 
-***
+---
 
 [Circles SDK](../../../modules.md) / [rpc/src](../README.md) / InvitationMethods
 
@@ -59,11 +59,13 @@ The address of the inviting avatar or undefined if not found
 #### Example
 
 ```typescript
-const inviter = await rpc.invitation.getInvitedBy('0xde374ece6fa50e781e81aac78e811b33d16912c7');
-console.log(inviter); // '0x...'
+const inviter = await rpc.invitation.getInvitedBy(
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7"
+)
+console.log(inviter) // '0x...'
 ```
 
-***
+---
 
 ### getInvitations()
 
@@ -75,6 +77,9 @@ Defined in: [packages/rpc/src/methods/invitation.ts:83](https://github.com/about
 
 Get the list of avatars who have invited this avatar
 Checks v2 trust relations and validates that inviters have enough balance
+
+Uses the native RPC method for efficient server-side filtering and validation.
+Replaces 6-7 separate RPC calls with a single optimized query.
 
 #### Parameters
 
@@ -93,11 +98,13 @@ Array of avatar info for valid inviters
 #### Example
 
 ```typescript
-const invitations = await rpc.invitation.getInvitations('0xde374ece6fa50e781e81aac78e811b33d16912c7');
-console.log(invitations); // Array of AvatarInfo
+const invitations = await rpc.invitation.getInvitations(
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7"
+)
+console.log(invitations) // Array of AvatarInfo
 ```
 
-***
+---
 
 ### getInvitationsFrom()
 
@@ -134,13 +141,13 @@ Array of invited addresses
 ```typescript
 // Get accepted invitations
 const accepted = await rpc.invitation.getInvitationsFrom(
-  '0xde374ece6fa50e781e81aac78e811b33d16912c7',
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7",
   true
-);
+)
 
 // Get pending invitations
 const pending = await rpc.invitation.getInvitationsFrom(
-  '0xde374ece6fa50e781e81aac78e811b33d16912c7',
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7",
   false
-);
+)
 ```
