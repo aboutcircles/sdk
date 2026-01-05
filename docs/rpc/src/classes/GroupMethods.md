@@ -6,7 +6,7 @@
 
 # Class: GroupMethods
 
-Defined in: [packages/rpc/src/methods/group.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L10)
+Defined in: [packages/rpc/src/methods/group.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L10)
 
 Group query RPC methods
 
@@ -18,7 +18,7 @@ Group query RPC methods
 new GroupMethods(client): GroupMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/group.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L11)
+Defined in: [packages/rpc/src/methods/group.ts:11](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L11)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/group.ts:11](https://github.com/aboutcircl
 findGroups(limit, params?): Promise<GroupRow[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/group.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L44)
+Defined in: [packages/rpc/src/methods/group.ts:44](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L44)
 
 Find groups with optional filters
 
@@ -98,7 +98,7 @@ getGroupMemberships(
 sortOrder): PagedQuery<GroupMembershipRow>;
 ```
 
-Defined in: [packages/rpc/src/methods/group.ts:89](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L89)
+Defined in: [packages/rpc/src/methods/group.ts:89](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L89)
 
 Get group memberships for an avatar using cursor-based pagination
 
@@ -147,7 +147,7 @@ console.log(query.currentPage.results);
 getGroupHolders(groupAddress, limit): PagedQuery<GroupTokenHolderRow>;
 ```
 
-Defined in: [packages/rpc/src/methods/group.ts:154](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L154)
+Defined in: [packages/rpc/src/methods/group.ts:154](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L154)
 
 Get holders of a group token using cursor-based pagination
 
@@ -204,7 +204,7 @@ getGroupMembers(
 sortOrder): PagedQuery<GroupMembershipRow>;
 ```
 
-Defined in: [packages/rpc/src/methods/group.ts:222](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L222)
+Defined in: [packages/rpc/src/methods/group.ts:222](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L222)
 
 Get members of a group using cursor-based pagination
 
@@ -264,7 +264,7 @@ getGroups(
 sortOrder?): PagedQuery<GroupRow>;
 ```
 
-Defined in: [packages/rpc/src/methods/group.ts:284](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/group.ts#L284)
+Defined in: [packages/rpc/src/methods/group.ts:284](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/group.ts#L284)
 
 Get groups using cursor-based pagination
 

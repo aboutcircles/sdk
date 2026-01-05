@@ -6,7 +6,7 @@
 
 # Interface: CirclesConfig
 
-Defined in: [packages/types/src/config.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L10)
+Defined in: [packages/types/src/config.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L10)
 
 Circles protocol configuration for a specific chain
 
@@ -18,7 +18,7 @@ Circles protocol configuration for a specific chain
 circlesRpcUrl: string;
 ```
 
-Defined in: [packages/types/src/config.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L12)
+Defined in: [packages/types/src/config.ts:12](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L12)
 
 RPC URL for Circles-specific endpoints
 
@@ -30,7 +30,7 @@ RPC URL for Circles-specific endpoints
 pathfinderUrl: string;
 ```
 
-Defined in: [packages/types/src/config.ts:14](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L14)
+Defined in: [packages/types/src/config.ts:14](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L14)
 
 Pathfinder service URL for computing transfer paths
 
@@ -42,9 +42,21 @@ Pathfinder service URL for computing transfer paths
 profileServiceUrl: string;
 ```
 
-Defined in: [packages/types/src/config.ts:16](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L16)
+Defined in: [packages/types/src/config.ts:16](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L16)
 
 Profile service URL for user profiles and metadata
+
+***
+
+### referralsServiceUrl?
+
+```ts
+optional referralsServiceUrl: string;
+```
+
+Defined in: [packages/types/src/config.ts:18](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L18)
+
+Referrals service URL for referral/invitation links (optional)
 
 ***
 
@@ -54,7 +66,7 @@ Profile service URL for user profiles and metadata
 v1HubAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:18](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L18)
+Defined in: [packages/types/src/config.ts:20](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L20)
 
 Circles V1 Hub contract address
 
@@ -66,7 +78,7 @@ Circles V1 Hub contract address
 v2HubAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L20)
+Defined in: [packages/types/src/config.ts:22](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L22)
 
 Circles V2 Hub contract address
 
@@ -78,7 +90,7 @@ Circles V2 Hub contract address
 nameRegistryAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L22)
+Defined in: [packages/types/src/config.ts:24](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L24)
 
 Name Registry contract address
 
@@ -90,7 +102,7 @@ Name Registry contract address
 baseGroupMintPolicy: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L24)
+Defined in: [packages/types/src/config.ts:26](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L26)
 
 Base Group Mint Policy contract address
 
@@ -102,7 +114,7 @@ Base Group Mint Policy contract address
 standardTreasury: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L26)
+Defined in: [packages/types/src/config.ts:28](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L28)
 
 Standard Treasury contract address
 
@@ -114,7 +126,7 @@ Standard Treasury contract address
 coreMembersGroupDeployer: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:28](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L28)
+Defined in: [packages/types/src/config.ts:30](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L30)
 
 Core Members Group Deployer contract address
 
@@ -126,7 +138,7 @@ Core Members Group Deployer contract address
 baseGroupFactoryAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L30)
+Defined in: [packages/types/src/config.ts:32](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L32)
 
 Base Group Factory contract address
 
@@ -138,7 +150,7 @@ Base Group Factory contract address
 liftERC20Address: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L32)
+Defined in: [packages/types/src/config.ts:34](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L34)
 
 Lift ERC20 contract address
 
@@ -150,6 +162,30 @@ Lift ERC20 contract address
 invitationEscrowAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/config.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/config.ts#L34)
+Defined in: [packages/types/src/config.ts:36](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L36)
 
 Invitation Escrow contract address
+
+***
+
+### invitationFarmAddress
+
+```ts
+invitationFarmAddress: `0x${string}`;
+```
+
+Defined in: [packages/types/src/config.ts:38](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L38)
+
+Invitation Farm contract address
+
+***
+
+### referralsModuleAddress
+
+```ts
+referralsModuleAddress: `0x${string}`;
+```
+
+Defined in: [packages/types/src/config.ts:40](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/config.ts#L40)
+
+Referrals Module contract address

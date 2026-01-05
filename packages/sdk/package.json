@@ -36,6 +36,7 @@
     "@aboutcircles/sdk-core": "*",
     "@aboutcircles/sdk-rpc": "*",
     "@aboutcircles/sdk-profiles": "*",
+    "@aboutcircles/sdk-referrals": "*",
     "@aboutcircles/sdk-utils": "*",
     "@aboutcircles/sdk-runner": "*",
     "@aboutcircles/sdk-pathfinder": "*",

@@ -21,6 +21,7 @@
     { "path": "./packages/core" },
     { "path": "./packages/rpc" },
     { "path": "./packages/profiles" },
+    { "path": "./packages/referrals" },
     { "path": "./packages/pathfinder" },
     { "path": "./packages/transfers" },
     { "path": "./packages/sdk" },

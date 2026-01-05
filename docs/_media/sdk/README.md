@@ -203,27 +203,23 @@ await sdk.profiles.createOrUpdate({
 
 ## Implementation Status
 
-⚠️ **Note**: This package is currently a skeleton implementation. Most methods throw "Not yet implemented" errors and are marked with TODO comments. The purpose is to establish the API surface for future implementation.
+✅ **Status**: This SDK is feature-complete and production-ready. All core functionality has been implemented.
 
 ### Implemented Features
 
 - ✅ SDK initialization with configuration
-- ✅ Avatar retrieval (getAvatar)
-- ✅ Profile retrieval by CID (via profiles package)
-
-### Not Yet Implemented
-
-Most features are marked with TODO and will throw errors:
-
-- Registration methods (asHuman, asOrganization, asGroup)
-- Balance operations
-- Transfer operations
-- Trust operations
-- Personal token minting
-- Profile updates
-- Group operations
-- Token wrapping
-- Event streaming
+- ✅ Avatar retrieval and type detection (getAvatar)
+- ✅ Registration methods (asHuman, asOrganization, asGroup)
+- ✅ Balance operations (total, detailed token balances)
+- ✅ Transfer operations (direct transfers, pathfinding with advanced options)
+- ✅ Trust operations (add, remove, check trust status)
+- ✅ Personal token minting and management
+- ✅ Profile management (get, update, metadata, short names)
+- ✅ Group operations (members, holders, collateral, treasury)
+- ✅ Token wrapping (demurraged and inflationary ERC20)
+- ✅ Event subscriptions and streaming
+- ✅ Transaction history
+- ✅ Profile creation and management via IPFS
 
 ## Architecture
 
@@ -237,12 +233,13 @@ The SDK package wraps and simplifies the following packages:
 
 ## Contributing
 
-To implement a method:
+To extend or improve the SDK:
 
-1. Remove the "TODO" comment
-2. Replace the `throw new Error('not yet implemented')` with actual implementation
-3. Use the underlying packages (core, rpc, profiles, etc.) to implement functionality
-4. Add tests and update documentation
+1. Update existing methods or add new features as needed
+2. Leverage the underlying packages (core, rpc, profiles, transfers, etc.)
+3. Add tests and update documentation
+4. Ensure all changes maintain backward compatibility
+5. Follow the established patterns and code style in the SDK
 
 ## License
 

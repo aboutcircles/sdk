@@ -6,7 +6,7 @@
 
 # Class: SdkError
 
-Defined in: [packages/sdk/src/errors.ts:19](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L19)
+Defined in: [packages/sdk/src/errors.ts:19](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L19)
 
 SDK-related errors
 
@@ -22,7 +22,7 @@ SDK-related errors
 new SdkError(message, options?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L20)
+Defined in: [packages/sdk/src/errors.ts:20](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L20)
 
 #### Parameters
 
@@ -66,7 +66,7 @@ CirclesError<SdkErrorSource>.constructor
 static notInitialized(component): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L35)
+Defined in: [packages/sdk/src/errors.ts:35](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L35)
 
 Create error for uninitialized components
 
@@ -88,7 +88,7 @@ Create error for uninitialized components
 static unsupportedOperation(operation, reason?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:46](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L46)
+Defined in: [packages/sdk/src/errors.ts:46](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L46)
 
 Create error for unsupported operations
 
@@ -114,7 +114,7 @@ Create error for unsupported operations
 static configError(message, context?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:60](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L60)
+Defined in: [packages/sdk/src/errors.ts:60](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L60)
 
 Create error for configuration issues
 
@@ -143,7 +143,7 @@ static operationFailed(
    cause?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:71](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L71)
+Defined in: [packages/sdk/src/errors.ts:71](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L71)
 
 Create error for failed operations
 
@@ -173,7 +173,7 @@ Create error for failed operations
 static missingContractRunner(operation?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:83](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L83)
+Defined in: [packages/sdk/src/errors.ts:83](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L83)
 
 Create error for missing contract runner
 
@@ -195,7 +195,7 @@ Create error for missing contract runner
 static avatarNotFound(address): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:99](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L99)
+Defined in: [packages/sdk/src/errors.ts:99](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L99)
 
 Create error for avatar not found
 
@@ -217,7 +217,7 @@ Create error for avatar not found
 static invalidProfile(reason, context?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:110](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L110)
+Defined in: [packages/sdk/src/errors.ts:110](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L110)
 
 Create error for invalid profile
 
@@ -246,7 +246,7 @@ static profileOperationFailed(
    cause?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:121](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L121)
+Defined in: [packages/sdk/src/errors.ts:121](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L121)
 
 Create error for profile operation failures
 
@@ -279,7 +279,7 @@ static insufficientBalance(
    token?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:133](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L133)
+Defined in: [packages/sdk/src/errors.ts:133](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L133)
 
 Create error for insufficient balance
 
@@ -309,7 +309,7 @@ Create error for insufficient balance
 static transactionDataExtractionFailed(dataType, reason?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:149](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L149)
+Defined in: [packages/sdk/src/errors.ts:149](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L149)
 
 Create error for transaction extraction failures
 
@@ -338,7 +338,7 @@ static registrationFailed(
    cause?): SdkError;
 ```
 
-Defined in: [packages/sdk/src/errors.ts:165](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/errors.ts#L165)
+Defined in: [packages/sdk/src/errors.ts:165](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/errors.ts#L165)
 
 Create error for registration failures
 

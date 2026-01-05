@@ -52,6 +52,7 @@ export abstract class CommonAvatar {
   protected _cachedProfile?: Profile;
   protected _cachedProfileCid?: string;
   protected _eventSubscription?: () => void;
+  private _hasSubscribed = false;
 
   constructor(
     address: Address,
@@ -88,6 +89,7 @@ export abstract class CommonAvatar {
     this.transferBuilder = new TransferBuilder(core);
 
     // Event subscription is optional - initialize with stub observable
+    // Actual subscription is handled by Sdk.getAvatar() when autoSubscribeEvents is enabled
     const stub = ObservableClass.create<CirclesEvent>();
     this.events = stub.property;
   }
@@ -689,6 +691,7 @@ export abstract class CommonAvatar {
   /**
    * Subscribe to Circles events for this avatar
    * Events are filtered to only include events related to this avatar's address
+   * This method is idempotent - calling it multiple times will not create duplicate subscriptions
    *
    * @returns Promise that resolves when subscription is established
    *
@@ -707,9 +710,25 @@ export abstract class CommonAvatar {
    * ```
    */
   async subscribeToEvents(): Promise<void> {
-    // Subscribe to events via RPC WebSocket
-    const observable = await this.rpc.client.subscribe(this.address);
-    this.events = observable;
+    // Make idempotent - only subscribe once
+    if (this._hasSubscribed) {
+      return;
+    }
+    this._hasSubscribed = true;
+
+    try {
+      // Subscribe to events via RPC WebSocket
+      const observable = await this.rpc.client.subscribe(this.address);
+      this.events = observable;
+    } catch (e) {
+      // Reset flag on error so it can be retried
+      this._hasSubscribed = false;
+      throw SdkError.operationFailed(
+        'subscribeToEvents',
+        'Failed to subscribe to avatar events',
+        e
+      );
+    }
   }
 
   /**
