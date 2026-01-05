@@ -32,6 +32,7 @@
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-types": "*",
+    "@noble/hashes": "^2.0.1",
     "multiformats": "^13.4.1"
   }
 }
