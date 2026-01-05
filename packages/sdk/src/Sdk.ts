@@ -11,6 +11,7 @@ import type {
 import type { GroupTokenHolderRow } from '@aboutcircles/sdk-rpc';
 import { circlesConfig, Core, CirclesType, BaseGroupContract } from '@aboutcircles/sdk-core';
 import { Profiles } from '@aboutcircles/sdk-profiles';
+import { Referrals } from '@aboutcircles/sdk-referrals';
 import { CirclesRpc, PagedQuery } from '@aboutcircles/sdk-rpc';
 import { cidV0ToHex } from '@aboutcircles/sdk-utils';
 import { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars';
@@ -54,6 +55,7 @@ export class Sdk {
   public readonly core: Core;
   public readonly rpc: CirclesRpc;
   private readonly profilesClient: Profiles;
+  private readonly referralsClient?: Referrals;
 
   public readonly data: CirclesData = {
     getAvatar: async (address: Address): Promise<AvatarInfo | undefined> => {
@@ -80,6 +82,11 @@ export class Sdk {
     this.core = new Core(config);
     this.rpc = new CirclesRpc(config.circlesRpcUrl);
     this.profilesClient = new Profiles(config.profileServiceUrl);
+
+    // Initialize referrals client if service URL is configured
+    if (config.referralsServiceUrl) {
+      this.referralsClient = new Referrals(config.referralsServiceUrl);
+    }
 
     // Validate and extract sender address from contract runner
     if (contractRunner) {
@@ -453,6 +460,64 @@ export class Sdk {
      */
     get: async (cid: string): Promise<Profile | undefined> => {
       return await this.profilesClient.get(cid);
+    },
+  };
+
+  /**
+   * Referral/invitation management methods
+   *
+   * The referrals backend enables users to invite others via referral links.
+   * Requires referralsServiceUrl to be configured in CirclesConfig.
+   */
+  public readonly referrals = {
+    /**
+     * Store a referral private key
+     *
+     * The private key is validated on-chain via ReferralsModule.accounts() to ensure
+     * the account exists and has not been claimed. The inviter address is self-declared
+     * for dashboard visibility only.
+     *
+     * @param privateKey - The referral private key (0x-prefixed, 64 hex chars)
+     * @param inviter - Self-declared inviter address for dashboard visibility
+     * @throws Error if referrals service not configured or validation fails
+     */
+    store: async (privateKey: string, inviter: Address): Promise<void> => {
+      if (!this.referralsClient) {
+        throw SdkError.configError('Referrals service not configured. Set referralsServiceUrl in CirclesConfig.');
+      }
+      return await this.referralsClient.store(privateKey, inviter);
+    },
+
+    /**
+     * Retrieve referral info by private key
+     *
+     * This is a public endpoint - no authentication required.
+     * Used by invitees to look up who invited them.
+     *
+     * @param privateKey - The referral private key
+     * @returns Referral info including inviter and status
+     * @throws Error if referrals service not configured or referral not found
+     */
+    retrieve: async (privateKey: string) => {
+      if (!this.referralsClient) {
+        throw SdkError.configError('Referrals service not configured. Set referralsServiceUrl in CirclesConfig.');
+      }
+      return await this.referralsClient.retrieve(privateKey);
+    },
+
+    /**
+     * List all referrals created by the authenticated user
+     *
+     * Requires authentication - must configure a token provider.
+     *
+     * @returns List of referrals with their status and metadata
+     * @throws Error if referrals service not configured or not authenticated
+     */
+    listMine: async () => {
+      if (!this.referralsClient) {
+        throw SdkError.configError('Referrals service not configured. Set referralsServiceUrl in CirclesConfig.');
+      }
+      return await this.referralsClient.listMine();
     },
   };
 
