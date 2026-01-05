@@ -26,7 +26,7 @@ export class Referrals {
       : this.baseUrl;
   }
 
-  private async getAuthHeaders(): Promise<HeadersInit> {
+  private async getAuthHeaders(): Promise<Record<string, string>> {
     if (!this.getToken) {
       return { "Content-Type": "application/json" };
     }
