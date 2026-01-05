@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-types",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "TypeScript type definitions for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",
@@ -24,6 +24,10 @@
     "types",
     "typescript"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
   "license": "MIT",
   "dependencies": {
     "abitype": "^1.1.1"

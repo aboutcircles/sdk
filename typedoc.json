@@ -7,6 +7,7 @@
     "packages/runner/src/index.ts",
     "packages/utils/src/index.ts",
     "packages/profiles/src/index.ts",
+    "packages/referrals/src/index.ts",
     "packages/pathfinder/src/index.ts",
     "packages/transfers/src/index.ts",
     "packages/abis/src/index.ts"

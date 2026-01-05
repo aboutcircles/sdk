@@ -6,7 +6,7 @@
 
 # Class: SafeBrowserRunner
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L23)
+Defined in: [packages/runner/src/safe-browser-runner.ts:23](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L23)
 
 Safe browser contract runner implementation using Safe Protocol Kit
 Executes transactions through a Safe multisig wallet using the browser's Web3 provider
@@ -29,7 +29,7 @@ new SafeBrowserRunner(
    safeAddress?): SafeBrowserRunner;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:57](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L57)
+Defined in: [packages/runner/src/safe-browser-runner.ts:57](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L57)
 
 Creates a new SafeBrowserRunner
 
@@ -82,7 +82,7 @@ await runner.init();
 optional address: string;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L24)
+Defined in: [packages/runner/src/safe-browser-runner.ts:24](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L24)
 
 The address of the account (if available)
 
@@ -100,7 +100,7 @@ ContractRunner.address
 publicClient: object;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:25](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L25)
+Defined in: [packages/runner/src/safe-browser-runner.ts:25](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L25)
 
 The public client for reading blockchain state
 
@@ -122,7 +122,7 @@ static create(
 chain): Promise<SafeBrowserRunner>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:88](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L88)
+Defined in: [packages/runner/src/safe-browser-runner.ts:88](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L88)
 
 Create and initialize a SafeBrowserRunner in one step
 
@@ -178,7 +178,7 @@ const runner = await SafeBrowserRunner.create(
 init(safeAddress?): Promise<void>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:109](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L109)
+Defined in: [packages/runner/src/safe-browser-runner.ts:109](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L109)
 
 Initialize the runner with a Safe address
 
@@ -212,7 +212,7 @@ ContractRunner.init
 estimateGas(tx): Promise<bigint>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:145](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L145)
+Defined in: [packages/runner/src/safe-browser-runner.ts:145](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L145)
 
 Estimate gas for a transaction
 
@@ -240,7 +240,7 @@ ContractRunner.estimateGas
 call(tx): Promise<string>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:161](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L161)
+Defined in: [packages/runner/src/safe-browser-runner.ts:161](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L161)
 
 Call a contract (read-only operation)
 
@@ -268,7 +268,7 @@ ContractRunner.call
 resolveName(name): Promise<string | null>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:179](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L179)
+Defined in: [packages/runner/src/safe-browser-runner.ts:179](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L179)
 
 Resolve an ENS name to an address
 
@@ -296,7 +296,7 @@ ContractRunner.resolveName
 sendTransaction(txs): Promise<TransactionReceipt>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:199](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L199)
+Defined in: [packages/runner/src/safe-browser-runner.ts:199](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L199)
 
 Send one or more transactions through the Safe and wait for confirmation
 All transactions are batched and executed atomically
@@ -331,7 +331,7 @@ ContractRunner.sendTransaction
 sendBatchTransaction(): SafeBrowserBatchRun;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:247](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L247)
+Defined in: [packages/runner/src/safe-browser-runner.ts:247](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L247)
 
 Create a batch transaction runner
 

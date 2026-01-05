@@ -6,7 +6,7 @@
 
 # Class: TransferBuilder
 
-Defined in: [packages/transfers/src/TransferBuilder.ts:18](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/transfers/src/TransferBuilder.ts#L18)
+Defined in: [packages/transfers/src/TransferBuilder.ts:18](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/transfers/src/TransferBuilder.ts#L18)
 
 TransferBuilder constructs transfer transactions without executing them
 Handles pathfinding, wrapped token unwrapping/wrapping, and flow matrix construction
@@ -19,7 +19,7 @@ Handles pathfinding, wrapped token unwrapping/wrapping, and flow matrix construc
 new TransferBuilder(core): TransferBuilder;
 ```
 
-Defined in: [packages/transfers/src/TransferBuilder.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/transfers/src/TransferBuilder.ts#L22)
+Defined in: [packages/transfers/src/TransferBuilder.ts:22](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/transfers/src/TransferBuilder.ts#L22)
 
 #### Parameters
 
@@ -43,7 +43,7 @@ constructAdvancedTransfer(
 options?): Promise<object[]>;
 ```
 
-Defined in: [packages/transfers/src/TransferBuilder.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/transfers/src/TransferBuilder.ts#L37)
+Defined in: [packages/transfers/src/TransferBuilder.ts:37](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/transfers/src/TransferBuilder.ts#L37)
 
 Construct an advanced transfer transaction
 Returns the list of transactions to execute without executing them
@@ -88,7 +88,7 @@ Array of transactions to execute in order
 constructReplenish(avatarAddress, options?): Promise<object[]>;
 ```
 
-Defined in: [packages/transfers/src/TransferBuilder.ts:227](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/transfers/src/TransferBuilder.ts#L227)
+Defined in: [packages/transfers/src/TransferBuilder.ts:227](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/transfers/src/TransferBuilder.ts#L227)
 
 Construct a replenish transaction to convert wrapped/other tokens into unwrapped personal CRC
 This uses pathfinder to find the best way to convert available tokens (including wrapped tokens)

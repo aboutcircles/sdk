@@ -49,6 +49,7 @@ export type { GroupRow, GroupMembershipRow, GroupQueryParams } from './group';
 // Pathfinding types
 export type {
   SimulatedBalance,
+  SimulatedTrust,
   FindPathParams,
   TransferStep,
   PathfindingResult,

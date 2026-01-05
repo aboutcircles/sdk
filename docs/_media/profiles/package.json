@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-profiles",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Minimal IPFS/CID pinning service for Circles profiles",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,10 @@
     "profiles",
     "pinning"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-types": "*"

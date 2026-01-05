@@ -6,7 +6,7 @@
 
 # Class: RpcError
 
-Defined in: [packages/rpc/src/errors.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L20)
+Defined in: [packages/rpc/src/errors.ts:20](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L20)
 
 RPC-related errors
 
@@ -22,7 +22,7 @@ RPC-related errors
 new RpcError(message, options?): RpcError;
 ```
 
-Defined in: [packages/rpc/src/errors.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L21)
+Defined in: [packages/rpc/src/errors.ts:21](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L21)
 
 #### Parameters
 
@@ -66,7 +66,7 @@ CirclesError<RpcErrorSource>.constructor
 static connectionFailed(url, cause?): RpcError;
 ```
 
-Defined in: [packages/rpc/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L36)
+Defined in: [packages/rpc/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L36)
 
 Create error for connection failures
 
@@ -92,7 +92,7 @@ Create error for connection failures
 static timeout(method, timeout): RpcError;
 ```
 
-Defined in: [packages/rpc/src/errors.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L48)
+Defined in: [packages/rpc/src/errors.ts:48](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L48)
 
 Create error for timeout
 
@@ -118,7 +118,7 @@ Create error for timeout
 static invalidResponse(method, response): RpcError;
 ```
 
-Defined in: [packages/rpc/src/errors.ts:59](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L59)
+Defined in: [packages/rpc/src/errors.ts:59](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L59)
 
 Create error for invalid response
 
@@ -144,7 +144,7 @@ Create error for invalid response
 static fromJsonRpcError(error): RpcError;
 ```
 
-Defined in: [packages/rpc/src/errors.ts:70](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L70)
+Defined in: [packages/rpc/src/errors.ts:70](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L70)
 
 Create error from JSON-RPC error response
 
@@ -176,7 +176,7 @@ Create error from JSON-RPC error response
 static websocketError(message, cause?): RpcError;
 ```
 
-Defined in: [packages/rpc/src/errors.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/errors.ts#L81)
+Defined in: [packages/rpc/src/errors.ts:81](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/errors.ts#L81)
 
 Create error for WebSocket failures
 
