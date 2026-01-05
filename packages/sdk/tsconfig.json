@@ -14,6 +14,7 @@
     { "path": "../core" },
     { "path": "../rpc" },
     { "path": "../profiles" },
+    { "path": "../referrals" },
     { "path": "../utils" },
     { "path": "../runner" },
     { "path": "../pathfinder" },
