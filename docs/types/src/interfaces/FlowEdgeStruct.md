@@ -6,7 +6,7 @@
 
 # Interface: FlowEdgeStruct
 
-Defined in: [packages/types/src/pathfinding.ts:56](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L56)
+Defined in: [packages/types/src/pathfinding.ts:65](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L65)
 
 Flow edge structure for operateFlowMatrix
 Corresponds to TypeDefinitions.FlowEdge in the Hub V2 contract
@@ -19,7 +19,7 @@ Corresponds to TypeDefinitions.FlowEdge in the Hub V2 contract
 streamSinkId: number;
 ```
 
-Defined in: [packages/types/src/pathfinding.ts:57](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L57)
+Defined in: [packages/types/src/pathfinding.ts:66](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L66)
 
 ***
 
@@ -29,4 +29,4 @@ Defined in: [packages/types/src/pathfinding.ts:57](https://github.com/aboutcircl
 amount: bigint;
 ```
 
-Defined in: [packages/types/src/pathfinding.ts:58](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L58)
+Defined in: [packages/types/src/pathfinding.ts:67](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L67)

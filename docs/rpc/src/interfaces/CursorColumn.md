@@ -6,7 +6,7 @@
 
 # Interface: CursorColumn
 
-Defined in: [packages/rpc/src/types.ts:70](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L70)
+Defined in: [packages/rpc/src/types.ts:70](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L70)
 
 Configuration for a cursor column in pagination
 
@@ -18,7 +18,7 @@ Configuration for a cursor column in pagination
 name: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:71](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L71)
+Defined in: [packages/rpc/src/types.ts:71](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L71)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/rpc/src/types.ts:71](https://github.com/aboutcircles/sdk-v
 sortOrder: "ASC" | "DESC";
 ```
 
-Defined in: [packages/rpc/src/types.ts:72](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L72)
+Defined in: [packages/rpc/src/types.ts:72](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L72)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/types.ts:72](https://github.com/aboutcircles/sdk-v
 optional toValue: (value) => string | number | boolean;
 ```
 
-Defined in: [packages/rpc/src/types.ts:73](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L73)
+Defined in: [packages/rpc/src/types.ts:73](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L73)
 
 #### Parameters
 

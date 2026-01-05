@@ -10,6 +10,6 @@
 type TransfersErrorSource = "TRANSFERS" | "PATHFINDING" | "FLOW_MATRIX" | "VALIDATION";
 ```
 
-Defined in: [packages/transfers/src/errors.ts:7](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/transfers/src/errors.ts#L7)
+Defined in: [packages/transfers/src/errors.ts:7](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/transfers/src/errors.ts#L7)
 
 Transfers package error source

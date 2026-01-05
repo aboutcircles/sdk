@@ -10,6 +10,6 @@
 type CoreErrorSource = "CORE" | "CONTRACT" | "TRANSACTION" | "GAS_ESTIMATION" | "NETWORK";
 ```
 
-Defined in: [packages/core/src/errors.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L10)
+Defined in: [packages/core/src/errors.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/errors.ts#L10)
 
 Core-specific error sources

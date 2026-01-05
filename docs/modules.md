@@ -11,6 +11,7 @@
 - [core/src](core/src/README.md)
 - [pathfinder/src](pathfinder/src/README.md)
 - [profiles/src](profiles/src/README.md)
+- [referrals/src](referrals/src/README.md)
 - [rpc/src](rpc/src/README.md)
 - [runner/src](runner/src/README.md)
 - [transfers/src](transfers/src/README.md)

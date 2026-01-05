@@ -6,7 +6,7 @@
 
 # Class: QueryMethods
 
-Defined in: [packages/rpc/src/methods/query.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L8)
+Defined in: [packages/rpc/src/methods/query.ts:8](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/query.ts#L8)
 
 Query and table RPC methods
 
@@ -18,7 +18,7 @@ Query and table RPC methods
 new QueryMethods(client): QueryMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L9)
+Defined in: [packages/rpc/src/methods/query.ts:9](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/query.ts#L9)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/query.ts:9](https://github.com/aboutcircle
 query<T>(params): Promise<T[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:45](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L45)
+Defined in: [packages/rpc/src/methods/query.ts:45](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/query.ts#L45)
 
 Query tables with filters
 
@@ -99,7 +99,7 @@ const results = await rpc.query.query({
 tables(): Promise<TableInfo[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:61](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L61)
+Defined in: [packages/rpc/src/methods/query.ts:61](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/query.ts#L61)
 
 Return all available namespaces and tables which can be queried
 
@@ -129,7 +129,7 @@ events<T>(
 includeTransactionData): Promise<T[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:86](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L86)
+Defined in: [packages/rpc/src/methods/query.ts:86](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/query.ts#L86)
 
 Query events of specific types within a block range
 

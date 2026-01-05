@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Simplified Circles SDK for non-crypto users with low entrance barrier",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm && tsc --emitDeclarationOnly",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
@@ -26,12 +26,17 @@
     "web3",
     "ubi"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-types": "*",
     "@aboutcircles/sdk-core": "*",
     "@aboutcircles/sdk-rpc": "*",
     "@aboutcircles/sdk-profiles": "*",
+    "@aboutcircles/sdk-referrals": "*",
     "@aboutcircles/sdk-utils": "*",
     "@aboutcircles/sdk-runner": "*",
     "@aboutcircles/sdk-pathfinder": "*",
