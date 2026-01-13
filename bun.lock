@@ -35,6 +35,23 @@
         "typescript": "^5.0.4",
       },
     },
+    "packages/invitations": {
+      "name": "@aboutcircles/sdk-invitations",
+      "version": "0.1.4",
+      "dependencies": {
+        "@aboutcircles/sdk-core": "*",
+        "@aboutcircles/sdk-pathfinder": "*",
+        "@aboutcircles/sdk-rpc": "*",
+        "@aboutcircles/sdk-types": "*",
+        "@aboutcircles/sdk-utils": "*",
+      },
+      "devDependencies": {
+        "@esbuild-kit/esm-loader": "^2.6.5",
+        "@types/bun": "^1.2.23",
+        "esbuild": "^0.25.10",
+        "typescript": "^5.0.4",
+      },
+    },
     "packages/pathfinder": {
       "name": "@aboutcircles/sdk-pathfinder",
       "version": "0.1.4",
@@ -143,6 +160,8 @@
     "@aboutcircles/sdk-abis": ["@aboutcircles/sdk-abis@workspace:packages/abis"],
 
     "@aboutcircles/sdk-core": ["@aboutcircles/sdk-core@workspace:packages/core"],
+
+    "@aboutcircles/sdk-invitations": ["@aboutcircles/sdk-invitations@workspace:packages/invitations"],
 
     "@aboutcircles/sdk-pathfinder": ["@aboutcircles/sdk-pathfinder@workspace:packages/pathfinder"],
 

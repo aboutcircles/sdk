@@ -55,6 +55,7 @@
     "packages/pathfinder",
     "packages/profiles",
     "packages/transfers",
+    "packages/invitations",
     "packages/sdk"
   ]
 }

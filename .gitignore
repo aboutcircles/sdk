@@ -39,3 +39,6 @@ coverage/
 
 # Misc
 .cache/
+
+# AI
+CLAUDE.md

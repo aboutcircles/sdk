@@ -36,4 +36,6 @@ export interface CirclesConfig {
   invitationFarmAddress: Address;
   /** Referrals Module contract address */
   referralsModuleAddress: Address;
+  /** Invitation Module contract address */
+  invitationModuleAddress: Address;
 }
