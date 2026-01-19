@@ -22,11 +22,10 @@ export interface ProxyInviter {
   possibleInvites: number;
 }
 
-export interface ReferralResult {
-  privateKey: `0x${string}`;
-  transactions: TransactionRequest[];
-}
-// @todo use personal tokens as a priority
+/**
+ * InvitationBuilder handles invitation operations for Circles
+ * Supports both referral invitations (new users) and direct invitations (existing Safe wallets)
+ */
 export class InvitationBuilder {
   private core: Core;
   private rpc: CirclesRpc;
@@ -34,6 +33,63 @@ export class InvitationBuilder {
   constructor(core: Core) {
     this.core = core;
     this.rpc = new CirclesRpc(core.config.circlesRpcUrl);
+  }
+
+  /**
+   * Save referral data to database (mock implementation)
+   *
+   * @param inviter - Address of the inviter
+   * @param privateKey - Private key generated for the new user
+   * @param signerAddress - Signer address derived from the private key
+   *
+   * @description
+   * This is a placeholder function for saving referral data.
+   * The actual implementation will store this data in a database for tracking invitations.
+   *
+   * Data to be stored:
+   * - Inviter address
+   * - Generated private key (encrypted)
+   * - Signer address
+   * - Timestamp
+   * - Status (pending/completed)
+   */
+  private async saveReferralData(
+    inviter: Address,
+    privateKey: `0x${string}`,
+    signerAddress: Address
+  ): Promise<void> {
+    // TODO: Implement actual database storage logic
+    // For now, just log the data
+    console.log('\n=== SAVING REFERRAL DATA ===');
+    console.log(`Inviter: ${inviter}`);
+    console.log(`Private Key: ${privateKey}`);
+    console.log(`Signer Address: ${signerAddress}`);
+    console.log(`Timestamp: ${new Date().toISOString()}`);
+    console.log('=== DATA SAVED (MOCK) ===\n');
+  }
+
+  /**
+   * Order real inviters by preference (best to worst)
+   *
+   * @param realInviters - Array of valid real inviters with their addresses and possible invites
+   * @returns Ordered array of real inviters (best candidates first)
+   *
+   * @description
+   * This function determines the optimal order for selecting real inviters.
+   * Current implementation returns the list as-is (no sorting).
+   *
+   * Future sorting criteria (to be implemented):
+   * - Number of possible invites (more is better)
+   * - Token balance amount (higher is better)
+   * - Trust relationship strength/history
+   * - Previous invitation success rate
+   * - Gas cost considerations
+   * - Personal tokens prioritization
+   */
+  private orderRealInviters(realInviters: ProxyInviter[]): ProxyInviter[] {
+    // TODO: Implement sorting logic
+    // For now, return the list as-is
+    return realInviters;
   }
 
   /**
@@ -62,14 +118,7 @@ export class InvitationBuilder {
     const isHuman = await this.core.hubV2.isHuman(inviteeLower);
 
     if (isHuman) {
-      throw new InvitationError(
-        `Invitee ${inviteeLower} is already registered as a human in Circles Hub. Cannot invite an already registered user.`,
-        {
-          code: 'INVITEE_ALREADY_REGISTERED',
-          source: 'VALIDATION',
-          context: { inviter: inviterLower, invitee: inviteeLower }
-        }
-      );
+      throw InvitationError.inviteeAlreadyRegistered(inviterLower, inviteeLower);
     }
 
     // Step 2: Find path to invitation module using proxy inviters
@@ -83,14 +132,14 @@ export class InvitationBuilder {
     // Step 4: Build transactions using TransferBuilder to properly handle wrapped tokens
     const transferBuilder = new TransferBuilder(this.core.config);
 
-    // Get the proxy inviter address from the path
-    const proxyInviters = await this.getProxyInviters(inviterLower);
+    // Get the real inviter address from the path
+    const realInviters = await this.getRealInviters(inviterLower);
 
-    if (proxyInviters.length === 0) {
+    if (realInviters.length === 0) {
       throw InvitationError.noPathFound(inviterLower, this.core.config.invitationModuleAddress);
     }
 
-    const proxyInviterAddress = proxyInviters[0].address;
+    const realInviterAddress = realInviters[0].address;
 
     // Use the buildFlowMatrixTx method to construct transactions from the path
     const transferTransactions = await transferBuilder.buildFlowMatrixTx(
@@ -98,7 +147,7 @@ export class InvitationBuilder {
       this.core.config.invitationModuleAddress,
       path,
       {
-        toTokens: [proxyInviterAddress],
+        toTokens: [realInviterAddress],
         useWrappedBalances: true,
         txData: hexToBytes(transferData)
       },
@@ -143,14 +192,14 @@ export class InvitationBuilder {
     if (proxyInviterAddress) {
       tokenToUse = proxyInviterAddress.toLowerCase() as Address;
     } else {
-      // Get proxy inviters and use the first one
-      const proxyInviters = await this.getProxyInviters(inviterLower);
+      // Get real inviters and use the first one
+      const realInviters = await this.getRealInviters(inviterLower);
 
-      if (proxyInviters.length === 0) {
+      if (realInviters.length === 0) {
         throw InvitationError.noPathFound(inviterLower, this.core.config.invitationModuleAddress);
       }
 
-      tokenToUse = proxyInviters[0].address;
+      tokenToUse = realInviters[0].address;
     }
 
     // Find path using the selected token
@@ -183,33 +232,30 @@ export class InvitationBuilder {
   }
 
   /**
-   * Get proxy inviters who have enough balance to cover invitation fees
+   * Get real inviters who have enough balance to cover invitation fees
    *
    * @param inviter - Address of the inviter
-   * @returns Array of proxy inviters with their addresses and possible number of invitations
+   * @returns Array of real inviters with their addresses and possible number of invitations
    *
    * @description
    * This function:
    * 1. Gets all addresses that trust the inviter (set1) - includes both one-way trusts and mutual trusts
    * 2. Gets all addresses trusted by the invitation module (set2) - includes both one-way trusts and mutual trusts
    * 3. Finds the intersection of set1 and set2
-   * 4. Builds a path from inviter to invitation module using intersection addresses as toTokens
-   * 5. Sums up transferred token amounts by tokenOwner
-   * 6. Calculates possible invites (1 invite = 96 CRC)
-   * 7. Returns only those token owners whose total amounts exceed the invitation fee (96 CRC)
+   * 4. Adds the inviter's own address to the list of possible tokens
+   * 5. Builds a path from inviter to invitation module using intersection addresses as toTokens
+   * 6. Sums up transferred token amounts by tokenOwner
+   * 7. Calculates possible invites (1 invite = 96 CRC)
+   * 8. Orders real inviters by preference (best candidates first)
+   * 9. Returns only those token owners whose total amounts exceed the invitation fee (96 CRC)
    */
-  async getProxyInviters(inviter: Address): Promise<ProxyInviter[]> {
-    // @todo separately check if the inviter is trusted by the invitation module and direct invite is possible 
+  async getRealInviters(inviter: Address): Promise<ProxyInviter[]> {
     const inviterLower = inviter.toLowerCase() as Address;
 
     // Step 1: Get addresses that trust the inviter (set1)
     // This includes both one-way incoming trusts and mutual trusts
     const trustedByRelations = await this.rpc.trust.getTrustedBy(inviterLower);
     const mutualTrustRelations = await this.rpc.trust.getMutualTrusts(inviterLower);
-
-    if (trustedByRelations.length === 0 && mutualTrustRelations.length === 0) {
-      return [];
-    }
 
     // Extract the addresses of avatars who trust the inviter
     // Combine both trustedBy (one-way) and mutualTrusts
@@ -236,17 +282,16 @@ export class InvitationBuilder {
       }
     }
 
-    if (intersection.length === 0) {
+    // Step 4: Add the inviter's own address to the list of possible tokens
+    // This allows the inviter to use their own personal tokens for invitations
+    const tokensToUse = [...intersection, inviterLower];
+
+    // If no tokens available at all, return empty
+    if (tokensToUse.length === 0) {
       return [];
     }
 
-    const tokensToUse = intersection;
-    console.log('Invitation Module Address:', this.core.config.invitationModuleAddress);
-    console.log('Addresses that trust inviter:', trustedByInviter.size);
-    console.log('Addresses trusted by module:', trustedByModule.size);
-    console.log('Intersection (toTokens):', tokensToUse.length, tokensToUse);
-
-    // Step 4: Build path from inviter to invitation module
+    // Step 5: Build path from inviter to invitation module
     const path = await this.rpc.pathfinder.findPath({
       from: inviterLower,
       to: this.core.config.invitationModuleAddress,
@@ -259,7 +304,7 @@ export class InvitationBuilder {
       return [];
     }
 
-    // Step 5: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
+    // Step 6: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
     const tokenOwnerAmounts = new Map<string, bigint>();
     const invitationModuleLower = this.core.config.invitationModuleAddress.toLowerCase();
 
@@ -272,40 +317,47 @@ export class InvitationBuilder {
       }
     }
 
-    // Step 6: Calculate possible invites and filter token owners
-    const proxyInviters: ProxyInviter[] = [];
+    // Step 7: Calculate possible invites and filter token owners
+    const realInviters: ProxyInviter[] = [];
 
     for (const [tokenOwner, amount] of tokenOwnerAmounts.entries()) {
       const possibleInvites = Number(amount / INVITATION_FEE);
       console.log(`Token Owner: ${tokenOwner}, Total Amount to Module: ${amount / BigInt(10 ** 18)} CRC, Possible Invites: ${possibleInvites}`);
 
       if (possibleInvites >= 1) {
-        proxyInviters.push({
+        realInviters.push({
           address: tokenOwner as Address,
           possibleInvites
         });
       }
     }
 
-    return proxyInviters;
+    // Step 8: Order real inviters by preference (best candidates first)
+    const orderedRealInviters = this.orderRealInviters(realInviters);
+
+    return orderedRealInviters;
   }
   /**
    * Generate a referral for inviting a new user
    *
    * @param inviter - Address of the inviter
-   * @returns Object containing the private key and transaction batch
+   * @returns Array of transactions to execute in order
    *
    * @description
    * This function:
    * 1. Generates a new private key and signer address for the invitee
    * 2. Finds a proxy inviter (someone who has balance and is trusted by both inviter and invitation module)
-   * 3. Builds transaction batch including trust, transfers, and invitation
+   * 3. Builds transaction batch including transfers and invitation
    * 4. Uses generateInviteData to properly encode the Safe account creation data
-   * 5. Returns the private key (to share with invitee) and transactions (to execute)
+   * 5. Saves the referral data (private key, signer, inviter) to database
+   * 6. Returns transactions ready to execute
+   *
+   * Note: The private key is saved via saveReferralData and not returned.
+   * Retrieve it from the database using the inviter and signer addresses.
    */
   async generateReferral(
     inviter: Address
-  ): Promise<ReferralResult> {
+  ): Promise<TransactionRequest[]> {
     const inviterLower = inviter.toLowerCase() as Address;
 
     // Step 1: Generate private key and derive signer address
@@ -314,20 +366,19 @@ export class InvitationBuilder {
     console.log(`  Private Key: ${privateKey}`);
     console.log(`  Signer Address: ${signerAddress}`);
 
-    // Step 2: Get proxy inviters
-    const proxyInviters = await this.getProxyInviters(inviterLower);
+    // Step 2: Get real inviters
+    const realInviters = await this.getRealInviters(inviterLower);
 
-    if (proxyInviters.length === 0) {
-      // @todo allow to be a direct inviter
-      throw new Error('No proxy inviters found');
+    if (realInviters.length === 0) {
+      throw InvitationError.noProxyInviters(inviterLower);
     }
 
-    // Step 3: Pick the first proxy inviter
-    const firstProxyInviter = proxyInviters[0];
-    const proxyInviterAddress = firstProxyInviter.address;
+    // Step 3: Pick the first real inviter
+    const firstRealInviter = realInviters[0];
+    const realInviterAddress = firstRealInviter.address;
 
     // Step 4: Find path to invitation module
-    const path = await this.findInvitePath(inviterLower, proxyInviterAddress);
+    const path = await this.findInvitePath(inviterLower, realInviterAddress);
 
     // Step 5: Build transactions using TransferBuilder to properly handle wrapped tokens
     const transferBuilder = new TransferBuilder(this.core.config);
@@ -340,39 +391,28 @@ export class InvitationBuilder {
       this.core.config.invitationModuleAddress,
       path,
       {
-        toTokens: [proxyInviterAddress],
+        toTokens: [realInviterAddress],
         useWrappedBalances: true,
         txData: hexToBytes(transferData)
       },
       true
     );
 
-    // Step 6: Build final transaction batch
+    // Step 6: Save referral data to database
+    await this.saveReferralData(inviterLower, privateKey, signerAddress);
+
+    // Step 7: Build final transaction batch
     const transactions: TransactionRequest[] = [];
     transactions.push(...transferTransactions);
-    // TX 1: Trust proxy inviter if not already trusted
-    // (TransferBuilder includes approval if needed, so we only add trust if needed)
-
-    // TX 2: Add all transfer transactions (approval, unwraps, operateFlowMatrix, wraps)
-
-    // Step 7: Generate invitation data using generateInviteData
-    // This will create the proper data for creating the Safe account via ReferralsModule
-
-    // TX 4: Untrust proxy inviter if it wasn't trusted before
-    // @todo remove before production
     console.log(`\nTotal transactions: ${transactions.length}`);
     console.log('\n=== TRANSACTION BATCH ===');
     console.dir(transactions, { depth: null });
 
     console.log('\n=== REFERRAL RESULT ===');
-    console.log(`Private Key: ${privateKey}`);
     console.log(`Signer Address: ${signerAddress}`);
-    console.log(`Proxy Inviter: ${proxyInviterAddress}`);
-    // @todo connect the result to the referrals module to track invitations
-    return {
-      privateKey,
-      transactions
-    };
+    console.log(`Real Inviter: ${realInviterAddress}`);
+
+    return transactions;
   }
 
   /**
@@ -391,13 +431,7 @@ export class InvitationBuilder {
    */
   async generateInviteData(addresses: Address[], useSafeCreation: boolean = true): Promise<`0x${string}`> {
     if (addresses.length === 0) {
-      throw new InvitationError(
-        'At least one address must be provided',
-        {
-          code: 'NO_ADDRESSES_PROVIDED',
-          source: 'VALIDATION'
-        }
-      );
+      throw InvitationError.noAddressesProvided();
     }
 
     // If NOT using Safe creation, encode addresses directly (for existing Safe wallets)
