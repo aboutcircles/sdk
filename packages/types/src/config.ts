@@ -14,6 +14,8 @@ export interface CirclesConfig {
   pathfinderUrl: string;
   /** Profile service URL for user profiles and metadata */
   profileServiceUrl: string;
+  /** Referrals service URL for storing referral data */
+  referralsServiceUrl: string;
   /** Circles V1 Hub contract address */
   v1HubAddress: Address;
   /** Circles V2 Hub contract address */

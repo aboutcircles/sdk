@@ -36,36 +36,47 @@ export class InvitationBuilder {
   }
 
   /**
-   * Save referral data to database (mock implementation)
+   * Save referral data to the referrals service
    *
    * @param inviter - Address of the inviter
    * @param privateKey - Private key generated for the new user
-   * @param signerAddress - Signer address derived from the private key
    *
    * @description
-   * This is a placeholder function for saving referral data.
-   * The actual implementation will store this data in a database for tracking invitations.
-   *
-   * Data to be stored:
-   * - Inviter address
-   * - Generated private key (encrypted)
-   * - Signer address
-   * - Timestamp
-   * - Status (pending/completed)
+   * Sends a POST request to the referrals service to store referral data.
    */
   private async saveReferralData(
     inviter: Address,
-    privateKey: `0x${string}`,
-    signerAddress: Address
+    privateKey: `0x${string}`
   ): Promise<void> {
-    // TODO: Implement actual database storage logic
-    // For now, just log the data
-    console.log('\n=== SAVING REFERRAL DATA ===');
-    console.log(`Inviter: ${inviter}`);
-    console.log(`Private Key: ${privateKey}`);
-    console.log(`Signer Address: ${signerAddress}`);
-    console.log(`Timestamp: ${new Date().toISOString()}`);
-    console.log('=== DATA SAVED (MOCK) ===\n');
+    try {
+      const response = await fetch(`${this.core.config.referralsServiceUrl}/store`, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          privateKey,
+          inviter
+        })
+      });
+
+      if (!response.ok) {
+        throw new InvitationError(`HTTP error! status: ${response.status}`, {
+          code: 'INVITATION_HTTP_ERROR',
+          source: 'INVITATIONS',
+          context: { status: response.status, url: `${this.core.config.referralsServiceUrl}/store` }
+        });
+      }
+
+    } catch (error) {
+      console.error('Failed to save referral data:', error);
+      throw new InvitationError(`Failed to save referral data: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        code: 'INVITATION_SAVE_REFERRAL_FAILED',
+        source: 'INVITATIONS',
+        cause: error
+      });
+    }
   }
 
   /**
@@ -322,7 +333,6 @@ export class InvitationBuilder {
 
     for (const [tokenOwner, amount] of tokenOwnerAmounts.entries()) {
       const possibleInvites = Number(amount / INVITATION_FEE);
-      console.log(`Token Owner: ${tokenOwner}, Total Amount to Module: ${amount / BigInt(10 ** 18)} CRC, Possible Invites: ${possibleInvites}`);
 
       if (possibleInvites >= 1) {
         realInviters.push({
@@ -363,8 +373,6 @@ export class InvitationBuilder {
     // Step 1: Generate private key and derive signer address
     const privateKey = generatePrivateKey();
     const signerAddress = privateKeyToAddress(privateKey);
-    console.log(`  Private Key: ${privateKey}`);
-    console.log(`  Signer Address: ${signerAddress}`);
 
     // Step 2: Get real inviters
     const realInviters = await this.getRealInviters(inviterLower);
@@ -399,18 +407,11 @@ export class InvitationBuilder {
     );
 
     // Step 6: Save referral data to database
-    await this.saveReferralData(inviterLower, privateKey, signerAddress);
+    await this.saveReferralData(inviterLower, privateKey);
 
     // Step 7: Build final transaction batch
     const transactions: TransactionRequest[] = [];
     transactions.push(...transferTransactions);
-    console.log(`\nTotal transactions: ${transactions.length}`);
-    console.log('\n=== TRANSACTION BATCH ===');
-    console.dir(transactions, { depth: null });
-
-    console.log('\n=== REFERRAL RESULT ===');
-    console.log(`Signer Address: ${signerAddress}`);
-    console.log(`Real Inviter: ${realInviterAddress}`);
 
     return transactions;
   }
