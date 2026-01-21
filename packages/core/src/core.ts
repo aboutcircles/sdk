@@ -57,7 +57,8 @@ export class Core {
     config: CirclesConfig = circlesConfig[100]
   ) {
     this.config = config;
-    this.rpcUrl = config.circlesRpcUrl;
+    // Use chainRpcUrl for contract reads (eth_call), fallback to circlesRpcUrl
+    this.rpcUrl = config.chainRpcUrl ?? config.circlesRpcUrl;
 
     this.hubV2 = new HubV2Contract({
       address: config.v2HubAddress,
