@@ -1,6 +1,7 @@
 import type { RpcClient } from '../client';
 import type { FindPathParams, PathfindingResult } from '@aboutcircles/sdk-types';
 import { normalizeFindPathParams, parseStringsToBigInt, checksumAddresses } from '../utils';
+import { MAX_FLOW } from '@aboutcircles/sdk-utils/constants';
 
 /**
  * Circles V1 and V2 balance and pathfinding methods
@@ -50,10 +51,9 @@ export class PathfinderMethods {
    * ```
    */
   async findMaxFlow(params: Omit<FindPathParams, 'targetFlow'>): Promise<bigint> {
-    const targetFlow = 9999999999999999999999999999999999999n;
     const path = await this.findPath({
       ...params,
-      targetFlow
+      targetFlow: MAX_FLOW
     });
     return BigInt(path.maxFlow);
   }

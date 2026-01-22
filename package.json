@@ -11,7 +11,7 @@
     "version:patch": "bun scripts/bump-version.ts patch",
     "version:minor": "bun scripts/bump-version.ts minor",
     "version:major": "bun scripts/bump-version.ts major",
-    "build": "tsc --build && bun run --filter '@aboutcircles/sdk-types' build && bun run --filter '@aboutcircles/sdk-abis' build && bun run --filter '@aboutcircles/sdk-utils' build && bun run --filter '@aboutcircles/sdk-profiles' build && bun run --filter '@aboutcircles/sdk-core' build && bun run --filter '@aboutcircles/sdk-rpc' build && bun run --filter '@aboutcircles/sdk-pathfinder' build && bun run --filter '@aboutcircles/sdk-transfers' build && bun run --filter '@aboutcircles/sdk' build && bun run --filter '@aboutcircles/sdk-runner' build",
+    "build": "tsc --build && bun run --filter '@aboutcircles/sdk-types' build && bun run --filter '@aboutcircles/sdk-abis' build && bun run --filter '@aboutcircles/sdk-utils' build && bun run --filter '@aboutcircles/sdk-profiles' build && bun run --filter '@aboutcircles/sdk-core' build && bun run --filter '@aboutcircles/sdk-rpc' build && bun run --filter '@aboutcircles/sdk-pathfinder' build && bun run --filter '@aboutcircles/sdk-transfers' build && bun run --filter '@aboutcircles/sdk-invitations' build && bun run --filter '@aboutcircles/sdk' build && bun run --filter '@aboutcircles/sdk-runner' build",
     "build:types": "bun run --filter '@aboutcircles/sdk-types' build",
     "build:abis": "bun run --filter '@aboutcircles/sdk-abis' build",
     "build:core": "bun run --filter '@aboutcircles/sdk-core' build",
@@ -21,8 +21,9 @@
     "build:transfers": "bun run --filter '@aboutcircles/sdk-transfers' build",
     "build:sdk": "bun run --filter '@aboutcircles/sdk' build",
     "build:pathfinder": "bun run --filter '@aboutcircles/sdk-pathfinder' build",
+    "build:invitations": "bun run --filter '@aboutcircles/sdk-invitations' build",
     "build:runner": "bun run --filter '@aboutcircles/sdk-runner' build",
-    "build:analyze": "bun run build:analyze:types && bun run build:analyze:abis && bun run build:analyze:utils && bun run build:analyze:profiles && bun run build:analyze:core && bun run build:analyze:rpc && bun run build:analyze:pathfinder && bun run build:analyze:transfers && bun run build:analyze:sdk && bun run build:analyze:runner",
+    "build:analyze": "bun run build:analyze:types && bun run build:analyze:abis && bun run build:analyze:utils && bun run build:analyze:profiles && bun run build:analyze:core && bun run build:analyze:rpc && bun run build:analyze:pathfinder && bun run build:analyze:transfers && bun run build:analyze:invitations && bun run build:analyze:sdk && bun run build:analyze:runner",
     "build:analyze:types": "bun build ./packages/types/src/index.ts --outdir ./packages/types/dist --minify --analyze",
     "build:analyze:abis": "bun build ./packages/abis/src/index.ts --outdir ./packages/abis/dist --minify --analyze",
     "build:analyze:core": "bun build ./packages/core/src/index.ts --outdir ./packages/core/dist --minify --analyze",
@@ -31,6 +32,7 @@
     "build:analyze:utils": "bun build ./packages/utils/src/index.ts --outdir ./packages/utils/dist --minify --analyze",
     "build:analyze:profiles": "bun build ./packages/profiles/src/index.ts --outdir ./packages/profiles/dist --minify --analyze",
     "build:analyze:transfers": "bun build ./packages/transfers/src/index.ts --outdir ./packages/transfers/dist --minify --analyze",
+    "build:analyze:invitations": "bun build ./packages/invitations/src/index.ts --outdir ./packages/invitations/dist --minify --analyze",
     "build:analyze:sdk": "bun build ./packages/sdk/src/index.ts --outdir ./packages/sdk/dist --minify --analyze",
     "build:analyze:runner": "bun build ./packages/runner/src/index.ts --outdir ./packages/runner/dist --minify --analyze",
     "dev": "bun run --filter '@aboutcircles/sdk-utils' dev & bun run --filter '@aboutcircles/sdk-core' dev & bun run --filter '@aboutcircles/sdk-rpc' dev",
@@ -55,6 +57,7 @@
     "packages/pathfinder",
     "packages/profiles",
     "packages/transfers",
+    "packages/invitations",
     "packages/sdk"
   ]
 }

@@ -102,21 +102,23 @@ export class HumanAvatar extends CommonAvatar {
      * console.log('Replenished personal tokens, tx hash:', receipt.hash);
      * ```
      */
-    //@todo add amount to replenish
     replenish: async (options?: PathfindingOptions): Promise<TransactionReceipt> => {
-      // Construct replenish transactions using TransferBuilder
-      const transactions = await this.transferBuilder.constructReplenish(
-        this.address,
-        options
-      );
+      // First, get the maximum replenishable amount
+      const maxAmount = await this.balances.getMaxReplenishable(options);
 
-      // If no transactions needed, return early
-      if (transactions.length === 0) {
+      if (maxAmount === 0n) {
         throw SdkError.configError(
           'No tokens available to replenish',
           { message: 'You may not have any wrapped tokens or convertible tokens' }
         );
       }
+
+      // Construct replenish transactions using TransferBuilder
+      const transactions = await this.transferBuilder.constructReplenish(
+        this.address,
+        this.address, // tokenId is own address (replenishing own tokens)
+        maxAmount
+      );
 
       // Execute the constructed transactions
       return await this.runner.sendTransaction!(transactions);

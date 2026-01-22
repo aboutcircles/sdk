@@ -5,6 +5,9 @@ import { circlesConfig } from './config';
 /**
  * Core SDK class for managing Circles protocol contract interactions
  *
+ * Uses lazy initialization - contracts are only created when first accessed.
+ * This reduces initial memory footprint and bundle size for tree-shaking.
+ *
  * @example
  * ```typescript
  * // Use default Gnosis Chain config
@@ -40,13 +43,14 @@ import { circlesConfig } from './config';
 export class Core {
   public readonly config: CirclesConfig;
   public readonly rpcUrl: string;
-  public readonly hubV2: HubV2Contract;
-  public readonly baseGroupFactory: BaseGroupFactoryContract;
-  public readonly nameRegistry: NameRegistryContract;
-  public readonly liftERC20: LiftERC20Contract;
-  public readonly invitationEscrow: InvitationEscrowContract;
-  public readonly invitationFarm: InvitationFarmContract;
-  public readonly referralsModule: ReferralsModuleContract;
+
+  private _hubV2?: HubV2Contract;
+  private _baseGroupFactory?: BaseGroupFactoryContract;
+  private _nameRegistry?: NameRegistryContract;
+  private _liftERC20?: LiftERC20Contract;
+  private _invitationEscrow?: InvitationEscrowContract;
+  private _invitationFarm?: InvitationFarmContract;
+  private _referralsModule?: ReferralsModuleContract;
 
   /**
    * Create a new Core SDK instance
@@ -58,40 +62,75 @@ export class Core {
   ) {
     this.config = config;
     this.rpcUrl = config.circlesRpcUrl;
+  }
 
-    this.hubV2 = new HubV2Contract({
-      address: config.v2HubAddress,
-      rpcUrl: this.rpcUrl,
-    });
+  get hubV2(): HubV2Contract {
+    if (!this._hubV2) {
+      this._hubV2 = new HubV2Contract({
+        address: this.config.v2HubAddress,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._hubV2;
+  }
 
-    this.baseGroupFactory = new BaseGroupFactoryContract({
-      address: config.baseGroupFactoryAddress,
-      rpcUrl: this.rpcUrl,
-    });
+  get baseGroupFactory(): BaseGroupFactoryContract {
+    if (!this._baseGroupFactory) {
+      this._baseGroupFactory = new BaseGroupFactoryContract({
+        address: this.config.baseGroupFactoryAddress,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._baseGroupFactory;
+  }
 
-    this.nameRegistry = new NameRegistryContract({
-      address: config.nameRegistryAddress,
-      rpcUrl: this.rpcUrl,
-    });
+  get nameRegistry(): NameRegistryContract {
+    if (!this._nameRegistry) {
+      this._nameRegistry = new NameRegistryContract({
+        address: this.config.nameRegistryAddress,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._nameRegistry;
+  }
 
-    this.liftERC20 = new LiftERC20Contract({
-      address: config.liftERC20Address,
-      rpcUrl: this.rpcUrl,
-    });
+  get liftERC20(): LiftERC20Contract {
+    if (!this._liftERC20) {
+      this._liftERC20 = new LiftERC20Contract({
+        address: this.config.liftERC20Address,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._liftERC20;
+  }
 
-    this.invitationEscrow = new InvitationEscrowContract({
-      address: config.invitationEscrowAddress,
-      rpcUrl: this.rpcUrl,
-    });
+  get invitationEscrow(): InvitationEscrowContract {
+    if (!this._invitationEscrow) {
+      this._invitationEscrow = new InvitationEscrowContract({
+        address: this.config.invitationEscrowAddress,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._invitationEscrow;
+  }
 
-    this.invitationFarm = new InvitationFarmContract({
-      address: config.invitationFarmAddress,
-      rpcUrl: this.rpcUrl,
-    });
+  get invitationFarm(): InvitationFarmContract {
+    if (!this._invitationFarm) {
+      this._invitationFarm = new InvitationFarmContract({
+        address: this.config.invitationFarmAddress,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._invitationFarm;
+  }
 
-    this.referralsModule = new ReferralsModuleContract({
-      address: config.referralsModuleAddress,
-      rpcUrl: this.rpcUrl,
-    });
+  get referralsModule(): ReferralsModuleContract {
+    if (!this._referralsModule) {
+      this._referralsModule = new ReferralsModuleContract({
+        address: this.config.referralsModuleAddress,
+        rpcUrl: this.rpcUrl,
+      });
+    }
+    return this._referralsModule;
   }
 }

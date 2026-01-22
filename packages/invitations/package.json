@@ -1,7 +1,7 @@
 {
-  "name": "@aboutcircles/sdk-rpc",
-  "version": "0.1.5",
-  "description": "Circles RPC wrapper",
+  "name": "@aboutcircles/sdk-invitations",
+  "version": "0.1.4",
+  "description": "Circles Invitations Module SDK",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -9,6 +9,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     }
   },
@@ -21,12 +22,16 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --minify --splitting && tsc --emitDeclarationOnly",
+    "build": "bun run build.ts --minify && tsc --emitDeclarationOnly",
+    "build:analyze": "bun run build.ts --analyze",
     "dev": "tsc --watch"
   },
   "dependencies": {
     "@aboutcircles/sdk-types": "*",
-    "@aboutcircles/sdk-utils": "*"
+    "@aboutcircles/sdk-utils": "*",
+    "@aboutcircles/sdk-rpc": "*",
+    "@aboutcircles/sdk-core": "*",
+    "@aboutcircles/sdk-transfers": "*"
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.6.5",

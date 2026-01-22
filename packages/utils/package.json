@@ -5,14 +5,51 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./bytes": {
+      "types": "./dist/bytes.d.ts",
+      "default": "./dist/bytes.js"
+    },
+    "./abi": {
+      "types": "./dist/abi.d.ts",
+      "default": "./dist/abi.js"
+    },
+    "./cid": {
+      "types": "./dist/cid.d.ts",
+      "default": "./dist/cid.js"
+    },
+    "./address": {
+      "types": "./dist/address.d.ts",
+      "default": "./dist/address.js"
+    },
+    "./constants": {
+      "types": "./dist/constants.d.ts",
+      "default": "./dist/constants.js"
+    },
+    "./circlesConverter": {
+      "types": "./dist/circlesConverter.d.ts",
+      "default": "./dist/circlesConverter.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
+    "./contractErrors": {
+      "types": "./dist/contractErrors.d.ts",
+      "default": "./dist/contractErrors.js"
+    },
+    "./crypto": {
+      "types": "./dist/crypto.d.ts",
+      "default": "./dist/crypto.js"
     }
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm --minify && tsc --emitDeclarationOnly",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
@@ -32,6 +69,8 @@
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-types": "*",
+    "@noble/curves": "^1.7.0",
+    "@noble/hashes": "^1.6.1",
     "multiformats": "^13.4.1"
   }
 }

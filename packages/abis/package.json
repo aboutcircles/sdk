@@ -10,6 +10,66 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./hubV2": {
+      "types": "./dist/hubV2.d.ts",
+      "default": "./dist/hubV2.js"
+    },
+    "./baseGroup": {
+      "types": "./dist/baseGroup.d.ts",
+      "default": "./dist/baseGroup.js"
+    },
+    "./baseGroupFactory": {
+      "types": "./dist/baseGroupFactory.d.ts",
+      "default": "./dist/baseGroupFactory.js"
+    },
+    "./nameRegistry": {
+      "types": "./dist/nameRegistry.d.ts",
+      "default": "./dist/nameRegistry.js"
+    },
+    "./inflationaryCircles": {
+      "types": "./dist/inflationaryCircles.d.ts",
+      "default": "./dist/inflationaryCircles.js"
+    },
+    "./demurrageCircles": {
+      "types": "./dist/demurrageCircles.d.ts",
+      "default": "./dist/demurrageCircles.js"
+    },
+    "./liftERC20": {
+      "types": "./dist/liftERC20.d.ts",
+      "default": "./dist/liftERC20.js"
+    },
+    "./invitationEscrow": {
+      "types": "./dist/invitationEscrow.d.ts",
+      "default": "./dist/invitationEscrow.js"
+    },
+    "./invitationFarm": {
+      "types": "./dist/invitationFarm.d.ts",
+      "default": "./dist/invitationFarm.js"
+    },
+    "./referralsModule": {
+      "types": "./dist/referralsModule.d.ts",
+      "default": "./dist/referralsModule.js"
+    },
+    "./minimal": {
+      "types": "./dist/minimal/index.d.ts",
+      "default": "./dist/minimal/index.js"
+    },
+    "./minimal/hubV2": {
+      "types": "./dist/minimal/hubV2.d.ts",
+      "default": "./dist/minimal/hubV2.js"
+    },
+    "./minimal/liftERC20": {
+      "types": "./dist/minimal/liftERC20.d.ts",
+      "default": "./dist/minimal/liftERC20.js"
+    },
+    "./minimal/wrappedCircles": {
+      "types": "./dist/minimal/wrappedCircles.d.ts",
+      "default": "./dist/minimal/wrappedCircles.js"
+    },
+    "./minimal/referralsModule": {
+      "types": "./dist/minimal/referralsModule.d.ts",
+      "default": "./dist/minimal/referralsModule.js"
     }
   },
   "files": [
@@ -21,7 +81,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts ./src/minimal/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
     "dev": "tsc --watch"
   },
   "dependencies": {

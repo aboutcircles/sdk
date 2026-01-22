@@ -2,7 +2,7 @@
  * Core Package Error Types
  */
 
-import { CirclesError } from '@aboutcircles/sdk-utils';
+import { CirclesError } from '@aboutcircles/sdk-utils/errors';
 
 /**
  * Core-specific error sources

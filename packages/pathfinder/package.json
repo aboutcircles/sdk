@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm --minify && tsc --emitDeclarationOnly",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
@@ -31,8 +31,7 @@
   "dependencies": {
     "@aboutcircles/sdk-rpc": "*",
     "@aboutcircles/sdk-types": "*",
-    "@aboutcircles/sdk-utils": "*",
-    "viem": "^2.38.0"
+    "@aboutcircles/sdk-utils": "*"
   },
   "devDependencies": {
     "typescript": "^5.0.4"

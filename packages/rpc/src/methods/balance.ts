@@ -1,7 +1,7 @@
 import type { RpcClient } from '../client';
 import type { Address, TokenBalance } from '@aboutcircles/sdk-types';
 import { normalizeAddress, parseStringsToBigInt, checksumAddresses } from '../utils';
-import { CirclesConverter } from '@aboutcircles/sdk-utils';
+import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
 
 /**
  * Balance query RPC methods

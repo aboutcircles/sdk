@@ -11,6 +11,70 @@
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./hubV2": {
+      "types": "./dist/contracts/hubV2.d.ts",
+      "default": "./dist/contracts/hubV2.js"
+    },
+    "./baseGroup": {
+      "types": "./dist/contracts/baseGroup.d.ts",
+      "default": "./dist/contracts/baseGroup.js"
+    },
+    "./baseGroupFactory": {
+      "types": "./dist/contracts/baseGroupFactory.d.ts",
+      "default": "./dist/contracts/baseGroupFactory.js"
+    },
+    "./nameRegistry": {
+      "types": "./dist/contracts/nameRegistry.d.ts",
+      "default": "./dist/contracts/nameRegistry.js"
+    },
+    "./liftERC20": {
+      "types": "./dist/contracts/liftERC20.d.ts",
+      "default": "./dist/contracts/liftERC20.js"
+    },
+    "./invitationEscrow": {
+      "types": "./dist/contracts/invitationEscrow.d.ts",
+      "default": "./dist/contracts/invitationEscrow.js"
+    },
+    "./invitationFarm": {
+      "types": "./dist/contracts/invitationFarm.d.ts",
+      "default": "./dist/contracts/invitationFarm.js"
+    },
+    "./referralsModule": {
+      "types": "./dist/contracts/referralsModule.d.ts",
+      "default": "./dist/contracts/referralsModule.js"
+    },
+    "./inflationaryCircles": {
+      "types": "./dist/contracts/inflationaryCircles.d.ts",
+      "default": "./dist/contracts/inflationaryCircles.js"
+    },
+    "./demurrageCircles": {
+      "types": "./dist/contracts/demurrageCircles.d.ts",
+      "default": "./dist/contracts/demurrageCircles.js"
+    },
+    "./minimal": {
+      "types": "./dist/contracts/minimal/index.d.ts",
+      "default": "./dist/contracts/minimal/index.js"
+    },
+    "./minimal/hubV2": {
+      "types": "./dist/contracts/minimal/hubV2.d.ts",
+      "default": "./dist/contracts/minimal/hubV2.js"
+    },
+    "./minimal/liftERC20": {
+      "types": "./dist/contracts/minimal/liftERC20.d.ts",
+      "default": "./dist/contracts/minimal/liftERC20.js"
+    },
+    "./minimal/wrappedCircles": {
+      "types": "./dist/contracts/minimal/wrappedCircles.d.ts",
+      "default": "./dist/contracts/minimal/wrappedCircles.js"
+    },
+    "./minimal/referralsModule": {
+      "types": "./dist/contracts/minimal/referralsModule.d.ts",
+      "default": "./dist/contracts/minimal/referralsModule.js"
+    },
+    "./contracts/minimal": {
+      "types": "./dist/contracts/minimal/index.d.ts",
+      "default": "./dist/contracts/minimal/index.js"
     }
   },
   "files": [
@@ -22,7 +86,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --minify && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts ./src/contracts/minimal/index.ts ./src/contracts/minimal/hubV2.ts ./src/contracts/minimal/liftERC20.ts ./src/contracts/minimal/wrappedCircles.ts ./src/contracts/minimal/referralsModule.ts --outdir ./dist --format esm --minify --splitting && tsc --emitDeclarationOnly",
     "dev": "tsc --watch"
   },
   "dependencies": {
