@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-invitations",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "Circles Invitations Module SDK",
   "type": "module",
   "main": "./dist/index.js",
@@ -18,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/aboutcircles/sdk"
+    "url": "git+https://github.com/aboutcircles/sdk.git"
   },
   "license": "MIT",
   "scripts": {
@@ -38,5 +38,11 @@
     "@types/bun": "^1.2.23",
     "esbuild": "^0.25.10",
     "typescript": "^5.0.4"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/aboutcircles/sdk/issues"
+  },
+  "homepage": "https://github.com/aboutcircles/sdk#readme",
+  "keywords": [],
+  "author": ""
 }
