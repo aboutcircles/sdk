@@ -1,6 +1,6 @@
-import type { Address, TransactionRequest } from '@aboutcircles/sdk-types';
+import type { Address, TransactionRequest, CirclesConfig } from '@aboutcircles/sdk-types';
 import { RpcClient, PathfinderMethods, TrustMethods } from '@aboutcircles/sdk-rpc';
-import type { Core } from '@aboutcircles/sdk-core';
+import { HubV2ContractMinimal, ReferralsModuleContractMinimal } from '@aboutcircles/sdk-core/minimal';
 import { InvitationError } from './errors';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import {
@@ -27,16 +27,33 @@ export interface ProxyInviter {
  * Supports both referral invitations (new users) and direct invitations (existing Safe wallets)
  */
 export class InvitationBuilder {
-  private core: Core;
+  private config: CirclesConfig;
   private rpcClient: RpcClient;
   private pathfinder: PathfinderMethods;
   private trust: TrustMethods;
+  private hubV2: HubV2ContractMinimal;
+  private referralsModule: ReferralsModuleContractMinimal;
 
-  constructor(core: Core) {
-    this.core = core;
-    this.rpcClient = new RpcClient(core.config.circlesRpcUrl);
+  constructor(config: CirclesConfig) {
+    if (!config.referralsServiceUrl) {
+      throw new InvitationError('referralsServiceUrl is required in config', {
+        code: 'INVITATION_MISSING_CONFIG',
+        source: 'INVITATIONS',
+        context: { missingField: 'referralsServiceUrl' }
+      });
+    }
+    this.config = config;
+    this.rpcClient = new RpcClient(config.circlesRpcUrl);
     this.pathfinder = new PathfinderMethods(this.rpcClient);
     this.trust = new TrustMethods(this.rpcClient);
+    this.hubV2 = new HubV2ContractMinimal({
+      address: config.v2HubAddress,
+      rpcUrl: config.circlesRpcUrl,
+    });
+    this.referralsModule = new ReferralsModuleContractMinimal({
+      address: config.referralsModuleAddress,
+      rpcUrl: config.circlesRpcUrl,
+    });
   }
 
   /**
@@ -53,7 +70,7 @@ export class InvitationBuilder {
     privateKey: `0x${string}`
   ): Promise<void> {
     try {
-      const response = await fetch(`${this.core.config.referralsServiceUrl}/store`, {
+      const response = await fetch(`${this.config.referralsServiceUrl}/store`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',
@@ -69,7 +86,7 @@ export class InvitationBuilder {
         throw new InvitationError(`HTTP error! status: ${response.status}`, {
           code: 'INVITATION_HTTP_ERROR',
           source: 'INVITATIONS',
-          context: { status: response.status, url: `${this.core.config.referralsServiceUrl}/store` }
+          context: { status: response.status, url: `${this.config.referralsServiceUrl}/store` }
         });
       }
 
@@ -130,7 +147,7 @@ export class InvitationBuilder {
     const inviteeLower = invitee.toLowerCase() as Address;
 
     // Step 1: Verify invitee is NOT already registered as a human in Circles Hub
-    const isHuman = await this.core.hubV2.isHuman(inviteeLower);
+    const isHuman = await this.hubV2.isHuman(inviteeLower);
 
     if (isHuman) {
       throw InvitationError.inviteeAlreadyRegistered(inviterLower, inviteeLower);
@@ -145,13 +162,13 @@ export class InvitationBuilder {
     const transferData = await this.generateInviteData([inviteeLower], false);
 
     // Step 4: Build transactions using TransferBuilder to properly handle wrapped tokens
-    const transferBuilder = new TransferBuilder(this.core.config);
+    const transferBuilder = new TransferBuilder(this.config);
 
     // Get the real inviter address from the path
     const realInviters = await this.getRealInviters(inviterLower);
 
     if (realInviters.length === 0) {
-      throw InvitationError.noPathFound(inviterLower, this.core.config.invitationModuleAddress);
+      throw InvitationError.noPathFound(inviterLower, this.config.invitationModuleAddress);
     }
 
     const realInviterAddress = realInviters[0].address;
@@ -159,7 +176,7 @@ export class InvitationBuilder {
     // Use the buildFlowMatrixTx method to construct transactions from the path
     const transferTransactions = await transferBuilder.buildFlowMatrixTx(
       inviterLower,
-      this.core.config.invitationModuleAddress,
+      this.config.invitationModuleAddress,
       path,
       {
         toTokens: [realInviterAddress],
@@ -196,7 +213,7 @@ export class InvitationBuilder {
       const realInviters = await this.getRealInviters(inviterLower);
 
       if (realInviters.length === 0) {
-        throw InvitationError.noPathFound(inviterLower, this.core.config.invitationModuleAddress);
+        throw InvitationError.noPathFound(inviterLower, this.config.invitationModuleAddress);
       }
 
       tokenToUse = realInviters[0].address;
@@ -205,14 +222,14 @@ export class InvitationBuilder {
     // Find path using the selected token
     const path = await this.pathfinder.findPath({
       from: inviterLower,
-      to: this.core.config.invitationModuleAddress,
+      to: this.config.invitationModuleAddress,
       targetFlow: INVITATION_FEE,
       toTokens: [tokenToUse],
       useWrappedBalances: true
     });
 
     if (!path.transfers || path.transfers.length === 0) {
-      throw InvitationError.noPathFound(inviterLower, this.core.config.invitationModuleAddress);
+      throw InvitationError.noPathFound(inviterLower, this.config.invitationModuleAddress);
     }
 
     if (path.maxFlow < INVITATION_FEE) {
@@ -224,7 +241,7 @@ export class InvitationBuilder {
         INVITATION_FEE,
         path.maxFlow,
         inviterLower,
-        this.core.config.invitationModuleAddress
+        this.config.invitationModuleAddress
       );
     }
 
@@ -266,8 +283,8 @@ export class InvitationBuilder {
 
     // Step 2: Get addresses trusted by the invitation module (set2)
     // This includes both one-way outgoing trusts and mutual trusts
-    const trustsRelations = await this.trust.getTrusts(this.core.config.invitationModuleAddress);
-    const mutualTrustRelationsModule = await this.trust.getMutualTrusts(this.core.config.invitationModuleAddress);
+    const trustsRelations = await this.trust.getTrusts(this.config.invitationModuleAddress);
+    const mutualTrustRelationsModule = await this.trust.getMutualTrusts(this.config.invitationModuleAddress);
 
     const trustedByModule = new Set<Address>([
       ...trustsRelations.map(relation => relation.objectAvatar.toLowerCase() as Address),
@@ -294,7 +311,7 @@ export class InvitationBuilder {
     // Step 5: Build path from inviter to invitation module
     const path = await this.pathfinder.findPath({
       from: inviterLower,
-      to: this.core.config.invitationModuleAddress,
+      to: this.config.invitationModuleAddress,
       useWrappedBalances: true,
       targetFlow: MAX_FLOW,
       toTokens: tokensToUse,
@@ -306,7 +323,7 @@ export class InvitationBuilder {
 
     // Step 6: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
     const tokenOwnerAmounts = new Map<string, bigint>();
-    const invitationModuleLower = this.core.config.invitationModuleAddress.toLowerCase();
+    const invitationModuleLower = this.config.invitationModuleAddress.toLowerCase();
 
     for (const transfer of path.transfers) {
       // Only count transfers that go to the invitation module (terminal transfers)
@@ -378,14 +395,14 @@ export class InvitationBuilder {
     const path = await this.findInvitePath(inviterLower, realInviterAddress);
 
     // Step 5: Build transactions using TransferBuilder to properly handle wrapped tokens
-    const transferBuilder = new TransferBuilder(this.core.config);
+    const transferBuilder = new TransferBuilder(this.config);
     // useSafeCreation = true because we're creating a new Safe wallet via ReferralsModule
     const transferData = await this.generateInviteData([signerAddress], true);
 
     // Use the new buildFlowMatrixTx method to construct transactions from the path
     const transferTransactions = await transferBuilder.buildFlowMatrixTx(
       inviterLower,
-      this.core.config.invitationModuleAddress,
+      this.config.invitationModuleAddress,
       path,
       {
         toTokens: [realInviterAddress],
@@ -444,23 +461,23 @@ export class InvitationBuilder {
     // Use ReferralsModule to create Safe accounts for new users (signers without Safe wallets)
     if (addresses.length === 1) {
       // Single address - use createAccount(address signer)
-      const createAccountTx = this.core.referralsModule.createAccount(addresses[0]);
+      const createAccountTx = this.referralsModule.createAccount(addresses[0]);
       const createAccountData = createAccountTx.data as `0x${string}`;
 
       // Encode (address target, bytes callData) for the invitation module
       return encodeAbiParameters(
         ['address', 'bytes'],
-        [this.core.config.referralsModuleAddress, createAccountData]
+        [this.config.referralsModuleAddress, createAccountData]
       );
     } else {
       // Multiple addresses - use createAccounts(address[] signers)
-      const createAccountsTx = this.core.referralsModule.createAccounts(addresses);
+      const createAccountsTx = this.referralsModule.createAccounts(addresses);
       const createAccountsData = createAccountsTx.data as `0x${string}`;
 
       // Encode (address target, bytes callData) for the invitation module
       return encodeAbiParameters(
         ['address', 'bytes'],
-        [this.core.config.referralsModuleAddress, createAccountsData]
+        [this.config.referralsModuleAddress, createAccountsData]
       );
     }
   }

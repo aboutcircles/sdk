@@ -40,8 +40,8 @@
       "version": "0.1.4",
       "dependencies": {
         "@aboutcircles/sdk-core": "*",
-        "@aboutcircles/sdk-pathfinder": "*",
         "@aboutcircles/sdk-rpc": "*",
+        "@aboutcircles/sdk-transfers": "*",
         "@aboutcircles/sdk-types": "*",
         "@aboutcircles/sdk-utils": "*",
       },
@@ -59,7 +59,6 @@
         "@aboutcircles/sdk-rpc": "*",
         "@aboutcircles/sdk-types": "*",
         "@aboutcircles/sdk-utils": "*",
-        "viem": "^2.38.0",
       },
       "devDependencies": {
         "typescript": "^5.0.4",

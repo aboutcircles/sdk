@@ -9,10 +9,12 @@ import {
 import { RpcClient, PathfinderMethods, BalanceMethods, GroupMethods } from '@aboutcircles/sdk-rpc';
 import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
 import { ZERO_ADDRESS } from '@aboutcircles/sdk-utils/constants';
-import { HubV2Contract } from '@aboutcircles/sdk-core/hubV2';
-import { LiftERC20Contract } from '@aboutcircles/sdk-core/liftERC20';
-import { InflationaryCirclesContract } from '@aboutcircles/sdk-core/inflationaryCircles';
-import { DemurrageCirclesContract } from '@aboutcircles/sdk-core/demurrageCircles';
+import {
+  HubV2ContractMinimal,
+  LiftERC20ContractMinimal,
+  DemurrageCirclesContractMinimal,
+  InflationaryCirclesContractMinimal,
+} from '@aboutcircles/sdk-core/minimal';
 import { CirclesType } from '@aboutcircles/sdk-types';
 import { TransferError } from './errors';
 
@@ -22,8 +24,8 @@ import { TransferError } from './errors';
  */
 export class TransferBuilder {
   private config: CirclesConfig;
-  private hubV2: HubV2Contract;
-  private liftERC20: LiftERC20Contract;
+  private hubV2: HubV2ContractMinimal;
+  private liftERC20: LiftERC20ContractMinimal;
   private rpcClient: RpcClient;
   private pathfinder: PathfinderMethods;
   private balance: BalanceMethods;
@@ -31,11 +33,11 @@ export class TransferBuilder {
 
   constructor(config: CirclesConfig) {
     this.config = config;
-    this.hubV2 = new HubV2Contract({
+    this.hubV2 = new HubV2ContractMinimal({
       address: config.v2HubAddress,
       rpcUrl: config.circlesRpcUrl,
     });
-    this.liftERC20 = new LiftERC20Contract({
+    this.liftERC20 = new LiftERC20ContractMinimal({
       address: config.liftERC20Address,
       rpcUrl: config.circlesRpcUrl,
     });
@@ -204,7 +206,7 @@ export class TransferBuilder {
       if (fromTokenAddr.toLowerCase() === demurragedWrapper.toLowerCase() &&
           demurragedWrapper !== ZERO_ADDRESS) {
         // Use demurraged wrapper contract to unwrap
-        const wrapper = new DemurrageCirclesContract({
+        const wrapper = new DemurrageCirclesContractMinimal({
           address: fromTokenAddr,
           rpcUrl: this.config.circlesRpcUrl
         });
@@ -220,7 +222,7 @@ export class TransferBuilder {
       if (fromTokenAddr.toLowerCase() === inflationaryWrapper.toLowerCase() &&
           inflationaryWrapper !== ZERO_ADDRESS) {
         // Use inflationary wrapper contract to unwrap
-        const wrapper = new InflationaryCirclesContract({
+        const wrapper = new InflationaryCirclesContractMinimal({
           address: fromTokenAddr,
           rpcUrl: this.config.circlesRpcUrl
         });
@@ -393,7 +395,7 @@ export class TransferBuilder {
           ? wrappedDemurrageBalance
           : remainingToUnwrap;
 
-        const wrapper = new DemurrageCirclesContract({
+        const wrapper = new DemurrageCirclesContractMinimal({
           address: wrappedDemurrageAddress,
           rpcUrl: this.config.circlesRpcUrl
         });
@@ -416,7 +418,7 @@ export class TransferBuilder {
           ? wrappedInflationaryBalance
           : staticToUnwrap;
 
-        const wrapper = new InflationaryCirclesContract({
+        const wrapper = new InflationaryCirclesContractMinimal({
           address: wrappedInflationaryAddress,
           rpcUrl: this.config.circlesRpcUrl
         });
@@ -661,7 +663,7 @@ export class TransferBuilder {
       }
 
       // Create unwrap call for the exact amount used in path
-      const wrapper = new DemurrageCirclesContract({
+      const wrapper = new DemurrageCirclesContractMinimal({
         address: wrapperAddr as Address,
         rpcUrl: this.config.circlesRpcUrl
       });
@@ -711,7 +713,7 @@ export class TransferBuilder {
       }
 
       // Create unwrap call for the entire balance (in static units)
-      const wrapper = new InflationaryCirclesContract({
+      const wrapper = new InflationaryCirclesContractMinimal({
         address: wrapperAddr as Address,
         rpcUrl: this.config.circlesRpcUrl
       });

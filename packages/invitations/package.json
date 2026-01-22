@@ -22,7 +22,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --minify --splitting && tsc --emitDeclarationOnly",
+    "build": "bun run build.ts --minify && tsc --emitDeclarationOnly",
+    "build:analyze": "bun run build.ts --analyze",
     "dev": "tsc --watch"
   },
   "dependencies": {
