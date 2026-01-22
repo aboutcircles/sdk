@@ -15,6 +15,7 @@ const packages = [
   "profiles",
   "pathfinder",
   "transfers",
+  "invitations",
   "runner",
   "sdk",
 ];

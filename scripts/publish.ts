@@ -25,13 +25,14 @@ const packagesDir = join(process.cwd(), 'packages');
 
 async function publishPackage(pkg: string): Promise<boolean> {
   const pkgPath = join(packagesDir, pkg);
-  const pkgName = `@aboutcircles/sdk-${pkg}`;
-  console.log(`\n📦 Publishing ${pkgName}...`);
 
-  // Read version from package.json
+  // Read package.json to get actual name and version
   const pkgJsonPath = join(pkgPath, 'package.json');
   const pkgJson = JSON.parse(await $`cat ${pkgJsonPath}`.text());
+  const pkgName = pkgJson.name;
   const version = pkgJson.version;
+
+  console.log(`\n📦 Publishing ${pkgName}...`);
 
   try {
     // Use npm publish for provenance support (Bun doesn't support --provenance yet)
