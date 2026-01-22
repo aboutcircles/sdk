@@ -104,24 +104,26 @@ export class InvitationBuilder {
    * Order real inviters by preference (best to worst)
    *
    * @param realInviters - Array of valid real inviters with their addresses and possible invites
+   * @param inviter - Address of the current inviter (prioritized first)
    * @returns Ordered array of real inviters (best candidates first)
    *
    * @description
    * This function determines the optimal order for selecting real inviters.
-   * Current implementation returns the list as-is (no sorting).
-   *
-   * Future sorting criteria (to be implemented):
-   * - Number of possible invites (more is better)
-   * - Token balance amount (higher is better)
-   * - Trust relationship strength/history
-   * - Previous invitation success rate
-   * - Gas cost considerations
-   * - Personal tokens prioritization
+   * Prioritizes the inviter's own tokens first, then others.
    */
-  private orderRealInviters(realInviters: ProxyInviter[]): ProxyInviter[] {
-    // TODO: Implement sorting logic
-    // For now, return the list as-is
-    return realInviters;
+  private orderRealInviters(realInviters: ProxyInviter[], inviter: Address): ProxyInviter[] {
+    const inviterLower = inviter.toLowerCase();
+
+    return realInviters.sort((a, b) => {
+      const aIsInviter = a.address.toLowerCase() === inviterLower;
+      const bIsInviter = b.address.toLowerCase() === inviterLower;
+
+      // Prioritize the inviter's own tokens first
+      if (aIsInviter && !bIsInviter) return -1;
+      if (!aIsInviter && bIsInviter) return 1;
+
+      return 0;
+    });
   }
 
   /**
@@ -349,7 +351,8 @@ export class InvitationBuilder {
     }
 
     // Step 8: Order real inviters by preference (best candidates first)
-    const orderedRealInviters = this.orderRealInviters(realInviters);
+    // Prioritizes the inviter's own tokens first
+    const orderedRealInviters = this.orderRealInviters(realInviters, inviterLower);
 
     return orderedRealInviters;
   }
