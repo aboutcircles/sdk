@@ -52,7 +52,7 @@ export class Referrals {
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
     try {
-      const url = `${this.getBaseUrl()}/referral/retrieve?key=${encodeURIComponent(privateKey)}`;
+      const url = `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -102,7 +102,7 @@ export class Referrals {
     }
 
     try {
-      const url = `${this.getBaseUrl()}/referral/my-referrals`;
+      const url = `${this.getBaseUrl()}/my-referrals`;
       const headers = await this.getAuthHeaders();
       const response = await fetch(url, { headers });
 

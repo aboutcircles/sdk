@@ -4,6 +4,13 @@
 export const invitationFarmMinimalAbi = [
   {
     type: 'function',
+    name: 'claimInvite',
+    inputs: [],
+    outputs: [{ name: 'id', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'claimInvites',
     inputs: [{ name: 'numberOfInvites', type: 'uint256' }],
     outputs: [{ name: 'ids', type: 'uint256[]' }],
