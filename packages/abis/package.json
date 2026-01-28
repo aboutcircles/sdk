@@ -39,10 +39,6 @@
       "types": "./dist/liftERC20.d.ts",
       "default": "./dist/liftERC20.js"
     },
-    "./invitationEscrow": {
-      "types": "./dist/invitationEscrow.d.ts",
-      "default": "./dist/invitationEscrow.js"
-    },
     "./invitationFarm": {
       "types": "./dist/invitationFarm.d.ts",
       "default": "./dist/invitationFarm.js"
@@ -70,6 +66,10 @@
     "./minimal/referralsModule": {
       "types": "./dist/minimal/referralsModule.d.ts",
       "default": "./dist/minimal/referralsModule.js"
+    },
+    "./minimal/invitationFarm": {
+      "types": "./dist/minimal/invitationFarm.d.ts",
+      "default": "./dist/minimal/invitationFarm.js"
     }
   },
   "files": [

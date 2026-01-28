@@ -32,8 +32,6 @@ export interface CirclesConfig {
   baseGroupFactoryAddress: Address;
   /** Lift ERC20 contract address */
   liftERC20Address: Address;
-  /** Invitation Escrow contract address */
-  invitationEscrowAddress: Address;
   /** Invitation Farm contract address */
   invitationFarmAddress: Address;
   /** Referrals Module contract address */

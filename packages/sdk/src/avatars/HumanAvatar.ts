@@ -5,17 +5,16 @@ import type {
   TokenBalanceRow,
   GroupMembershipRow,
   GroupRow,
-  AggregatedTrustRelation
+  AggregatedTrustRelation,
+  TransactionRequest
 } from '@aboutcircles/sdk-types';
 import type { TransactionReceipt, Hex } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import { ValidationError } from '@aboutcircles/sdk-utils';
 import { SdkError } from '../errors';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
-import { encodeAbiParameters, parseAbiParameters, encodeFunctionData } from 'viem';
-import { referralsModuleAbi } from '@aboutcircles/sdk-abis';
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { CommonAvatar, type PathfindingOptions } from './CommonAvatar';
+import { Invitations, InviteFarm, type ProxyInviter, type GeneratedInvite } from '@aboutcircles/sdk-invitations';
 
 /**
  * HumanAvatar class implementation
@@ -133,306 +132,145 @@ export class HumanAvatar extends CommonAvatar {
   // Trust methods are inherited from CommonAvatar
   // ============================================================================
 
-  // Invitation methods
-  public readonly invite = {
+  // Invitation methods using the new Invitations module
+  public readonly invitation = {
     /**
-     * Invite someone to Circles by escrowing 100 CRC tokens
-     *
-     * This batches two transactions atomically:
-     * 1. Establishes trust with the invitee (with indefinite expiry)
-     * 2. Transfers 100 of your personal CRC tokens to the InvitationEscrow contract
-     *
-     * The tokens are held in escrow until the invitee redeems the invitation by registering.
-     *
-     * Requirements:
-     * - You must have at least 100 CRC available
-     * - Invitee must not be already registered in Circles
-     * - You can only have one active invitation per invitee
-     *
-     * @param invitee The address to invite
-     * @returns Transaction response
-     *
-     * @example
-     * ```typescript
-     * // Invite someone with 100 CRC (automatically establishes trust)
-     * await avatar.invite.send('0x123...');
-     * ```
-     */
-    send: async (invitee: Address): Promise<TransactionReceipt> => {
-      //@todo add replenish/unwrap logic
-      // Create trust transaction (indefinite trust)
-      const trustTx = this.core.hubV2.trust(invitee, BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFF'));
-
-      // Get the token ID for this avatar's personal token
-      const tokenId = await this.core.hubV2.toTokenId(this.address);
-
-      // ABI-encode the invitee address as 32 bytes
-      const encodedInvitee = encodeAbiParameters(
-        parseAbiParameters('address'),
-        [invitee]
-      );
-
-      // Create the safeTransferFrom transaction to the InvitationEscrow contract
-      const transferTx = this.core.hubV2.safeTransferFrom(
-        this.address,
-        this.core.config.invitationEscrowAddress,
-        tokenId,
-        BigInt(100e18),
-        encodedInvitee
-      );
-
-      // Batch both transactions: trust + invitation transfer
-      return await this.runner.sendTransaction!([trustTx, transferTx]);
-    },
-
-    /**
-     * Revoke a previously sent invitation
-     *
-     * This returns the escrowed tokens (with demurrage applied) back to you
-     * as wrapped ERC20 tokens.
-     *
-     * @param invitee The address whose invitation to revoke
-     * @returns Transaction response
-     *
-     * @example
-     * ```typescript
-     * await avatar.invite.revoke('0x123...');
-     * ```
-     */
-    revoke: async (invitee: Address): Promise<TransactionReceipt> => {
-      const revokeTx = this.core.invitationEscrow.revokeInvitation(invitee);
-      return await this.runner.sendTransaction!([revokeTx]);
-    },
-
-    /**
-     * Revoke all active invitations at once
-     *
-     * This returns all escrowed tokens (with demurrage applied) back to you
-     * as wrapped ERC20 tokens in a single transaction.
-     *
-     * @returns Transaction response
-     *
-     * @example
-     * ```typescript
-     * await avatar.invite.revokeAll();
-     * ```
-     */
-    revokeAll: async (): Promise<TransactionReceipt> => {
-      const revokeAllTx = this.core.invitationEscrow.revokeAllInvitations();
-      return await this.runner.sendTransaction!([revokeAllTx]);
-    },
-
-    /**
-     * Redeem an invitation received from an inviter
-     *
-     * This claims the escrowed tokens from a specific inviter and refunds
-     * all other inviters' escrows back to them.
-     *
-     * @param inviter The address of the inviter whose invitation to redeem
-     * @returns Transaction response
-     *
-     * @example
-     * ```typescript
-     * // Get all inviters first
-     * const inviters = await avatar.invite.getInviters();
-     *
-     * // Redeem invitation from the first inviter
-     * await avatar.invite.redeem(inviters[0]);
-     * ```
-     */
-    // @todo check if it functionable
-    redeem: async (inviter: Address): Promise<TransactionReceipt> => {
-      const redeemTx = this.core.invitationEscrow.redeemInvitation(inviter);
-      return await this.runner.sendTransaction!([redeemTx]);
-    },
-
-    /**
-     * Get all addresses that have sent invitations to you
-     *
-     * @returns Array of inviter addresses
-     *
-     * @example
-     * ```typescript
-     * const inviters = await avatar.invite.getInviters();
-     * console.log(`You have ${inviters.length} pending invitations`);
-     * ```
-     */
-    getInviters: async (): Promise<Address[]> => {
-      return await this.core.invitationEscrow.getInviters(this.address);
-    },
-
-    /**
-     * Get all addresses you have invited
-     *
-     * @returns Array of invitee addresses
-     *
-     * @example
-     * ```typescript
-     * const invitees = await avatar.invite.getInvitees();
-     * console.log(`You have invited ${invitees.length} people`);
-     * ```
-     */
-    getInvitees: async (): Promise<Address[]> => {
-      return await this.core.invitationEscrow.getInvitees(this.address);
-    },
-
-    /**
-     * Get the escrowed amount and days since escrow for a specific invitation
-     *
-     * The amount returned has demurrage applied, so it decreases over time.
-     *
-     * @param inviter The inviter address (when checking invitations you received)
-     * @param invitee The invitee address (when checking invitations you sent)
-     * @returns Object with escrowedAmount (in atto-circles) and days since escrow
-     *
-     * @example
-     * ```typescript
-     * // Check an invitation you sent
-     * const { escrowedAmount, days_ } = await avatar.invite.getEscrowedAmount(
-     *   avatar.address,
-     *   '0xinvitee...'
-     * );
-     * console.log(`Escrowed: ${CirclesConverter.attoCirclesToCircles(escrowedAmount)} CRC`);
-     * console.log(`Days since escrow: ${days_}`);
-     *
-     * // Check an invitation you received
-     * const { escrowedAmount, days_ } = await avatar.invite.getEscrowedAmount(
-     *   '0xinviter...',
-     *   avatar.address
-     * );
-     * ```
-     */
-    getEscrowedAmount: async (inviter: Address, invitee: Address) => {
-      return await this.core.invitationEscrow.getEscrowedAmountAndDays(inviter, invitee);
-    },
-
-    /**
-     * Generate new invitations and return associated secrets and signer addresses
+     * Get a referral code for inviting a new user who doesn't have a Safe wallet yet
      *
      * This function:
-     * 1. Calls invitationFarm.claimInvites() to get invitation IDs via eth_call
-     * 2. Generates random secrets for each invitation
-     * 3. Derives signer addresses from the secrets using ECDSA
-     * 4. Batches the claimInvites write call with safeBatchTransferFrom to transfer
-     *    invitation tokens (96 CRC each) to the invitation module
-     * 5. Returns the list of secrets and corresponding signers
+     * 1. Generates a new private key and signer address for the invitee
+     * 2. Finds proxy inviters (intermediaries in trust graph)
+     * 3. Builds transaction batch to transfer 96 CRC to the invitation module
+     * 4. Saves the referral data to the backend
+     * 5. Returns transactions and the generated private key
      *
-     * The data field in the batch transfer contains the count of generated secrets,
-     * which the contract uses to validate the transfer.
+     * The private key should be shared with the invitee to claim their account.
      *
-     * @param numberOfInvites The number of invitations to generate
-     * @returns Promise containing arrays of secrets and signers for each generated invitation
+     * Requirements:
+     * - You must have at least 96 CRC available (directly or via proxy inviters)
+     * - Referrals service must be configured
      *
-     * @throws {SdkError} If the transaction fails or invitations cannot be claimed
+     * @returns Object containing transactions to execute and the private key to share
      *
      * @example
      * ```typescript
-     * // Generate 5 invitations
-     * const result = await avatar.invite.generateInvites(5n);
+     * const { transactions, privateKey } = await avatar.invitation.getReferralCode();
+     * // Execute transactions
+     * await avatar.runner.sendTransaction(transactions);
+     * // Share privateKey with invitee
+     * ```
+     */
+    getReferralCode: async (): Promise<{ transactions: TransactionRequest[]; privateKey: `0x${string}` }> => {
+      const invitations = new Invitations(this.core.config);
+      return await invitations.generateReferral(this.address);
+    },
+
+    /**
+     * Invite a user who already has a Safe wallet but is not yet registered in Circles
      *
-     * console.log('Generated invitations:');
-     * result.secrets.forEach((secret, index) => {
-     *   console.log(`Invitation ${index + 1}:`);
-     *   console.log(`  Secret: ${secret}`);
-     *   console.log(`  Signer: ${result.signers[index]}`);
+     * Use this when inviting someone who has an existing Safe wallet but is not
+     * yet registered in Circles Hub.
+     *
+     * @param invitee Address of the invitee (must have existing Safe wallet, NOT registered in Circles)
+     * @returns Array of transactions to execute
+     *
+     * @example
+     * ```typescript
+     * const transactions = await avatar.invitation.invite('0xInviteeAddress');
+     * await avatar.runner.sendTransaction(transactions);
+     * ```
+     */
+    invite: async (invitee: Address): Promise<TransactionRequest[]> => {
+      const invitations = new Invitations(this.core.config);
+      return await invitations.generateInvite(this.address, invitee);
+    },
+
+    /**
+     * Get proxy inviters who can facilitate invitations
+     *
+     * Proxy inviters are addresses that:
+     * - Trust this avatar (or have mutual trust)
+     * - Are trusted by the invitation module
+     * - Have sufficient balance to cover invitation fees (96 CRC per invite)
+     *
+     * @returns Array of proxy inviters with their addresses and possible invite counts
+     *
+     * @example
+     * ```typescript
+     * const proxyInviters = await avatar.invitation.getProxyInviters();
+     * proxyInviters.forEach(inviter => {
+     *   console.log(`${inviter.address}: can invite ${inviter.possibleInvites} people`);
+     * });
+     * ```
+     */
+    getProxyInviters: async (): Promise<ProxyInviter[]> => {
+      const invitations = new Invitations(this.core.config);
+      return await invitations.getRealInviters(this.address);
+    },
+
+    /**
+     * Find a path from this avatar to the invitation module
+     *
+     * @param proxyInviterAddress Optional specific proxy inviter to route through
+     * @returns PathfindingResult containing the transfer path
+     *
+     * @example
+     * ```typescript
+     * const path = await avatar.invitation.findInvitePath();
+     * console.log('Max flow:', path.maxFlow);
+     * ```
+     */
+    findInvitePath: async (proxyInviterAddress?: Address) => {
+      const invitations = new Invitations(this.core.config);
+      return await invitations.findInvitePath(this.address, proxyInviterAddress);
+    },
+
+    /**
+     * Compute the deterministic Safe address for a given signer
+     *
+     * Uses CREATE2 to predict the Safe address without deployment.
+     *
+     * @param signer The signer public address
+     * @returns The deterministic Safe address
+     *
+     * @example
+     * ```typescript
+     * const safeAddress = avatar.invitation.computeAddress('0xSignerAddress');
+     * ```
+     */
+    computeAddress: (signer: Address): Address => {
+      const invitations = new Invitations(this.core.config);
+      return invitations.computeAddress(signer);
+    },
+
+    /**
+     * Generate new invitations using the InvitationFarm
+     *
+     * @param count Number of invitations to generate
+     * @returns Promise containing secrets, signers, and transaction receipt
+     *
+     * @example
+     * ```typescript
+     * const result = await avatar.invitation.generateInvites(5);
+     * result.secrets.forEach((secret, i) => {
+     *   console.log(`Invite ${i + 1}: ${result.signers[i]}`);
      * });
      * ```
      */
     generateInvites: async (
-      numberOfInvites: bigint
+      count: number
     ): Promise<{
       secrets: Hex[];
       signers: Address[];
       transactionReceipt: TransactionReceipt;
     }> => {
-      if (numberOfInvites <= 0n) {
-        throw SdkError.operationFailed(
-          'generateInvites',
-          'numberOfInvites must be greater than 0'
-        );
-      }
-
-      // Step 1: Call eth_call to claimInvites to get invitation IDs (read-only simulation)
-      // This simulates the claimInvites call without actually modifying state
-      // to get the IDs that would be returned
-      const ids = (await this.core.invitationFarm.read('claimInvites', [numberOfInvites], {
-        from: this.address
-      })) as unknown as bigint[];
-      console.log("ids", ids)
-      if (!ids || ids.length === 0) {
-        throw SdkError.operationFailed(
-          'generateInvites',
-          'No invitation IDs returned from claimInvites'
-        );
-      }
-
-      // Step 2: Generate random secrets and derive signers
-      const secrets: Hex[] = [];
-      const signers: Address[] = [];
-
-      for (let i = 0; i < numberOfInvites; i++) {
-        // Generate a random private key
-        const privateKey = generatePrivateKey();
-        secrets.push(privateKey);
-
-        // Derive the signer address from the private key
-        const account = privateKeyToAccount(privateKey);
-        signers.push(account.address.toLowerCase() as Address);
-      }
-
-      // Step 3: Get invitation module address
-      const invitationModuleAddress = await this.core.invitationFarm.invitationModule();
-
-      // Step 4: Referrals module address
-      const referralsModuleAddress = this.core.config.referralsModuleAddress;
-
-      // Step 5: Build the batch transaction
-      // - claimInvites write call (to actually claim the invites)
-      // - safeBatchTransferFrom to transfer invitation tokens to the invitation module
-
-      // Create the claimInvites write transaction
-      const claimInvitesWriteTx = this.core.invitationFarm.claimInvites(numberOfInvites);
-
-      // Step 6: Encode the createAccounts function call to the referrals module
-      // This call will be executed by the invitation module via the generic call proxy
-      const createAccountsCallData = encodeFunctionData({
-        abi: referralsModuleAbi,
-        functionName: 'createAccounts',
-        args: [signers],
-      });
-
-      // Step 7: Create safeBatchTransferFrom transaction to transfer invitation tokens to the invitation module
-      // - from: this avatar
-      // - to: invitation module
-      // - ids: the invitation IDs returned from claimInvites
-      // - amounts: all 96 CRC (96 * 10^18) per invitation
-      // - data: encoded as (address referralsModule, bytes callData) for the invitation module to execute
-
-      const amounts: bigint[] = [];
-      for (let i = 0; i < ids.length; i++) {
-        amounts.push(BigInt(96e18)); // 96 CRC in atto-circles
-      }
-
-      // Encode the data as (address, bytes) - referrals module address + createAccounts call data
-      const encodedData = encodeAbiParameters(
-        parseAbiParameters('address, bytes'),
-        [referralsModuleAddress, createAccountsCallData]
-      );
-
-      const batchTransferTx = this.core.hubV2.safeBatchTransferFrom(
-        this.address,
-        invitationModuleAddress,
-        ids,
-        amounts,
-        encodedData
-      );
-
-      // Step 7: Execute the batch transaction
-      const receipt = await this.runner.sendTransaction!([claimInvitesWriteTx, batchTransferTx]);
+      const farm = new InviteFarm(this.core.config);
+      const result = await farm.generateInvites(this.address, count);
+      const receipt = await this.runner.sendTransaction!(result.transactions);
 
       return {
-        secrets,
-        signers,
+        secrets: result.invites.map((inv: GeneratedInvite) => inv.secret),
+        signers: result.invites.map((inv: GeneratedInvite) => inv.signer),
         transactionReceipt: receipt,
       };
     },

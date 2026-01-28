@@ -32,10 +32,6 @@
       "types": "./dist/contracts/liftERC20.d.ts",
       "default": "./dist/contracts/liftERC20.js"
     },
-    "./invitationEscrow": {
-      "types": "./dist/contracts/invitationEscrow.d.ts",
-      "default": "./dist/contracts/invitationEscrow.js"
-    },
     "./invitationFarm": {
       "types": "./dist/contracts/invitationFarm.d.ts",
       "default": "./dist/contracts/invitationFarm.js"
@@ -72,6 +68,10 @@
       "types": "./dist/contracts/minimal/referralsModule.d.ts",
       "default": "./dist/contracts/minimal/referralsModule.js"
     },
+    "./minimal/invitationFarm": {
+      "types": "./dist/contracts/minimal/invitationFarm.d.ts",
+      "default": "./dist/contracts/minimal/invitationFarm.js"
+    },
     "./contracts/minimal": {
       "types": "./dist/contracts/minimal/index.d.ts",
       "default": "./dist/contracts/minimal/index.js"
@@ -86,7 +86,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "bun build ./src/index.ts ./src/contracts/minimal/index.ts ./src/contracts/minimal/hubV2.ts ./src/contracts/minimal/liftERC20.ts ./src/contracts/minimal/wrappedCircles.ts ./src/contracts/minimal/referralsModule.ts --outdir ./dist --format esm --minify --splitting && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts ./src/contracts/minimal/index.ts ./src/contracts/minimal/hubV2.ts ./src/contracts/minimal/liftERC20.ts ./src/contracts/minimal/wrappedCircles.ts ./src/contracts/minimal/referralsModule.ts ./src/contracts/minimal/invitationFarm.ts --outdir ./dist --format esm --minify --splitting && tsc --emitDeclarationOnly",
     "dev": "tsc --watch"
   },
   "dependencies": {

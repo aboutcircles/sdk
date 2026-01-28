@@ -2,6 +2,7 @@ import type { Address, TransactionRequest, CirclesConfig } from '@aboutcircles/s
 import { RpcClient, PathfinderMethods, TrustMethods } from '@aboutcircles/sdk-rpc';
 import { HubV2ContractMinimal, ReferralsModuleContractMinimal } from '@aboutcircles/sdk-core/minimal';
 import { InvitationError } from './errors';
+import type { ReferralPreviewList } from './types';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import {
   hexToBytes,
@@ -65,7 +66,7 @@ export class Invitations {
    * @description
    * Sends a POST request to the referrals service to store referral data.
    */
-  private async saveReferralData(
+  async saveReferralData(
     inviter: Address,
     privateKey: `0x${string}`
   ): Promise<void> {
@@ -97,6 +98,51 @@ export class Invitations {
         source: 'INVITATIONS',
         cause: error
       });
+    }
+  }
+
+  /**
+   * List referrals for a given inviter with key previews
+   *
+   * @param inviter - Address of the inviter
+   * @param limit - Maximum number of referrals to return (default 10)
+   * @param offset - Number of referrals to skip for pagination (default 0)
+   * @returns Paginated list of referral previews with masked keys
+   */
+  async listReferrals(
+    inviter: Address,
+    limit: number = 10,
+    offset: number = 0
+  ): Promise<ReferralPreviewList> {
+    try {
+      const url = new URL(`${this.config.referralsServiceUrl}/referrals/list/${inviter}`);
+      url.searchParams.set('limit', String(limit));
+      url.searchParams.set('offset', String(offset));
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { 'accept': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new InvitationError(`HTTP error! status: ${response.status}`, {
+          code: 'INVITATION_HTTP_ERROR',
+          source: 'INVITATIONS',
+          context: { status: response.status, url: url.toString() },
+        });
+      }
+
+      return await response.json() as ReferralPreviewList;
+    } catch (error) {
+      if (error instanceof InvitationError) throw error;
+      throw new InvitationError(
+        `Failed to list referrals: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          code: 'INVITATION_LIST_REFERRALS_FAILED',
+          source: 'INVITATIONS',
+          cause: error,
+        }
+      );
     }
   }
 

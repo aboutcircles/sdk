@@ -1,4 +1,4 @@
-import { HubV2Contract, BaseGroupFactoryContract, NameRegistryContract, LiftERC20Contract, InvitationEscrowContract, InvitationFarmContract, ReferralsModuleContract } from './contracts';
+import { HubV2Contract, BaseGroupFactoryContract, NameRegistryContract, LiftERC20Contract, InvitationFarmContract, ReferralsModuleContract } from './contracts';
 import type { CirclesConfig } from '@aboutcircles/sdk-types';
 import { circlesConfig } from './config';
 
@@ -48,7 +48,6 @@ export class Core {
   private _baseGroupFactory?: BaseGroupFactoryContract;
   private _nameRegistry?: NameRegistryContract;
   private _liftERC20?: LiftERC20Contract;
-  private _invitationEscrow?: InvitationEscrowContract;
   private _invitationFarm?: InvitationFarmContract;
   private _referralsModule?: ReferralsModuleContract;
 
@@ -102,16 +101,6 @@ export class Core {
       });
     }
     return this._liftERC20;
-  }
-
-  get invitationEscrow(): InvitationEscrowContract {
-    if (!this._invitationEscrow) {
-      this._invitationEscrow = new InvitationEscrowContract({
-        address: this.config.invitationEscrowAddress,
-        rpcUrl: this.rpcUrl,
-      });
-    }
-    return this._invitationEscrow;
   }
 
   get invitationFarm(): InvitationFarmContract {

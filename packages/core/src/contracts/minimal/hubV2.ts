@@ -81,4 +81,18 @@ export class HubV2ContractMinimal extends Contract<typeof hubV2MinimalAbi> {
   async isHuman(human: Address): Promise<boolean> {
     return this.read('isHuman', [human]) as Promise<boolean>;
   }
+
+  safeBatchTransferFrom(
+    from: Address,
+    to: Address,
+    ids: readonly bigint[],
+    amounts: readonly bigint[],
+    data: Hex = '0x'
+  ): TransactionRequest {
+    return {
+      to: this.address,
+      data: this.encodeWrite('safeBatchTransferFrom', [from, to, ids, amounts, data]),
+      value: 0n,
+    };
+  }
 }

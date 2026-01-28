@@ -108,4 +108,17 @@ export const hubV2MinimalAbi = [
     outputs: [{ type: 'bool' }],
     stateMutability: 'view',
   },
+  {
+    type: 'function',
+    name: 'safeBatchTransferFrom',
+    inputs: [
+      { name: '_from', type: 'address' },
+      { name: '_to', type: 'address' },
+      { name: '_ids', type: 'uint256[]' },
+      { name: '_values', type: 'uint256[]' },
+      { name: '_data', type: 'bytes' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
 ] as const;

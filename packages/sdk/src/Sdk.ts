@@ -144,18 +144,15 @@ export class Sdk {
      * Register as a human in the Circles ecosystem
      *
      * This function:
-     * 1. Checks for pending invitations from inviters in the InvitationEscrow
-     * 2. If invitations exist, redeems one to claim escrowed tokens
-     * 3. Otherwise, checks if the specified inviter has enough unwrapped CRC
-     * 4. Creates and uploads profile data to IPFS
-     * 5. Registers the human with the profile CID
-     * 6. Returns a HumanAvatar instance for the registered account
+     * 1. Creates and uploads profile data to IPFS
+     * 2. Registers the human with the profile CID
+     * 3. Returns a HumanAvatar instance for the registered account
      *
      * Requirements:
      * - Contract runner must be configured to execute transactions
-     * - Either: pending invitations from inviters, OR inviter has 96+ CRC unwrapped
+     * - An inviter address must be provided
      *
-     * @param inviter Address of the inviting avatar (fallback if no invitations found)
+     * @param inviter Address of the inviting avatar
      * @param profile Profile data with name, description, etc.
      * @returns HumanAvatar instance for the newly registered human
      *
@@ -178,37 +175,7 @@ export class Sdk {
       const contractRunner: ContractRunner = this.contractRunner;
       const senderAddress: Address = this.senderAddress;
 
-      // List of transactions to execute
-      const transactions: any[] = [];
-
-      // Step 1: Check for pending invitations in the InvitationEscrow
-      const inviters = await this.core.invitationEscrow.getInviters(senderAddress);
-
-      if (inviters.length > 0) {
-        // Redeem the invitation from the first available inviter
-        const redeemTx = this.core.invitationEscrow.redeemInvitation(inviters[0]);
-        transactions.push(redeemTx);
-      } else {
-        // No invitations found, check if inviter has enough unwrapped CRC
-        // Minimum required: 96 CRC (after demurrage it becomes valid amount)
-        const minRequiredCRC = BigInt(96e18); // 96 CRC in atto-circles
-
-        // Get the token ID for the inviter's personal token
-        const tokenId = await this.core.hubV2.toTokenId(inviter);
-
-        // Check balance at the Inviter address
-        const balance = await this.core.hubV2.balanceOf(inviter, tokenId);
-
-        if (balance < minRequiredCRC) {
-          throw SdkError.insufficientBalance(
-            '96 CRC',
-            `${Number(balance) / 1e18} CRC`,
-            'unwrapped CRC'
-          );
-        }
-      }
-
-      // Step 2: Create and upload profile to IPFS
+      // Step 1: Create and upload profile to IPFS
       let profileCid: string;
 
       if (typeof profile === 'string') {
@@ -222,14 +189,13 @@ export class Sdk {
       // Convert CID to metadata digest hex (format expected by registerHuman)
       const metadataDigest = cidV0ToHex(profileCid);
 
-      // Step 3: Call registerHuman with profile data
+      // Step 2: Call registerHuman with profile data
       const registerTx = this.core.hubV2.registerHuman(inviter, metadataDigest as `0x${string}`);
-      transactions.push(registerTx);
 
-      // Step 4: Execute all transactions
-      await contractRunner.sendTransaction!(transactions);
+      // Step 3: Execute the transaction
+      await contractRunner.sendTransaction!([registerTx]);
 
-      // Step 5: Return a HumanAvatar instance for the newly registered account
+      // Step 4: Return a HumanAvatar instance for the newly registered account
       const avatarInfo = await this.rpc.avatar.getAvatarInfo(senderAddress);
       return new HumanAvatar(
         senderAddress,
