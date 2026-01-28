@@ -15,6 +15,14 @@ export class InvitationFarmContractMinimal extends Contract<typeof invitationFar
     });
   }
 
+  claimInvite(): TransactionRequest {
+    return {
+      to: this.address,
+      data: this.encodeWrite('claimInvite', []),
+      value: 0n,
+    };
+  }
+
   claimInvites(numberOfInvites: bigint): TransactionRequest {
     return {
       to: this.address,

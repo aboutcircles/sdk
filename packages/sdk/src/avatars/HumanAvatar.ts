@@ -14,7 +14,7 @@ import { ValidationError } from '@aboutcircles/sdk-utils';
 import { SdkError } from '../errors';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
 import { CommonAvatar, type PathfindingOptions } from './CommonAvatar';
-import { Invitations, InviteFarm, type ProxyInviter, type GeneratedInvite } from '@aboutcircles/sdk-invitations';
+import { Invitations, InviteFarm, type ProxyInviter, type GeneratedInvite, type ReferralPreviewList } from '@aboutcircles/sdk-invitations';
 
 /**
  * HumanAvatar class implementation
@@ -132,147 +132,96 @@ export class HumanAvatar extends CommonAvatar {
   // Trust methods are inherited from CommonAvatar
   // ============================================================================
 
-  // Invitation methods using the new Invitations module
+  // ============================================================================
+  // Invitation methods using the Invitations module
+  // ============================================================================
+
+  private readonly _invitations = new Invitations(this.core.config);
+  private readonly _inviteFarm = new InviteFarm(this.core.config);
+
   public readonly invitation = {
     /**
-     * Get a referral code for inviting a new user who doesn't have a Safe wallet yet
-     *
-     * This function:
-     * 1. Generates a new private key and signer address for the invitee
-     * 2. Finds proxy inviters (intermediaries in trust graph)
-     * 3. Builds transaction batch to transfer 96 CRC to the invitation module
-     * 4. Saves the referral data to the backend
-     * 5. Returns transactions and the generated private key
-     *
-     * The private key should be shared with the invitee to claim their account.
-     *
-     * Requirements:
-     * - You must have at least 96 CRC available (directly or via proxy inviters)
-     * - Referrals service must be configured
-     *
-     * @returns Object containing transactions to execute and the private key to share
-     *
-     * @example
-     * ```typescript
-     * const { transactions, privateKey } = await avatar.invitation.getReferralCode();
-     * // Execute transactions
-     * await avatar.runner.sendTransaction(transactions);
-     * // Share privateKey with invitee
-     * ```
+     * Get a referral code for inviting a new user who doesn't have a Safe wallet yet.
+     * Generates private key, finds proxy inviters, builds tx batch, saves referral data.
+     * @returns Transactions to execute and the private key to share with invitee
      */
-    getReferralCode: async (): Promise<{ transactions: TransactionRequest[]; privateKey: `0x${string}` }> => {
-      const invitations = new Invitations(this.core.config);
-      return await invitations.generateReferral(this.address);
+    getReferralCode: async (): Promise<{ transactions: TransactionRequest[]; privateKey: Hex }> => {
+      return this._invitations.generateReferral(this.address);
     },
 
     /**
-     * Invite a user who already has a Safe wallet but is not yet registered in Circles
-     *
-     * Use this when inviting someone who has an existing Safe wallet but is not
-     * yet registered in Circles Hub.
-     *
-     * @param invitee Address of the invitee (must have existing Safe wallet, NOT registered in Circles)
-     * @returns Array of transactions to execute
-     *
-     * @example
-     * ```typescript
-     * const transactions = await avatar.invitation.invite('0xInviteeAddress');
-     * await avatar.runner.sendTransaction(transactions);
-     * ```
+     * Invite a user who already has a Safe wallet but is not yet registered in Circles.
+     * @param invitee Address of the invitee (must have existing Safe, NOT registered in Circles)
      */
     invite: async (invitee: Address): Promise<TransactionRequest[]> => {
-      const invitations = new Invitations(this.core.config);
-      return await invitations.generateInvite(this.address, invitee);
+      return this._invitations.generateInvite(this.address, invitee);
     },
 
     /**
-     * Get proxy inviters who can facilitate invitations
-     *
-     * Proxy inviters are addresses that:
-     * - Trust this avatar (or have mutual trust)
-     * - Are trusted by the invitation module
-     * - Have sufficient balance to cover invitation fees (96 CRC per invite)
-     *
-     * @returns Array of proxy inviters with their addresses and possible invite counts
-     *
-     * @example
-     * ```typescript
-     * const proxyInviters = await avatar.invitation.getProxyInviters();
-     * proxyInviters.forEach(inviter => {
-     *   console.log(`${inviter.address}: can invite ${inviter.possibleInvites} people`);
-     * });
-     * ```
+     * Get proxy inviters who can facilitate invitations.
+     * These are addresses that trust this avatar, are trusted by the invitation module,
+     * and have sufficient balance (96 CRC per invite).
      */
     getProxyInviters: async (): Promise<ProxyInviter[]> => {
-      const invitations = new Invitations(this.core.config);
-      return await invitations.getRealInviters(this.address);
+      return this._invitations.getRealInviters(this.address);
     },
 
     /**
-     * Find a path from this avatar to the invitation module
-     *
+     * Find a path from this avatar to the invitation module.
      * @param proxyInviterAddress Optional specific proxy inviter to route through
-     * @returns PathfindingResult containing the transfer path
-     *
-     * @example
-     * ```typescript
-     * const path = await avatar.invitation.findInvitePath();
-     * console.log('Max flow:', path.maxFlow);
-     * ```
      */
     findInvitePath: async (proxyInviterAddress?: Address) => {
-      const invitations = new Invitations(this.core.config);
-      return await invitations.findInvitePath(this.address, proxyInviterAddress);
+      return this._invitations.findInvitePath(this.address, proxyInviterAddress);
     },
 
     /**
-     * Compute the deterministic Safe address for a given signer
-     *
-     * Uses CREATE2 to predict the Safe address without deployment.
-     *
+     * Compute the deterministic Safe address for a given signer using CREATE2.
      * @param signer The signer public address
-     * @returns The deterministic Safe address
-     *
-     * @example
-     * ```typescript
-     * const safeAddress = avatar.invitation.computeAddress('0xSignerAddress');
-     * ```
      */
     computeAddress: (signer: Address): Address => {
-      const invitations = new Invitations(this.core.config);
-      return invitations.computeAddress(signer);
+      return this._invitations.computeAddress(signer);
     },
 
     /**
-     * Generate new invitations using the InvitationFarm
-     *
+     * Generate batch invitations using the InvitationFarm.
      * @param count Number of invitations to generate
-     * @returns Promise containing secrets, signers, and transaction receipt
-     *
-     * @example
-     * ```typescript
-     * const result = await avatar.invitation.generateInvites(5);
-     * result.secrets.forEach((secret, i) => {
-     *   console.log(`Invite ${i + 1}: ${result.signers[i]}`);
-     * });
-     * ```
      */
-    generateInvites: async (
-      count: number
-    ): Promise<{
+    generateInvites: async (count: number): Promise<{
       secrets: Hex[];
       signers: Address[];
       transactionReceipt: TransactionReceipt;
     }> => {
-      const farm = new InviteFarm(this.core.config);
-      const result = await farm.generateInvites(this.address, count);
+      const result = await this._inviteFarm.generateInvites(this.address, count);
       const receipt = await this.runner.sendTransaction!(result.transactions);
-
       return {
         secrets: result.invites.map((inv: GeneratedInvite) => inv.secret),
         signers: result.invites.map((inv: GeneratedInvite) => inv.signer),
         transactionReceipt: receipt,
       };
+    },
+
+    /** Get the remaining invite quota for this avatar */
+    getQuota: async (): Promise<bigint> => {
+      return this._inviteFarm.getQuota(this.address);
+    },
+
+    /** Get the invitation fee (96 CRC) */
+    getInvitationFee: async (): Promise<bigint> => {
+      return this._inviteFarm.getInvitationFee();
+    },
+
+    /** Get the invitation module address from the farm */
+    getInvitationModule: async (): Promise<Address> => {
+      return this._inviteFarm.getInvitationModule();
+    },
+
+    /**
+     * List referrals for this avatar with key previews.
+     * @param limit Max referrals to return (default 10)
+     * @param offset Pagination offset (default 0)
+     */
+    listReferrals: async (limit = 10, offset = 0): Promise<ReferralPreviewList> => {
+      return this._inviteFarm.listReferrals(this.address, limit, offset);
     },
   };
 

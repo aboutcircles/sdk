@@ -115,7 +115,7 @@ export class Invitations {
     offset: number = 0
   ): Promise<ReferralPreviewList> {
     try {
-      const url = new URL(`${this.config.referralsServiceUrl}/referrals/list/${inviter}`);
+      const url = new URL(`${this.config.referralsServiceUrl}/list/${inviter}`);
       url.searchParams.set('limit', String(limit));
       url.searchParams.set('offset', String(offset));
 
@@ -421,7 +421,7 @@ export class Invitations {
     inviter: Address
   ): Promise<{ transactions: TransactionRequest[]; privateKey: `0x${string}` }> {
     const inviterLower = inviter.toLowerCase() as Address;
-
+    // @todo use `generateSecrets` here
     // Step 1: Generate private key and derive signer address
     const privateKey = generatePrivateKey();
     const signerAddress = privateKeyToAddress(privateKey);
@@ -580,4 +580,15 @@ export class Invitations {
     return checksumAddress(addressHex) as Address;
   }
 
+  /**
+   * Generate secrets and derive signer addresses for multiple invitations
+   * @param count Number of secrets to generate
+   */
+  generateSecrets(count: number): Array<{ secret: `0x${string}`; signer: Address }> {
+    return Array.from({ length: count }, () => {
+      const secret = generatePrivateKey();
+      const signer = privateKeyToAddress(secret).toLowerCase() as Address;
+      return { secret, signer };
+    });
+  }
 }
