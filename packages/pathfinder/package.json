@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-pathfinder",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Pathfinding utilities for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",
