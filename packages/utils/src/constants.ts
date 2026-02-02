@@ -28,7 +28,7 @@ export const SAFE_PROXY_FACTORY: Address = '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f8
 /**
  * Hash of the account initializer used in CREATE2 salt calculation
  */
-export const ACCOUNT_INITIALIZER_HASH: `0x${string}` = '0x440ea2f93c9703f7d456d48796f7bc25b8721582535a492ce0a09df32146242a';
+export const ACCOUNT_INITIALIZER_HASH: `0x${string}` = '0x89867a67674bd4bf33165a653cde826b696ab7d050166b71066dfa0b9b6f90f4';
 
 /**
  * Hash of the account creation code used in CREATE2 address calculation

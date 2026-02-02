@@ -301,18 +301,20 @@ export class Invitations {
    *
    * @param inviter - Address of the inviter
    * @returns Array of real inviters with their addresses and possible number of invitations
+   * @throws InvitationError if inviter has not enabled the invitation module
    *
    * @description
    * This function:
    * 1. Gets all addresses that trust the inviter (set1) - includes both one-way trusts and mutual trusts
    * 2. Gets all addresses trusted by the invitation module (set2) - includes both one-way trusts and mutual trusts
-   * 3. Finds the intersection of set1 and set2
-   * 4. Adds the inviter's own address to the list of possible tokens
-   * 5. Builds a path from inviter to invitation module using intersection addresses as toTokens
-   * 6. Sums up transferred token amounts by tokenOwner
-   * 7. Calculates possible invites (1 invite = 96 CRC)
-   * 8. Orders real inviters by preference (best candidates first)
-   * 9. Returns only those token owners whose total amounts exceed the invitation fee (96 CRC)
+   * 3. Verifies that the inviter is trusted by the invitation module (throws error if not)
+   * 4. Finds the intersection of set1 and set2
+   * 5. Adds the inviter's own address to the list of possible tokens
+   * 6. Builds a path from inviter to invitation module using intersection addresses as toTokens
+   * 7. Sums up transferred token amounts by tokenOwner
+   * 8. Calculates possible invites (1 invite = 96 CRC)
+   * 9. Orders real inviters by preference (best candidates first)
+   * 10. Returns only those token owners whose total amounts exceed the invitation fee (96 CRC)
    */
   async getRealInviters(inviter: Address): Promise<ProxyInviter[]> {
     const inviterLower = inviter.toLowerCase() as Address;
@@ -332,14 +334,22 @@ export class Invitations {
     // Step 2: Get addresses trusted by the invitation module (set2)
     // This includes both one-way outgoing trusts and mutual trusts
     const trustsRelations = await this.trust.getTrusts(this.config.invitationModuleAddress);
-    const mutualTrustRelationsModule = await this.trust.getMutualTrusts(this.config.invitationModuleAddress);
-
     const trustedByModule = new Set<Address>([
       ...trustsRelations.map(relation => relation.objectAvatar.toLowerCase() as Address),
-      ...mutualTrustRelationsModule.map(relation => relation.objectAvatar.toLowerCase() as Address)
     ]);
 
-    // Step 3: Find intersection - addresses that trust inviter AND are trusted by invitation module
+    // Step 3: Check if inviter is trusted by the invitation module
+    // If not, the inviter needs to enable the invitation module first
+    const inviterTrustedByModule = trustedByModule.has(inviterLower);
+    if (!inviterTrustedByModule) {
+      throw new InvitationError('Inviter must enable the invitation module before creating invitations', {
+        code: 'INVITATION_MODULE_NOT_ENABLED',
+        source: 'INVITATIONS',
+        context: { inviter: inviterLower, invitationModule: this.config.invitationModuleAddress }
+      });
+    }
+
+    // Step 4: Find intersection - addresses that trust inviter AND are trusted by invitation module
     const intersection: Address[] = [];
     for (const address of trustedByInviter) {
       if (trustedByModule.has(address)) {
@@ -347,7 +357,7 @@ export class Invitations {
       }
     }
 
-    // Step 4: Add the inviter's own address to the list of possible tokens
+    // Step 5: Add the inviter's own address to the list of possible tokens
     // This allows the inviter to use their own personal tokens for invitations
     const tokensToUse = [...intersection, inviterLower];
 
@@ -355,8 +365,7 @@ export class Invitations {
     if (tokensToUse.length === 0) {
       return [];
     }
-
-    // Step 5: Build path from inviter to invitation module
+    // Step 6: Build path from inviter to invitation module
     const path = await this.pathfinder.findPath({
       from: inviterLower,
       to: this.config.invitationModuleAddress,
@@ -369,7 +378,7 @@ export class Invitations {
       return [];
     }
 
-    // Step 6: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
+    // Step 7: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
     const tokenOwnerAmounts = new Map<string, bigint>();
     const invitationModuleLower = this.config.invitationModuleAddress.toLowerCase();
 
@@ -382,7 +391,7 @@ export class Invitations {
       }
     }
 
-    // Step 7: Calculate possible invites and filter token owners
+    // Step 8: Calculate possible invites and filter token owners
     const realInviters: ProxyInviter[] = [];
 
     for (const [tokenOwner, amount] of tokenOwnerAmounts.entries()) {
@@ -396,7 +405,7 @@ export class Invitations {
       }
     }
 
-    // Step 8: Order real inviters by preference (best candidates first)
+    // Step 9: Order real inviters by preference (best candidates first)
     // Prioritizes the inviter's own tokens first
     const orderedRealInviters = this.orderRealInviters(realInviters, inviterLower);
 
