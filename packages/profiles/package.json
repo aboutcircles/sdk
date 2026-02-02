@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-profiles",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Minimal IPFS/CID pinning service for Circles profiles",
   "type": "module",
   "main": "./dist/index.js",

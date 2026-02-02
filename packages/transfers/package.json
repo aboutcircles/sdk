@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-transfers",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Transfer data construction for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",
