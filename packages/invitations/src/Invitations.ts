@@ -332,10 +332,15 @@ export class Invitations {
     ]);
 
     // Step 2: Get addresses trusted by the invitation module (set2)
-    // This includes both one-way outgoing trusts and mutual trusts
-    const trustsRelations = await this.trust.getTrusts(this.config.invitationModuleAddress);
+    // getTrusts returns only one-way outgoing trusts, so we also need getMutualTrusts
+    // to catch addresses that mistakenly trusted the module back (creating a mutual trust)
+    const [trustsRelations, moduleMutualTrustRelations] = await Promise.all([
+      this.trust.getTrusts(this.config.invitationModuleAddress),
+      this.trust.getMutualTrusts(this.config.invitationModuleAddress),
+    ]);
     const trustedByModule = new Set<Address>([
       ...trustsRelations.map(relation => relation.objectAvatar.toLowerCase() as Address),
+      ...moduleMutualTrustRelations.map(relation => relation.objectAvatar.toLowerCase() as Address),
     ]);
 
     // Step 3: Check if inviter is trusted by the invitation module
