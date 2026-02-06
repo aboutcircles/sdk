@@ -14,7 +14,7 @@ import { ValidationError } from '@aboutcircles/sdk-utils';
 import { SdkError } from '../errors';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
 import { CommonAvatar, type PathfindingOptions } from './CommonAvatar';
-import { Invitations, InviteFarm, type ProxyInviter, type GeneratedInvite, type ReferralPreviewList } from '@aboutcircles/sdk-invitations';
+import { Invitations, InviteFarm, type ProxyInviter, type GeneratedReferral, type ReferralPreviewList } from '@aboutcircles/sdk-invitations';
 
 /**
  * HumanAvatar class implementation
@@ -183,19 +183,35 @@ export class HumanAvatar extends CommonAvatar {
     },
 
     /**
-     * Generate batch invitations using the InvitationFarm.
-     * @param count Number of invitations to generate
+     * Generate batch referrals using the InvitationFarm (for new users without a Safe).
+     * @param count Number of referrals to generate
      */
-    generateInvites: async (count: number): Promise<{
+    generateReferrals: async (count: number): Promise<{
       secrets: Hex[];
       signers: Address[];
       transactionReceipt: TransactionReceipt;
     }> => {
-      const result = await this._inviteFarm.generateInvites(this.address, count);
+      const result = await this._inviteFarm.generateReferrals(this.address, count);
       const receipt = await this.runner.sendTransaction!(result.transactions);
       return {
-        secrets: result.invites.map((inv: GeneratedInvite) => inv.secret),
-        signers: result.invites.map((inv: GeneratedInvite) => inv.signer),
+        secrets: result.referrals.map((r: GeneratedReferral) => r.secret),
+        signers: result.referrals.map((r: GeneratedReferral) => r.signer),
+        transactionReceipt: receipt,
+      };
+    },
+
+    /**
+     * Generate invitations for existing accounts using the InvitationFarm.
+     * @param invitees Array of addresses to invite (must have existing Safe wallets)
+     */
+    generateInvites: async (invitees: Address[]): Promise<{
+      invitees: Address[];
+      transactionReceipt: TransactionReceipt;
+    }> => {
+      const result = await this._inviteFarm.generateInvites(this.address, invitees);
+      const receipt = await this.runner.sendTransaction!(result.transactions);
+      return {
+        invitees: result.invitees,
         transactionReceipt: receipt,
       };
     },
