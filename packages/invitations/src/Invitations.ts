@@ -472,8 +472,8 @@ export class Invitations {
       true
     );
 
-    // Step 6: Save referral data to database
-    await this.saveReferralData(inviterLower, privateKey);
+    // Step 6: Save referral data to database (ignore for now)
+    //await this.saveReferralData(inviterLower, privateKey);
 
     // Step 7: Build final transaction batch
     const transactions: TransactionRequest[] = [];
