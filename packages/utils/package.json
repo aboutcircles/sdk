@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-utils",
-  "version": "0.1.8",
+  "version": "0.1.15",
   "description": "Utility functions for Circles SDK including demurrage calculations and conversions",
   "type": "module",
   "main": "./dist/index.js",
