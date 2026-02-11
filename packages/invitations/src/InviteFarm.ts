@@ -9,13 +9,18 @@ import type { ReferralPreviewList } from './types';
 import { Invitations } from './Invitations';
 import { encodeAbiParameters, INVITATION_FEE } from '@aboutcircles/sdk-utils';
 
-export interface GeneratedInvite {
+export interface GeneratedReferral {
   secret: Hex;
   signer: Address;
 }
 
+export interface GenerateReferralsResult {
+  referrals: GeneratedReferral[];
+  transactions: TransactionRequest[];
+}
+
 export interface GenerateInvitesResult {
-  invites: GeneratedInvite[];
+  invitees: Address[];
   transactions: TransactionRequest[];
 }
 
@@ -63,12 +68,13 @@ export class InviteFarm {
   }
 
   /**
-   * Generate batch invitations using the InvitationFarm.
-   * Simulates claimInvites to get token IDs, generates secrets/signers, and builds transactions.
+   * Generate batch referrals using the InvitationFarm.
+   * Creates new secrets/signers for users who don't have a Safe yet.
+   * The transfer data encodes the ReferralsModule address + createAccount calldata.
    * @param inviter Address of the inviter (must have quota)
-   * @param count Number of invitations to generate
+   * @param count Number of referrals to generate
    */
-  async generateInvites(inviter: Address, count: number): Promise<GenerateInvitesResult> {
+  async generateReferrals(inviter: Address, count: number): Promise<GenerateReferralsResult> {
     if (count <= 0) {
       throw new InvitationError('Count must be greater than 0', {
         code: 'INVITATION_INVALID_COUNT',
@@ -89,8 +95,8 @@ export class InviteFarm {
       });
     }
 
-    const invites = this.invitations.generateSecrets(count);
-    const signers = invites.map(inv => inv.signer);
+    const referrals = this.invitations.generateSecrets(count);
+    const signers = referrals.map(r => r.signer);
     const invitationModule = await this.invitationFarm.invitationModule();
 
     const claimTx = isSingle
@@ -98,14 +104,53 @@ export class InviteFarm {
       : this.invitationFarm.claimInvites(BigInt(count));
 
     const transferTx = isSingle
-      ? this.buildSingleTransfer(inviterLower, invitationModule, ids[0], signers[0])
-      : this.buildBatchTransfer(inviterLower, invitationModule, ids, signers);
+      ? this.buildReferralTransfer(inviterLower, invitationModule, ids[0], signers[0])
+      : this.buildBatchReferralTransfer(inviterLower, invitationModule, ids, signers);
 
-    await Promise.all(
-      invites.map(inv => this.invitations.saveReferralData(inviterLower, inv.secret))
-    );
+    return { referrals, transactions: [claimTx, transferTx] };
+  }
 
-    return { invites, transactions: [claimTx, transferTx] };
+  /**
+   * Generate invitations for existing accounts using the InvitationFarm.
+   * Invites users who already have a Safe wallet but are not registered in Circles Hub.
+   * The transfer data encodes the invitee address(es) directly (no Safe creation).
+   * @param inviter Address of the inviter (must have quota)
+   * @param invitees Array of addresses to invite (must have existing Safe wallets)
+   */
+  async generateInvites(inviter: Address, invitees: Address[]): Promise<GenerateInvitesResult> {
+    if (invitees.length === 0) {
+      throw new InvitationError('At least one invitee address must be provided', {
+        code: 'INVITATION_INVALID_COUNT',
+        source: 'VALIDATION',
+        context: { count: 0 },
+      });
+    }
+
+    const inviterLower = inviter.toLowerCase() as Address;
+    const inviteesLower = invitees.map(a => a.toLowerCase() as Address);
+    const count = inviteesLower.length;
+    const isSingle = count === 1;
+
+    const ids = await this.simulateClaim(inviterLower, count);
+    if (!ids.length) {
+      throw new InvitationError('No invitation IDs returned from claim', {
+        code: 'INVITATION_NO_IDS',
+        source: 'INVITATIONS',
+        context: { inviter: inviterLower, count },
+      });
+    }
+
+    const invitationModule = await this.invitationFarm.invitationModule();
+
+    const claimTx = isSingle
+      ? this.invitationFarm.claimInvite()
+      : this.invitationFarm.claimInvites(BigInt(count));
+
+    const transferTx = isSingle
+      ? this.buildInviteTransfer(inviterLower, invitationModule, ids[0], inviteesLower[0])
+      : this.buildBatchInviteTransfer(inviterLower, invitationModule, ids, inviteesLower);
+
+    return { invitees: inviteesLower, transactions: [claimTx, transferTx] };
   }
 
   /**
@@ -127,8 +172,8 @@ export class InviteFarm {
     return this.invitationFarm.read('claimInvites', [BigInt(count)], { from: inviter }) as Promise<bigint[]>;
   }
 
-  /** Build single safeTransferFrom with createAccount calldata */
-  private buildSingleTransfer(
+  /** Build single safeTransferFrom with createAccount calldata (for referrals - new users) */
+  private buildReferralTransfer(
     from: Address,
     to: Address,
     id: bigint,
@@ -139,8 +184,8 @@ export class InviteFarm {
     return this.hubV2.safeTransferFrom(from, to, id, INVITATION_FEE, data);
   }
 
-  /** Build batch safeBatchTransferFrom with createAccounts calldata */
-  private buildBatchTransfer(
+  /** Build batch safeBatchTransferFrom with createAccounts calldata (for referrals - new users) */
+  private buildBatchReferralTransfer(
     from: Address,
     to: Address,
     ids: bigint[],
@@ -148,6 +193,29 @@ export class InviteFarm {
   ): TransactionRequest {
     const calldata = this.referralsModule.createAccounts(signers).data as Hex;
     const data = encodeAbiParameters(['address', 'bytes'], [this.referralsModuleAddress, calldata]);
+    const amounts = ids.map(() => INVITATION_FEE);
+    return this.hubV2.safeBatchTransferFrom(from, to, ids, amounts, data);
+  }
+
+  /** Build single safeTransferFrom with invitee address encoded (for existing accounts) */
+  private buildInviteTransfer(
+    from: Address,
+    to: Address,
+    id: bigint,
+    invitee: Address
+  ): TransactionRequest {
+    const data = encodeAbiParameters(['address'], [invitee]);
+    return this.hubV2.safeTransferFrom(from, to, id, INVITATION_FEE, data);
+  }
+
+  /** Build batch safeBatchTransferFrom with invitee addresses encoded (for existing accounts) */
+  private buildBatchInviteTransfer(
+    from: Address,
+    to: Address,
+    ids: bigint[],
+    invitees: Address[]
+  ): TransactionRequest {
+    const data = encodeAbiParameters(['address[]'], [invitees]);
     const amounts = ids.map(() => INVITATION_FEE);
     return this.hubV2.safeBatchTransferFrom(from, to, ids, amounts, data);
   }
