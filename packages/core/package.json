@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-core",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Circles Contracts wrapper",
   "type": "module",
   "main": "./dist/index.js",
