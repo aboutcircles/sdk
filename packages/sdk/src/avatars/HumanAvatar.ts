@@ -200,22 +200,6 @@ export class HumanAvatar extends CommonAvatar {
       };
     },
 
-    /**
-     * Generate invitations for existing accounts using the InvitationFarm.
-     * @param invitees Array of addresses to invite (must have existing Safe wallets)
-     */
-    generateInvites: async (invitees: Address[]): Promise<{
-      invitees: Address[];
-      transactionReceipt: TransactionReceipt;
-    }> => {
-      const result = await this._inviteFarm.generateInvites(this.address, invitees);
-      const receipt = await this.runner.sendTransaction!(result.transactions);
-      return {
-        invitees: result.invitees,
-        transactionReceipt: receipt,
-      };
-    },
-
     /** Get the remaining invite quota for this avatar */
     getQuota: async (): Promise<bigint> => {
       return this._inviteFarm.getQuota(this.address);

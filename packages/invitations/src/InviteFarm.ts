@@ -107,11 +107,6 @@ export class InviteFarm {
       ? this.buildReferralTransfer(inviterLower, invitationModule, ids[0], signers[0])
       : this.buildBatchReferralTransfer(inviterLower, invitationModule, ids, signers);
 
-    // @dev ignore saving referral data for now
-    // await Promise.all(
-    //   referrals.map(r => this.invitations.saveReferralData(inviterLower, r.secret))
-    //);
-
     return { referrals, transactions: [claimTx, transferTx] };
   }
 

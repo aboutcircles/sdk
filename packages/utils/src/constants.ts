@@ -34,3 +34,14 @@ export const ACCOUNT_INITIALIZER_HASH: `0x${string}` = '0x89867a67674bd4bf33165a
  * Hash of the account creation code used in CREATE2 address calculation
  */
 export const ACCOUNT_CREATION_CODE_HASH: `0x${string}` = '0xe298282cefe913ab5d282047161268a8222e4bd4ed106300c547894bbefd31ee';
+
+/**
+ * Gnosis group address used for filtering trusted accounts in invitation logic
+ */
+export const GNOSIS_GROUP_ADDRESS: Address = '0xc19bc204eb1c1d5b3fe500e5e5dfabab625f286c';
+
+/**
+ * Farm destination address for market-based invitations
+ * Send 96 CRC here via transitive transfer to earn quota on the InvitationFarm
+ */
+export const FARM_DESTINATION: Address = '0x9Eb51E6A39B3F17bB1883B80748b56170039ff1d';
