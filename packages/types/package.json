@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-types",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "description": "TypeScript type definitions for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",

@@ -183,8 +183,8 @@ export class HumanAvatar extends CommonAvatar {
     },
 
     /**
-     * Generate batch invitations using the InvitationFarm.
-     * @param count Number of invitations to generate
+     * Generate batch referrals using the InvitationFarm (for new users without a Safe).
+     * @param count Number of referrals to generate
      */
     generateReferrals: async (count: number): Promise<{
       secrets: Hex[];

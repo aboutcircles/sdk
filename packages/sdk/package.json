@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "description": "Simplified Circles SDK for non-crypto users with low entrance barrier",
   "type": "module",
   "main": "./dist/index.js",
