@@ -1,6 +1,12 @@
 import type { Address, TransactionRequest, CirclesConfig, Hex } from '@aboutcircles/sdk-types';
 import { RpcClient, PathfinderMethods, TrustMethods } from '@aboutcircles/sdk-rpc';
-import { HubV2ContractMinimal, ReferralsModuleContractMinimal, InvitationFarmContractMinimal } from '@aboutcircles/sdk-core/minimal';
+import {
+  HubV2ContractMinimal,
+  ReferralsModuleContractMinimal,
+  InvitationFarmContractMinimal,
+  SafeContractMinimal,
+  InvitationModuleContractMinimal
+} from '@aboutcircles/sdk-core/minimal';
 import { InvitationError } from './errors';
 import type { ReferralPreviewList } from './types';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
@@ -42,6 +48,7 @@ export class Invitations {
   private hubV2: HubV2ContractMinimal;
   private referralsModule: ReferralsModuleContractMinimal;
   private invitationFarm: InvitationFarmContractMinimal;
+  private invitationModuleContract: InvitationModuleContractMinimal;
 
   constructor(config: CirclesConfig) {
     if (!config.referralsServiceUrl) {
@@ -67,6 +74,44 @@ export class Invitations {
       address: config.invitationFarmAddress,
       rpcUrl: config.circlesRpcUrl,
     });
+    this.invitationModuleContract = new InvitationModuleContractMinimal({
+      address: config.invitationModuleAddress,
+      rpcUrl: config.circlesRpcUrl,
+    });
+  }
+
+  /**
+   * Check if the inviter has the invitation module enabled on their Safe
+   * and is trusted by the invitation module. Returns setup transactions if needed.
+   *
+   * @param inviter - Address of the inviter (Safe wallet)
+   * @returns Array of setup transactions (enableModule + trustInviter) needed before inviting
+   */
+  async ensureInviterSetup(inviter: Address): Promise<TransactionRequest[]> {
+    const inviterLower = inviter.toLowerCase() as Address;
+    const moduleAddress = this.config.invitationModuleAddress;
+    const setupTxs: TransactionRequest[] = [];
+
+    // Check if invitation module is enabled on the inviter's Safe
+    const safeContract = new SafeContractMinimal({
+      address: inviterLower,
+      rpcUrl: this.config.circlesRpcUrl,
+    });
+    const moduleEnabled = await safeContract.isModuleEnabled(moduleAddress);
+
+    if (!moduleEnabled) {
+      setupTxs.push(safeContract.enableModule(moduleAddress));
+      // Module wasn't enabled so inviter can't be trusted yet — add trustInviter tx
+      setupTxs.push(this.invitationModuleContract.trustInviter(inviterLower));
+    } else {
+      // Module is enabled — check if the invitation module trusts the inviter
+      const inviterTrusted = await this.hubV2.isTrusted(moduleAddress, inviterLower);
+      if (!inviterTrusted) {
+        setupTxs.push(this.invitationModuleContract.trustInviter(inviterLower));
+      }
+    }
+
+    return setupTxs;
   }
 
   /**
@@ -213,10 +258,13 @@ export class Invitations {
       throw InvitationError.inviteeAlreadyRegistered(inviterLower, inviteeLower);
     }
 
-    // Step 2: Try to find proxy inviters
+    // Step 2: Ensure inviter has module enabled and is trusted
+    const setupTxs = await this.ensureInviterSetup(inviterLower);
+
+    // Step 3: Try to find proxy inviters
     const realInviters = await this.getRealInviters(inviterLower);
 
-    const transactions: TransactionRequest[] = [];
+    const transactions: TransactionRequest[] = [...setupTxs];
 
     if (realInviters.length > 0) {
       // Standard path: use proxy inviters
@@ -399,21 +447,19 @@ export class Invitations {
    *
    * @param inviter - Address of the inviter
    * @returns Array of real inviters with their addresses and possible number of invitations
-   * @throws InvitationError if inviter has not enabled the invitation module
    *
    * @description
    * This function:
    * 1. Gets all addresses that trust the inviter (set1) - includes both one-way trusts and mutual trusts
    * 2. Gets all addresses trusted by the invitation module (set2) - includes both one-way trusts and mutual trusts
    * 3. Gets all addresses trusted by the gnosis group (set3) - these will be excluded
-   * 4. Verifies that the inviter is trusted by the invitation module (throws error if not)
-   * 5. Finds the intersection of set1 and set2, excluding addresses in set3
-   * 6. Adds the inviter's own address to the list of possible tokens
-   * 7. Builds a path from inviter to invitation module using intersection addresses as toTokens
-   * 8. Sums up transferred token amounts by tokenOwner
-   * 9. Calculates possible invites (1 invite = 96 CRC)
-   * 10. Orders real inviters by preference (best candidates first)
-   * 11. Returns only those token owners whose total amounts exceed the invitation fee (96 CRC)
+   * 4. Finds the intersection of set1 and set2, excluding addresses in set3
+   * 5. Adds the inviter's own address to the list of possible tokens
+   * 6. Builds a path from inviter to invitation module using intersection addresses as toTokens
+   * 7. Sums up transferred token amounts by tokenOwner
+   * 8. Calculates possible invites (1 invite = 96 CRC)
+   * 9. Orders real inviters by preference (best candidates first)
+   * 10. Returns only those token owners whose total amounts exceed the invitation fee (96 CRC)
    */
   async getRealInviters(inviter: Address): Promise<ProxyInviter[]> {
     console.log('[getRealInviters] Finding valid proxy inviters for:', inviter);
@@ -454,17 +500,7 @@ export class Invitations {
     } else {
     }
 
-    // Step 4: Check if inviter is trusted by the invitation module
-    const inviterTrustedByModule = trustedByModule.has(inviterLower);
-    if (!inviterTrustedByModule) {
-      throw new InvitationError('Inviter must enable the invitation module before creating invitations', {
-        code: 'INVITATION_MODULE_NOT_ENABLED',
-        source: 'INVITATIONS',
-        context: { inviter: inviterLower, invitationModule: this.config.invitationModuleAddress }
-      });
-    }
-
-    // Step 5: Find intersection - addresses that trust inviter AND are trusted by invitation module
+    // Step 4: Find intersection - addresses that trust inviter AND are trusted by invitation module
     // AND are NOT trusted by the gnosis group
     const intersection: Address[] = [];
     for (const address of trustedByInviter) {
@@ -473,7 +509,7 @@ export class Invitations {
       }
     }
 
-    // Step 6: Add the inviter's own address to the list of possible tokens
+    // Step 5: Add the inviter's own address to the list of possible tokens
     const tokensToUse = [...intersection];
     const inviterExcluded = trustedByGnosisGroup.has(inviterLower);
     if (!inviterExcluded) {
@@ -485,7 +521,7 @@ export class Invitations {
       return [];
     }
 
-    // Step 7: Build path from inviter to invitation module
+    // Step 6: Build path from inviter to invitation module
     const path = await this.pathfinder.findPath({
       from: inviterLower,
       to: this.config.invitationModuleAddress,
@@ -498,7 +534,7 @@ export class Invitations {
       return [];
     }
 
-    // Step 8: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
+    // Step 7: Sum up transferred token amounts by tokenOwner (only terminal transfers to invitation module)
     const tokenOwnerAmounts = new Map<string, bigint>();
     const invitationModuleLower = this.config.invitationModuleAddress.toLowerCase();
 
@@ -511,7 +547,7 @@ export class Invitations {
       }
     }
 
-    // Step 9: Calculate possible invites and filter token owners
+    // Step 8: Calculate possible invites and filter token owners
     const realInviters: ProxyInviter[] = [];
 
     for (const [tokenOwner, amount] of tokenOwnerAmounts.entries()) {
@@ -525,7 +561,7 @@ export class Invitations {
       }
     }
 
-    // Step 10: Order real inviters by preference (best candidates first)
+    // Step 9: Order real inviters by preference (best candidates first)
     const orderedRealInviters = this.orderRealInviters(realInviters, inviterLower);
 
     console.log('[getRealInviters] Final result:', orderedRealInviters.length, 'valid proxy inviters');
@@ -562,10 +598,13 @@ export class Invitations {
     const privateKey = generatePrivateKey();
     const signerAddress = privateKeyToAddress(privateKey);
 
-    // Step 2: Get real inviters (filtered by gnosis group)
+    // Step 2: Ensure inviter has module enabled and is trusted
+    const setupTxs = await this.ensureInviterSetup(inviterLower);
+
+    // Step 3: Get real inviters (filtered by gnosis group)
     const realInviters = await this.getRealInviters(inviterLower);
 
-    const transactions: TransactionRequest[] = [];
+    const transactions: TransactionRequest[] = [...setupTxs];
 
     if (realInviters.length > 0) {
       // Standard path: use proxy inviters
