@@ -8,3 +8,4 @@ export { TokenMethods } from './token';
 export { InvitationMethods } from './invitation';
 export { TransactionMethods } from './transaction';
 export { GroupMethods } from './group';
+export { SdkMethods } from './sdk';

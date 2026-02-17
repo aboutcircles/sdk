@@ -1,5 +1,12 @@
 import type { RpcClient } from '../client';
-import type { Address, GroupRow, GroupMembershipRow, GroupQueryParams, Filter } from '@aboutcircles/sdk-types';
+import type {
+  Address,
+  GroupRow,
+  GroupMembershipRow,
+  GroupQueryParams,
+  Filter,
+  PagedResponse
+} from '@aboutcircles/sdk-types';
 import type { GroupTokenHolderRow } from '../types';
 import { normalizeAddress, checksumAddresses } from '../utils';
 import { PagedQuery } from '../pagedQuery';
@@ -13,8 +20,8 @@ export class GroupMethods {
   /**
    * Find groups with optional filters
    *
-   * This is a convenience method that fetches all pages using cursor-based pagination
-   * and returns the combined results up to the specified limit.
+   * Uses the native RPC method for efficient server-side filtering and pagination.
+   * Fetches all results using cursor-based pagination up to the specified limit.
    *
    * @param limit - Maximum number of groups to return (default: 50)
    * @param params - Optional query parameters to filter groups
@@ -43,217 +50,104 @@ export class GroupMethods {
    */
   async findGroups(
     limit: number = 50,
-    params?: GroupQueryParams
-  ): Promise<GroupRow[]> {
-    // Create the paged query
-    const query = this.getGroups(limit, params, 'DESC');
-    const results: GroupRow[] = [];
+    params?: GroupQueryParams,
+    cursor?: string | null
+  ): Promise<PagedResponse<GroupRow>> {
+    const normalizedParams = params
+      ? {
+          nameStartsWith: params.nameStartsWith,
+          symbolStartsWith: params.symbolStartsWith,
+          ownerIn: params.ownerIn?.map((owner) => normalizeAddress(owner)),
+        }
+      : undefined;
 
-    // Fetch all pages up to the limit
-    while (await query.queryNextPage()) {
-      results.push(...query.currentPage!.results);
+    const response = await this.client.call<[number, typeof normalizedParams | null, string | null], PagedResponse<GroupRow>>(
+      'circles_findGroups',
+      [limit, normalizedParams ?? null, cursor ?? null]
+    );
 
-      // If we have enough results, break
-      if (results.length >= limit) {
-        break;
+    const rows = checksumAddresses(response.results).map((row) => {
+      const enriched = row as GroupRow & { mint?: Address };
+      if (!enriched.owner && enriched.mint) {
+        return { ...enriched, owner: enriched.mint } as GroupRow;
       }
+      return enriched;
+    });
 
-      // If no more pages, break
-      if (!query.currentPage!.hasMore) {
-        break;
-      }
-    }
-
-    // Apply limit
-    return results.slice(0, limit);
+    return {
+      hasMore: response.hasMore,
+      nextCursor: response.nextCursor,
+      results: rows,
+    };
   }
 
   /**
-   * Get group memberships for an avatar using cursor-based pagination
+   * Get group memberships for an avatar
+   *
+   * Uses the native RPC method for efficient server-side queries.
+   * Fetches all results using cursor-based pagination up to the specified limit.
    *
    * @param avatar - Avatar address to query group memberships for
-   * @param limit - Number of memberships per page (default: 50)
-   * @param sortOrder - Sort order for results (default: 'DESC')
-   * @returns PagedQuery instance for iterating through memberships
+   * @param limit - Maximum number of memberships to return (default: 50)
+   * @returns Array of group membership rows
    *
    * @example
    * ```typescript
-   * const query = rpc.group.getGroupMemberships(
+   * const memberships = await rpc.group.getGroupMemberships(
    *   '0xde374ece6fa50e781e81aac78e811b33d16912c7',
    *   50
    * );
-   * await query.queryNextPage();
-   * console.log(query.currentPage.results);
+   * console.log(memberships);
    * ```
    */
-  getGroupMemberships(
+  async getGroupMemberships(
     avatar: Address,
     limit: number = 50,
-    sortOrder: 'ASC' | 'DESC' = 'DESC'
-  ): PagedQuery<GroupMembershipRow> {
-    const normalized = normalizeAddress(avatar);
-
-    return new PagedQuery<GroupMembershipRow>(
-      this.client,
-      {
-        namespace: 'V_CrcV2',
-        table: 'GroupMemberships',
-        sortOrder,
-        columns: [
-          'blockNumber',
-          'timestamp',
-          'transactionIndex',
-          'logIndex',
-          'transactionHash',
-          'group',
-          'member',
-          'expiryTime',
-        ],
-        filter: [
-          {
-            Type: 'FilterPredicate',
-            FilterType: 'Equals',
-            Column: 'member',
-            Value: normalized,
-          },
-        ],
-        limit,
-      },
-      (row) => checksumAddresses(row) as GroupMembershipRow
+    cursor?: string | null
+  ): Promise<PagedResponse<GroupMembershipRow>> {
+    const response = await this.client.call<[Address, number, string | null], PagedResponse<GroupMembershipRow>>(
+      'circles_getGroupMemberships',
+      [normalizeAddress(avatar), limit, cursor ?? null]
     );
+
+    return {
+      hasMore: response.hasMore,
+      nextCursor: response.nextCursor,
+      results: checksumAddresses(response.results),
+    };
   }
 
   /**
-   * Get holders of a group token using cursor-based pagination
+   * Get members of a group
    *
-   * Returns a PagedQuery instance that can be used to fetch holders page by page.
-   * Results are ordered by totalBalance DESC (highest first), with holder address as tie-breaker.
+   * Uses the native RPC method for efficient server-side queries.
+   * Fetches all results using cursor-based pagination up to the specified limit.
    *
-   * Note: Pagination uses holder address as cursor because totalBalance (BigInt) values
-   * cannot be reliably passed through JSON-RPC filters. This means pagination boundaries
-   * are based on holder addresses, not balances.
-   *
-   * @param groupAddress - The address of the group token
-   * @param limit - Number of holders per page (default: 100)
-   * @returns PagedQuery instance for iterating through group token holders
+   * @param groupAddress - Group address to query members for
+   * @param limit - Maximum number of members to return (default: 100)
+   * @returns Array of group membership rows (members of the group)
    *
    * @example
    * ```typescript
-   * const query = rpc.group.getGroupHolders('0xGroupAddress...', 50);
-   *
-   * // Get first page (ordered by totalBalance DESC)
-   * await query.queryNextPage();
-   * console.log(query.currentPage.results[0]); // Holder with highest balance
-   *
-   * // Get next page if available
-   * if (query.currentPage.hasMore) {
-   *   await query.queryNextPage();
-   * }
+   * const members = await rpc.group.getGroupMembers('0xGroupAddress...', 100);
+   * console.log(`Group has ${members.length} members`);
    * ```
    */
-  getGroupHolders(
-    groupAddress: Address,
-    limit: number = 100
-  ): PagedQuery<GroupTokenHolderRow> {
-    const normalized = normalizeAddress(groupAddress);
-
-    return new PagedQuery<GroupTokenHolderRow>(this.client, {
-      namespace: 'V_CrcV2',
-      table: 'GroupTokenHoldersBalance',
-      sortOrder: 'DESC',
-      columns: ['group', 'holder', 'totalBalance', 'demurragedTotalBalance', 'fractionOwnership'],
-      cursorColumns: [
-        {
-          name: 'holder',
-          sortOrder: 'ASC', // Use holder for cursor-based pagination
-        },
-      ],
-      orderColumns: [
-        { Column: 'totalBalance', SortOrder: 'DESC' },
-        { Column: 'holder', SortOrder: 'ASC' },
-      ],
-      filter: [
-        {
-          Type: 'FilterPredicate',
-          FilterType: 'Equals',
-          Column: 'group',
-          Value: normalized,
-        },
-      ],
-      limit,
-      rowTransformer: (row: any) => {
-        // Convert string values to bigint for specific fields
-        const transformed = {
-          ...row,
-          totalBalance: BigInt(row.totalBalance),
-          demurragedTotalBalance: BigInt(row.demurragedTotalBalance),
-        };
-        return checksumAddresses(transformed) as GroupTokenHolderRow;
-      },
-    });
-  }
-
-  /**
-   * Get members of a group using cursor-based pagination
-   *
-   * Returns a PagedQuery instance that can be used to fetch members page by page
-   * using cursor-based pagination.
-   *
-   * @param groupAddress - The address of the group to query members for
-   * @param limit - Number of members per page (default: 100)
-   * @param sortOrder - Sort order for results (default: 'DESC')
-   * @returns PagedQuery instance for iterating through group members
-   *
-   * @example
-   * ```typescript
-   * const query = rpc.group.getGroupMembers('0xGroupAddress...', 100);
-   *
-   * // Get first page
-   * await query.queryNextPage();
-   * console.log(query.currentPage.results);
-   *
-   * // Get next page if available
-   * if (query.currentPage.hasMore) {
-   *   await query.queryNextPage();
-   *   console.log(query.currentPage.results);
-   * }
-   * ```
-   */
-  getGroupMembers(
+  async getGroupMembers(
     groupAddress: Address,
     limit: number = 100,
-    sortOrder: 'ASC' | 'DESC' = 'DESC'
-  ): PagedQuery<GroupMembershipRow> {
-    const normalized = normalizeAddress(groupAddress);
-
-    return new PagedQuery<GroupMembershipRow>(
-      this.client,
-      {
-        namespace: 'V_CrcV2',
-        table: 'GroupMemberships',
-        sortOrder,
-        columns: [
-          'blockNumber',
-          'timestamp',
-          'transactionIndex',
-          'logIndex',
-          'transactionHash',
-          'group',
-          'member',
-          'expiryTime',
-        ],
-        filter: [
-          {
-            Type: 'FilterPredicate',
-            FilterType: 'Equals',
-            Column: 'group',
-            Value: normalized,
-          },
-        ],
-        limit,
-      },
-      (row) => checksumAddresses(row) as GroupMembershipRow
+    cursor?: string | null
+  ): Promise<PagedResponse<GroupMembershipRow>> {
+    const response = await this.client.call<[Address, number, string | null], PagedResponse<GroupMembershipRow>>(
+      'circles_getGroupMembers',
+      [normalizeAddress(groupAddress), limit, cursor ?? null]
     );
+
+    return {
+      hasMore: response.hasMore,
+      nextCursor: response.nextCursor,
+      results: checksumAddresses(response.results),
+    };
   }
 
   /**
@@ -428,6 +322,50 @@ export class GroupMethods {
         limit,
       },
       (row) => checksumAddresses(row) as GroupRow
+    );
+  }
+
+  /**
+   * Get holders of a group token
+   *
+   * @param groupAddress - Group address (which is also the token address)
+   * @param limit - Maximum number of holders to return (default: 100)
+   * @returns PagedQuery instance for iterating through holders
+   */
+  getGroupHolders(
+    groupAddress: Address,
+    limit: number = 100
+  ): PagedQuery<GroupTokenHolderRow> {
+    const normalized = normalizeAddress(groupAddress);
+
+    return new PagedQuery<GroupTokenHolderRow>(
+      this.client,
+      {
+        namespace: 'V_Crc',
+        table: 'TokenBalances',
+        sortOrder: 'DESC',
+        columns: [
+          'blockNumber',
+          'timestamp',
+          'transactionIndex',
+          'logIndex',
+          'transactionHash',
+          'token',
+          'account',
+          'balance',
+          'lastChangedAt'
+        ],
+        filter: [
+          {
+            Type: 'FilterPredicate',
+            FilterType: 'Equals',
+            Column: 'token',
+            Value: normalized,
+          }
+        ],
+        limit,
+      },
+      (row) => checksumAddresses(row) as unknown as GroupTokenHolderRow
     );
   }
 }

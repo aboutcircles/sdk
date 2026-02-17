@@ -10,6 +10,8 @@ import type { Address } from './base';
 export interface CirclesConfig {
   /** RPC URL for Circles-specific endpoints */
   circlesRpcUrl: string;
+  /** RPC URL for direct chain calls (eth_call, etc). Defaults to circlesRpcUrl if not provided */
+  chainRpcUrl?: string;
   /** Pathfinder service URL for computing transfer paths */
   pathfinderUrl: string;
   /** Profile service URL for user profiles and metadata */
@@ -32,4 +34,8 @@ export interface CirclesConfig {
   liftERC20Address: Address;
   /** Invitation Escrow contract address */
   invitationEscrowAddress: Address;
+  /** Invitation Farm contract address */
+  invitationFarmAddress: Address;
+  /** Referrals Module contract address */
+  referralsModuleAddress: Address;
 }
