@@ -6,7 +6,7 @@
 
 # Interface: JsonRpcResponse\<TResult\>
 
-Defined in: [packages/types/src/rpc.ts:18](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L18)
+Defined in: [packages/types/src/rpc.ts:18](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L18)
 
 JSON-RPC response structure
 
@@ -24,7 +24,7 @@ JSON-RPC response structure
 jsonrpc: "2.0";
 ```
 
-Defined in: [packages/types/src/rpc.ts:19](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L19)
+Defined in: [packages/types/src/rpc.ts:19](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L19)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [packages/types/src/rpc.ts:19](https://github.com/aboutcircles/sdk-v
 id: string | number;
 ```
 
-Defined in: [packages/types/src/rpc.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L20)
+Defined in: [packages/types/src/rpc.ts:20](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L20)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [packages/types/src/rpc.ts:20](https://github.com/aboutcircles/sdk-v
 optional result: TResult;
 ```
 
-Defined in: [packages/types/src/rpc.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L21)
+Defined in: [packages/types/src/rpc.ts:21](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L21)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/types/src/rpc.ts:21](https://github.com/aboutcircles/sdk-v
 optional error: object;
 ```
 
-Defined in: [packages/types/src/rpc.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L22)
+Defined in: [packages/types/src/rpc.ts:22](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L22)
 
 #### code
 

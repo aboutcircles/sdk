@@ -6,7 +6,7 @@
 
 # Class: ContractError
 
-Defined in: [packages/utils/src/contractErrors.ts:190](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/contractErrors.ts#L190)
+Defined in: [packages/utils/src/contractErrors.ts:190](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/contractErrors.ts#L190)
 
 Contract error class for Circles SDK
 Extends CirclesError with contract-specific error information
@@ -23,7 +23,7 @@ Extends CirclesError with contract-specific error information
 new ContractError(message, options?): ContractError;
 ```
 
-Defined in: [packages/utils/src/contractErrors.ts:193](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/contractErrors.ts#L193)
+Defined in: [packages/utils/src/contractErrors.ts:193](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/contractErrors.ts#L193)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ Defined in: [packages/utils/src/contractErrors.ts:193](https://github.com/aboutc
 readonly optional decodedError: DecodedContractError;
 ```
 
-Defined in: [packages/utils/src/contractErrors.ts:191](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/contractErrors.ts#L191)
+Defined in: [packages/utils/src/contractErrors.ts:191](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/contractErrors.ts#L191)
 
 ***
 
@@ -75,7 +75,7 @@ Defined in: [packages/utils/src/contractErrors.ts:191](https://github.com/aboutc
 readonly name: string;
 ```
 
-Defined in: [packages/utils/src/errors.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L32)
+Defined in: [packages/utils/src/errors.ts:32](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/errors.ts#L32)
 
 #### Inherited from
 
@@ -89,7 +89,7 @@ Defined in: [packages/utils/src/errors.ts:32](https://github.com/aboutcircles/sd
 readonly optional code: string | number;
 ```
 
-Defined in: [packages/utils/src/errors.ts:33](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L33)
+Defined in: [packages/utils/src/errors.ts:33](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/errors.ts#L33)
 
 #### Inherited from
 
@@ -103,7 +103,7 @@ Defined in: [packages/utils/src/errors.ts:33](https://github.com/aboutcircles/sd
 readonly source: "CORE";
 ```
 
-Defined in: [packages/utils/src/errors.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L34)
+Defined in: [packages/utils/src/errors.ts:34](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/errors.ts#L34)
 
 #### Inherited from
 
@@ -117,7 +117,7 @@ Defined in: [packages/utils/src/errors.ts:34](https://github.com/aboutcircles/sd
 readonly optional cause: unknown;
 ```
 
-Defined in: [packages/utils/src/errors.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L35)
+Defined in: [packages/utils/src/errors.ts:35](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/errors.ts#L35)
 
 The cause of the error.
 
@@ -133,7 +133,7 @@ The cause of the error.
 readonly optional context: Record<string, any>;
 ```
 
-Defined in: [packages/utils/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L36)
+Defined in: [packages/utils/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/errors.ts#L36)
 
 #### Inherited from
 
@@ -150,7 +150,7 @@ static fromTransactionError(
    context?): ContractError;
 ```
 
-Defined in: [packages/utils/src/contractErrors.ts:209](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/contractErrors.ts#L209)
+Defined in: [packages/utils/src/contractErrors.ts:209](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/contractErrors.ts#L209)
 
 Create a ContractError from a transaction error
 
@@ -180,7 +180,7 @@ Create a ContractError from a transaction error
 toString(): string;
 ```
 
-Defined in: [packages/utils/src/contractErrors.ts:246](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/contractErrors.ts#L246)
+Defined in: [packages/utils/src/contractErrors.ts:246](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/contractErrors.ts#L246)
 
 Get formatted error message with details
 
@@ -200,7 +200,7 @@ Get formatted error message with details
 toJSON(): object;
 ```
 
-Defined in: [packages/utils/src/errors.ts:64](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L64)
+Defined in: [packages/utils/src/errors.ts:64](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/errors.ts#L64)
 
 Convert error to JSON for logging/debugging
 

@@ -6,7 +6,7 @@
 
 # Interface: TrustRelation
 
-Defined in: [packages/types/src/trust.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L10)
+Defined in: [packages/types/src/trust.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L10)
 
 Trust relation information
 
@@ -18,7 +18,7 @@ Trust relation information
 blockNumber: number;
 ```
 
-Defined in: [packages/types/src/trust.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L11)
+Defined in: [packages/types/src/trust.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L11)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/trust.ts:11](https://github.com/aboutcircles/sdk
 timestamp: number;
 ```
 
-Defined in: [packages/types/src/trust.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L12)
+Defined in: [packages/types/src/trust.ts:12](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L12)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/types/src/trust.ts:12](https://github.com/aboutcircles/sdk
 transactionIndex: number;
 ```
 
-Defined in: [packages/types/src/trust.ts:13](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L13)
+Defined in: [packages/types/src/trust.ts:13](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L13)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/types/src/trust.ts:13](https://github.com/aboutcircles/sdk
 logIndex: number;
 ```
 
-Defined in: [packages/types/src/trust.ts:14](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L14)
+Defined in: [packages/types/src/trust.ts:14](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L14)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/types/src/trust.ts:14](https://github.com/aboutcircles/sdk
 transactionHash: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/trust.ts:15](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L15)
+Defined in: [packages/types/src/trust.ts:15](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L15)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/types/src/trust.ts:15](https://github.com/aboutcircles/sdk
 truster: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/trust.ts:16](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L16)
+Defined in: [packages/types/src/trust.ts:16](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L16)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [packages/types/src/trust.ts:16](https://github.com/aboutcircles/sdk
 trustee: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/trust.ts:17](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L17)
+Defined in: [packages/types/src/trust.ts:17](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L17)
 
 ***
 
@@ -88,4 +88,4 @@ Defined in: [packages/types/src/trust.ts:17](https://github.com/aboutcircles/sdk
 expiryTime: number;
 ```
 
-Defined in: [packages/types/src/trust.ts:18](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L18)
+Defined in: [packages/types/src/trust.ts:18](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L18)

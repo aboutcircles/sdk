@@ -6,7 +6,7 @@
 
 # Class: NameRegistryContract
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L11)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L11)
 
 NameRegistry Contract Wrapper
 Provides type-safe methods for interacting with Circles NameRegistry contract
@@ -25,7 +25,7 @@ This is a singleton contract deployed at a fixed address.
 new NameRegistryContract(config): NameRegistryContract;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L12)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:12](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L12)
 
 #### Parameters
 
@@ -55,7 +55,7 @@ Defined in: [packages/core/src/contracts/nameRegistry.ts:12](https://github.com/
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L9)
 
 #### Inherited from
 
@@ -109,7 +109,7 @@ readonly abi: readonly [{
 }];
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L10)
 
 #### Inherited from
 
@@ -123,7 +123,7 @@ Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/abou
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L11)
 
 #### Inherited from
 
@@ -140,7 +140,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -182,7 +182,7 @@ Optional call options
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 
@@ -212,7 +212,7 @@ readonly `unknown`[]
 DEFAULT_CIRCLES_NAME_PREFIX(): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L23)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L23)
 
 Get the default Circles name prefix constant
 
@@ -228,7 +228,7 @@ Get the default Circles name prefix constant
 DEFAULT_CIRCLES_SYMBOL(): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L30)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:30](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L30)
 
 Get the default Circles symbol constant
 
@@ -244,7 +244,7 @@ Get the default Circles symbol constant
 MAX_SHORT_NAME(): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L37)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:37](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L37)
 
 Get the maximum short name value constant
 
@@ -260,7 +260,7 @@ Get the maximum short name value constant
 hub(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L44)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:44](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L44)
 
 Get the Hub contract address
 
@@ -276,7 +276,7 @@ Get the Hub contract address
 name(avatar): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L51)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:51](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L51)
 
 Get the name for an avatar
 
@@ -298,7 +298,7 @@ Get the name for an avatar
 symbol(avatar): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:58](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L58)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:58](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L58)
 
 Get the symbol for an avatar
 
@@ -320,7 +320,7 @@ Get the symbol for an avatar
 customNames(avatar): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:65](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L65)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:65](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L65)
 
 Get the custom name for an avatar
 
@@ -342,7 +342,7 @@ Get the custom name for an avatar
 customSymbols(avatar): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:72](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L72)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:72](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L72)
 
 Get the custom symbol for an avatar
 
@@ -364,7 +364,7 @@ Get the custom symbol for an avatar
 getMetadataDigest(avatar): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:79](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L79)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:79](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L79)
 
 Get the metadata digest for an avatar
 
@@ -386,7 +386,7 @@ Get the metadata digest for an avatar
 avatarToMetaDataDigest(avatar): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:86](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L86)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:86](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L86)
 
 Get the metadata digest for an avatar (mapping access)
 
@@ -408,7 +408,7 @@ Get the metadata digest for an avatar (mapping access)
 shortNames(avatar): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:93](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L93)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:93](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L93)
 
 Get the short name for an avatar
 
@@ -430,7 +430,7 @@ Get the short name for an avatar
 shortNameToAvatar(shortName): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:100](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L100)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:100](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L100)
 
 Get the avatar address for a short name
 
@@ -452,7 +452,7 @@ Get the avatar address for a short name
 searchShortName(avatar): Promise<readonly [bigint, bigint]>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:108](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L108)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:108](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L108)
 
 Search for a valid short name for an avatar
 
@@ -476,7 +476,7 @@ Search for a valid short name for an avatar
 calculateShortNameWithNonce(avatar, nonce): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:115](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L115)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:115](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L115)
 
 Calculate what short name would be generated for an avatar with a specific nonce
 
@@ -502,7 +502,7 @@ Calculate what short name would be generated for an avatar with a specific nonce
 isValidName(name): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:122](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L122)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:122](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L122)
 
 Check if a name is valid according to Circles naming rules
 
@@ -524,7 +524,7 @@ Check if a name is valid according to Circles naming rules
 isValidSymbol(symbol): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:129](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L129)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:129](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L129)
 
 Check if a symbol is valid according to Circles naming rules
 
@@ -546,7 +546,7 @@ Check if a symbol is valid according to Circles naming rules
 registerCustomName(avatar, name): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:136](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L136)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:136](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L136)
 
 Register a custom name for an avatar
 
@@ -572,7 +572,7 @@ Register a custom name for an avatar
 registerCustomSymbol(avatar, symbol): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:147](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L147)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:147](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L147)
 
 Register a custom symbol for an avatar
 
@@ -598,7 +598,7 @@ Register a custom symbol for an avatar
 registerShortName(value): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:158](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L158)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:158](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L158)
 
 Register a short name for the caller (searches for available nonce)
 
@@ -620,7 +620,7 @@ Register a short name for the caller (searches for available nonce)
 registerShortNameWithNonce(nonce): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:169](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L169)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:169](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L169)
 
 Register a short name with a specific nonce
 
@@ -642,7 +642,7 @@ Register a short name with a specific nonce
 setMetadataDigest(avatar, metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:180](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L180)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:180](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L180)
 
 Set metadata digest for an avatar (admin function)
 
@@ -668,7 +668,7 @@ Set metadata digest for an avatar (admin function)
 updateMetadataDigest(metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/nameRegistry.ts:191](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/nameRegistry.ts#L191)
+Defined in: [packages/core/src/contracts/nameRegistry.ts:191](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/nameRegistry.ts#L191)
 
 Update metadata digest for the caller
 

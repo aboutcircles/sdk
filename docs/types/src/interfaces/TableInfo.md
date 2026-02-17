@@ -6,48 +6,26 @@
 
 # Interface: TableInfo
 
-Defined in: [packages/types/src/query.ts:74](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L74)
+Defined in: [packages/types/src/query.ts:90](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L90)
 
-Table information from circles_tables
+Namespace info from circles_tables (top-level array element)
 
 ## Properties
 
-### Namespace
+### namespace
 
 ```ts
-Namespace: string;
+namespace: string;
 ```
 
-Defined in: [packages/types/src/query.ts:75](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L75)
+Defined in: [packages/types/src/query.ts:91](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L91)
 
 ***
 
-### Table
+### tables
 
 ```ts
-Table: string;
+tables: TableDefinition[];
 ```
 
-Defined in: [packages/types/src/query.ts:76](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L76)
-
-***
-
-### Columns
-
-```ts
-Columns: object[];
-```
-
-Defined in: [packages/types/src/query.ts:77](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L77)
-
-#### Name
-
-```ts
-Name: string;
-```
-
-#### Type
-
-```ts
-Type: string;
-```
+Defined in: [packages/types/src/query.ts:92](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L92)

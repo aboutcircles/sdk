@@ -6,7 +6,7 @@
 
 # Class: TokenMethods
 
-Defined in: [packages/rpc/src/methods/token.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/token.ts#L9)
+Defined in: [packages/rpc/src/methods/token.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/token.ts#L9)
 
 Token information RPC methods
 
@@ -18,7 +18,7 @@ Token information RPC methods
 new TokenMethods(client): TokenMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/token.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/token.ts#L10)
+Defined in: [packages/rpc/src/methods/token.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/token.ts#L10)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/token.ts:10](https://github.com/aboutcircl
 getTokenInfo(address): Promise<TokenInfo | undefined>;
 ```
 
-Defined in: [packages/rpc/src/methods/token.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/token.ts#L24)
+Defined in: [packages/rpc/src/methods/token.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/token.ts#L24)
 
 Get token information for a specific token address
 
@@ -71,7 +71,7 @@ console.log(tokenInfo);
 getTokenInfoBatch(addresses): Promise<TokenInfo[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/token.ts:43](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/token.ts#L43)
+Defined in: [packages/rpc/src/methods/token.ts:43](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/token.ts#L43)
 
 Get token information for multiple token addresses in batch
 
@@ -106,10 +106,10 @@ const tokenInfos = await rpc.token.getTokenInfoBatch([
 getTokenHolders(
    tokenAddress, 
    limit, 
-sortOrder): PagedQuery<TokenHolder>;
+cursor?): Promise<PagedResponse<TokenHolderRow>>;
 ```
 
-Defined in: [packages/rpc/src/methods/token.ts:79](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/token.ts#L79)
+Defined in: [packages/rpc/src/methods/token.ts:74](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/token.ts#L74)
 
 Get token holders for a specific token address with pagination
 
@@ -125,30 +125,24 @@ The token address to query holders for
 
 `number` = `100`
 
-Maximum number of results per page (default: 100)
+Maximum number of results to return (default: 100, max: 1000)
 
-##### sortOrder
+##### cursor?
 
-`SortOrder` = `'DESC'`
-
-Sort order for results (default: 'DESC' - highest balance first)
+`string` | `null`
 
 #### Returns
 
-[`PagedQuery`](PagedQuery.md)\<`TokenHolder`\>
+`Promise`\<`PagedResponse`\<`TokenHolderRow`\>\>
 
-PagedQuery instance for token holders
+Array of token holders with their balances
 
 #### Example
 
 ```typescript
-const holdersQuery = rpc.token.getTokenHolders('0x42cedde51198d1773590311e2a340dc06b24cb37', 10);
-
-while (await holdersQuery.queryNextPage()) {
-  const page = holdersQuery.currentPage!;
-  console.log(`Found ${page.size} holders`);
-  page.results.forEach(holder => {
-    console.log(`${holder.account}: ${holder.demurragedTotalBalance}`);
-  });
-}
+const holders = await rpc.token.getTokenHolders('0x42cedde51198d1773590311e2a340dc06b24cb37', 100);
+console.log(`Found ${holders.length} holders`);
+holders.forEach(holder => {
+  console.log(`${holder.account}: ${holder.balance}`);
+});
 ```

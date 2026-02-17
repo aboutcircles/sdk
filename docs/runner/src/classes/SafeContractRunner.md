@@ -6,7 +6,7 @@
 
 # Class: SafeContractRunner
 
-Defined in: [packages/runner/src/safe-runner.ts:88](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L88)
+Defined in: [packages/runner/src/safe-runner.ts:84](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L84)
 
 Safe contract runner implementation using Safe Protocol Kit
 Executes transactions through a Safe multisig wallet
@@ -27,7 +27,7 @@ new SafeContractRunner(
    safeAddress?): SafeContractRunner;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:105](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L105)
+Defined in: [packages/runner/src/safe-runner.ts:101](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L101)
 
 Creates a new SafeContractRunner
 
@@ -67,7 +67,7 @@ The address of the Safe wallet (optional, can be set in init)
 optional address: string;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:89](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L89)
+Defined in: [packages/runner/src/safe-runner.ts:85](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L85)
 
 The address of the account (if available)
 
@@ -85,7 +85,7 @@ ContractRunner.address
 publicClient: object;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:90](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L90)
+Defined in: [packages/runner/src/safe-runner.ts:86](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L86)
 
 The public client for reading blockchain state
 
@@ -107,7 +107,7 @@ static create(
 chain): Promise<SafeContractRunner>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:138](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L138)
+Defined in: [packages/runner/src/safe-runner.ts:143](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L143)
 
 Create and initialize a SafeContractRunner in one step
 
@@ -133,9 +133,9 @@ The address of the Safe wallet
 
 ##### chain
 
-`Chain`
+[`ChainLike`](../type-aliases/ChainLike.md)
 
-The viem chain configuration (e.g., gnosis from 'viem/chains')
+Chain configuration (accepts viem Chain or ChainConfig object)
 
 #### Returns
 
@@ -147,13 +147,22 @@ An initialized SafeContractRunner instance
 
 ```typescript
 import { gnosis } from 'viem/chains';
-import { SafeContractRunner } from '@aboutcircles/sdk-runner';
+import { SafeContractRunner, chains } from '@aboutcircles/sdk-runner';
 
+// Using viem chain (for backward compatibility)
 const runner = await SafeContractRunner.create(
   'https://rpc.gnosischain.com',
   '0xYourPrivateKey...',
   '0xYourSafeAddress...',
   gnosis
+);
+
+// Using built-in chain config (no viem import needed)
+const runner = await SafeContractRunner.create(
+  'https://rpc.gnosischain.com',
+  '0xYourPrivateKey...',
+  '0xYourSafeAddress...',
+  chains.gnosis
 );
 ```
 
@@ -165,7 +174,7 @@ const runner = await SafeContractRunner.create(
 init(safeAddress?): Promise<void>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:158](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L158)
+Defined in: [packages/runner/src/safe-runner.ts:163](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L163)
 
 Initialize the runner with a Safe address
 
@@ -195,7 +204,7 @@ ContractRunner.init
 estimateGas(tx): Promise<bigint>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:190](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L190)
+Defined in: [packages/runner/src/safe-runner.ts:195](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L195)
 
 Estimate gas for a transaction
 
@@ -223,7 +232,7 @@ ContractRunner.estimateGas
 call(tx): Promise<string>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:206](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L206)
+Defined in: [packages/runner/src/safe-runner.ts:211](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L211)
 
 Call a contract (read-only operation)
 
@@ -251,7 +260,7 @@ ContractRunner.call
 resolveName(name): Promise<string | null>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:224](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L224)
+Defined in: [packages/runner/src/safe-runner.ts:229](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L229)
 
 Resolve an ENS name to an address
 
@@ -279,7 +288,7 @@ ContractRunner.resolveName
 sendTransaction(txs): Promise<TransactionReceipt>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:242](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L242)
+Defined in: [packages/runner/src/safe-runner.ts:247](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L247)
 
 Send one or more transactions through the Safe and wait for confirmation
 All transactions are batched and executed atomically
@@ -312,7 +321,7 @@ ContractRunner.sendTransaction
 sendBatchTransaction(): SafeBatchRun;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:290](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L290)
+Defined in: [packages/runner/src/safe-runner.ts:295](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L295)
 
 Create a batch transaction runner
 

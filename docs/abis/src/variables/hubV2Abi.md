@@ -1107,6 +1107,6 @@ const hubV2Abi: readonly [{
 }];
 ```
 
-Defined in: [packages/abis/src/hubV2.ts:4](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/abis/src/hubV2.ts#L4)
+Defined in: [packages/abis/src/hubV2.ts:4](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/abis/src/hubV2.ts#L4)
 
 HubV2 Contract ABI

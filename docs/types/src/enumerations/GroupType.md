@@ -6,7 +6,7 @@
 
 # Enumeration: GroupType
 
-Defined in: [packages/types/src/sdk.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L48)
+Defined in: [packages/types/src/sdk.ts:68](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L68)
 
 Group type enumeration
 
@@ -18,7 +18,7 @@ Group type enumeration
 Standard: "Standard";
 ```
 
-Defined in: [packages/types/src/sdk.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L49)
+Defined in: [packages/types/src/sdk.ts:69](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L69)
 
 ***
 
@@ -28,4 +28,4 @@ Defined in: [packages/types/src/sdk.ts:49](https://github.com/aboutcircles/sdk-v
 Custom: "Custom";
 ```
 
-Defined in: [packages/types/src/sdk.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L50)
+Defined in: [packages/types/src/sdk.ts:70](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L70)

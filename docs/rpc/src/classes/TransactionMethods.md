@@ -6,7 +6,7 @@
 
 # Class: TransactionMethods
 
-Defined in: [packages/rpc/src/methods/transaction.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/transaction.ts#L42)
+Defined in: [packages/rpc/src/methods/transaction.ts:8](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/transaction.ts#L8)
 
 Transaction history RPC methods
 
@@ -18,7 +18,7 @@ Transaction history RPC methods
 new TransactionMethods(client): TransactionMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/transaction.ts:43](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/transaction.ts#L43)
+Defined in: [packages/rpc/src/methods/transaction.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/transaction.ts#L9)
 
 #### Parameters
 
@@ -38,15 +38,16 @@ Defined in: [packages/rpc/src/methods/transaction.ts:43](https://github.com/abou
 getTransactionHistory(
    avatar, 
    limit, 
-sortOrder): PagedQuery<TransactionHistoryRow>;
+cursor?): Promise<PagedResponse<TransactionHistoryRow>>;
 ```
 
-Defined in: [packages/rpc/src/methods/transaction.ts:73](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/transaction.ts#L73)
+Defined in: [packages/rpc/src/methods/transaction.ts:30](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/transaction.ts#L30)
 
-Get transaction history for an address using cursor-based pagination
+Get transaction history for an address
 
-Returns a PagedQuery instance that can be used to fetch transaction history page by page.
-Automatically calculates circle amounts for each v2 transaction.
+Uses the native RPC method which efficiently queries transfers and calculates
+all circle amount formats server-side. Fetches all results using cursor-based
+pagination up to the specified limit.
 
 #### Parameters
 
@@ -60,34 +61,75 @@ Avatar address to query transaction history for
 
 `number` = `50`
 
-Number of transactions per page (default: 50)
+Maximum number of transactions to return (default: 50)
 
-##### sortOrder
+##### cursor?
 
-Sort order for results (default: 'DESC')
-
-`"ASC"` | `"DESC"`
+`string` | `null`
 
 #### Returns
 
-[`PagedQuery`](PagedQuery.md)\<[`TransactionHistoryRow`](../interfaces/TransactionHistoryRow.md)\>
+`Promise`\<`PagedResponse`\<`TransactionHistoryRow`\>\>
 
-PagedQuery instance for iterating through transaction history
+Array of transaction history rows with all circle amount formats
 
 #### Example
 
 ```typescript
-const query = rpc.transaction.getTransactionHistory('0xAvatar...', 50);
-
-// Get first page
-await query.queryNextPage();
-query.currentPage.results.forEach(tx => {
+const history = await rpc.transaction.getTransactionHistory('0xAvatar...', 50);
+history.forEach(tx => {
   console.log(`${tx.from} -> ${tx.to}: ${tx.circles} CRC`);
 });
-
-// Get next page if available
-if (query.currentPage.hasMore) {
-  await query.queryNextPage();
-  // Process next page...
-}
 ```
+
+***
+
+### getTransactionHistoryEnriched()
+
+```ts
+getTransactionHistoryEnriched(
+   avatar, 
+   fromBlock, 
+   toBlock, 
+   limit, 
+cursor?): Promise<PagedResponse<EnrichedTransaction>>;
+```
+
+Defined in: [packages/rpc/src/methods/transaction.ts:56](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/transaction.ts#L56)
+
+Get enriched transaction history
+Includes profile data and pre-calculated balance formats
+
+#### Parameters
+
+##### avatar
+
+`` `0x${string}` ``
+
+Avatar address to query
+
+##### fromBlock
+
+`number` = `0`
+
+##### toBlock
+
+`number` | `null`
+
+##### limit
+
+`number` = `20`
+
+Number of transactions per page (default: 20)
+
+##### cursor?
+
+Pagination cursor
+
+`string` | `null`
+
+#### Returns
+
+`Promise`\<`PagedResponse`\<`EnrichedTransaction`\>\>
+
+Paged response with enriched transactions

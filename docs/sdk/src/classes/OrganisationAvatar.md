@@ -6,7 +6,7 @@
 
 # Class: OrganisationAvatar
 
-Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/OrganisationAvatar.ts#L23)
+Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/OrganisationAvatar.ts#L23)
 
 OrganisationAvatar class implementation
 Provides a simplified, user-friendly wrapper around Circles protocol for organisation avatars
@@ -31,7 +31,7 @@ new OrganisationAvatar(
    avatarInfo?): OrganisationAvatar;
 ```
 
-Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/OrganisationAvatar.ts#L24)
+Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/OrganisationAvatar.ts#L24)
 
 #### Parameters
 
@@ -69,7 +69,7 @@ CommonAvatar.constructor
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L42)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:51](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L51)
 
 #### Inherited from
 
@@ -85,7 +85,7 @@ CommonAvatar.address
 readonly avatarInfo: AvatarRow | undefined;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:43](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L43)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:52](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L52)
 
 #### Inherited from
 
@@ -101,7 +101,7 @@ CommonAvatar.avatarInfo
 readonly core: Core;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L44)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:53](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L53)
 
 #### Inherited from
 
@@ -117,7 +117,7 @@ CommonAvatar.core
 readonly optional contractRunner: ContractRunner;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:45](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L45)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:54](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L54)
 
 #### Inherited from
 
@@ -133,7 +133,7 @@ CommonAvatar.contractRunner
 events: Observable<CirclesEvent>;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:46](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L46)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:55](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L55)
 
 #### Inherited from
 
@@ -149,7 +149,7 @@ CommonAvatar.events
 protected readonly runner: ContractRunner;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L48)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:84](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L84)
 
 #### Inherited from
 
@@ -165,7 +165,7 @@ CommonAvatar.runner
 protected readonly profiles: Profiles;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L49)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:85](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L85)
 
 #### Inherited from
 
@@ -181,7 +181,7 @@ CommonAvatar.profiles
 protected readonly rpc: CirclesRpc;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L50)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:86](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L86)
 
 #### Inherited from
 
@@ -197,7 +197,7 @@ CommonAvatar.rpc
 protected readonly transferBuilder: TransferBuilder;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L51)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:87](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L87)
 
 #### Inherited from
 
@@ -213,7 +213,7 @@ CommonAvatar.transferBuilder
 protected optional _cachedProfile: Profile;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L52)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:88](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L88)
 
 #### Inherited from
 
@@ -229,7 +229,7 @@ CommonAvatar._cachedProfile
 protected optional _cachedProfileCid: string;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L53)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:89](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L89)
 
 #### Inherited from
 
@@ -245,7 +245,7 @@ CommonAvatar._cachedProfileCid
 protected optional _eventSubscription: () => void;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:54](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L54)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:90](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L90)
 
 #### Returns
 
@@ -265,7 +265,7 @@ CommonAvatar._eventSubscription
 readonly trust: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:128](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L128)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:166](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L166)
 
 #### add()
 
@@ -436,7 +436,7 @@ CommonAvatar.trust
 readonly profile: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:267](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L267)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:305](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L305)
 
 #### get()
 
@@ -580,12 +580,12 @@ CommonAvatar.profile
 readonly history: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:405](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L405)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:443](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L443)
 
 #### getTransactions()
 
 ```ts
-getTransactions: (limit, sortOrder) => PagedQuery<TransactionHistoryRow>;
+getTransactions: (limit) => Promise<PagedResponse<TransactionHistoryRow>>;
 ```
 
 Get transaction history for this avatar using cursor-based pagination
@@ -599,15 +599,9 @@ Returns incoming/outgoing transactions and minting events
 
 Number of transactions per page (default: 50)
 
-###### sortOrder
-
-Sort order for results (default: 'DESC')
-
-`"ASC"` | `"DESC"`
-
 ##### Returns
 
-`PagedQuery`\<`TransactionHistoryRow`\>
+`Promise`\<`PagedResponse`\<`TransactionHistoryRow`\>\>
 
 PagedQuery instance for iterating through transactions
 
@@ -642,7 +636,7 @@ CommonAvatar.history
 readonly transfer: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:439](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L439)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:477](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L477)
 
 #### direct()
 
@@ -829,7 +823,7 @@ CommonAvatar.transfer
 readonly wrap: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:599](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L599)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:637](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L637)
 
 #### asDemurraged()
 
@@ -983,7 +977,7 @@ CommonAvatar.wrap
 readonly balances: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/OrganisationAvatar.ts#L37)
+Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:37](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/OrganisationAvatar.ts#L37)
 
 #### getTotal()
 
@@ -1096,7 +1090,7 @@ CommonAvatar.balances
 readonly groupToken: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:127](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/OrganisationAvatar.ts#L127)
+Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:127](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/OrganisationAvatar.ts#L127)
 
 #### mint()
 
@@ -1353,7 +1347,7 @@ Array of membership condition addresses
 readonly group: object;
 ```
 
-Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:391](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/OrganisationAvatar.ts#L391)
+Defined in: [packages/sdk/src/avatars/OrganisationAvatar.ts:391](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/OrganisationAvatar.ts#L391)
 
 #### properties
 
@@ -1493,7 +1487,63 @@ The group address
 
 Array of membership condition addresses
 
+## Accessors
+
+### sdk
+
+#### Get Signature
+
+```ts
+get sdk(): SdkReference;
+```
+
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:68](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L68)
+
+Get the parent SDK instance.
+Throws if the avatar was not created via Sdk.getAvatar().
+
+##### Returns
+
+`SdkReference`
+
+#### Inherited from
+
+```ts
+CommonAvatar.sdk
+```
+
 ## Methods
+
+### setSdk()
+
+```ts
+setSdk(sdk): void;
+```
+
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:80](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L80)
+
+**`Internal`**
+
+Set the parent SDK reference.
+Called internally by Sdk.getAvatar().
+
+#### Parameters
+
+##### sdk
+
+`SdkReference`
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+```ts
+CommonAvatar.setSdk
+```
+
+***
 
 ### subscribeToEvents()
 
@@ -1501,10 +1551,11 @@ Array of membership condition addresses
 subscribeToEvents(): Promise<void>;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:709](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L709)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:748](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L748)
 
 Subscribe to Circles events for this avatar
 Events are filtered to only include events related to this avatar's address
+This method is idempotent - calling it multiple times will not create duplicate subscriptions
 
 #### Returns
 
@@ -1541,7 +1592,7 @@ CommonAvatar.subscribeToEvents
 unsubscribeFromEvents(): void;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:719](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L719)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:774](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L774)
 
 Unsubscribe from events
 Cleans up the WebSocket connection and event listeners
@@ -1568,7 +1619,7 @@ protected _transferErc1155(
 txData?): Promise<TransactionReceipt>;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:734](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L734)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:789](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L789)
 
 Transfer ERC1155 tokens using safeTransferFrom
 
@@ -1611,7 +1662,7 @@ protected _transferErc20(
 tokenAddress): Promise<TransactionReceipt>;
 ```
 
-Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:763](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/avatars/CommonAvatar.ts#L763)
+Defined in: [packages/sdk/src/avatars/CommonAvatar.ts:818](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/avatars/CommonAvatar.ts#L818)
 
 Transfer ERC20 tokens using the standard transfer function
 

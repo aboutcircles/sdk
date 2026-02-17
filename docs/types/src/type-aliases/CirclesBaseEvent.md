@@ -10,7 +10,7 @@
 type CirclesBaseEvent = object;
 ```
 
-Defined in: [packages/types/src/events.ts:5](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L5)
+Defined in: [packages/types/src/events.ts:5](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L5)
 
 Events types
 
@@ -22,7 +22,7 @@ Events types
 blockNumber: number;
 ```
 
-Defined in: [packages/types/src/events.ts:6](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L6)
+Defined in: [packages/types/src/events.ts:6](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L6)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/types/src/events.ts:6](https://github.com/aboutcircles/sdk
 optional timestamp: number;
 ```
 
-Defined in: [packages/types/src/events.ts:7](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L7)
+Defined in: [packages/types/src/events.ts:7](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L7)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [packages/types/src/events.ts:7](https://github.com/aboutcircles/sdk
 transactionIndex: number;
 ```
 
-Defined in: [packages/types/src/events.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L8)
+Defined in: [packages/types/src/events.ts:8](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L8)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [packages/types/src/events.ts:8](https://github.com/aboutcircles/sdk
 logIndex: number;
 ```
 
-Defined in: [packages/types/src/events.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L9)
+Defined in: [packages/types/src/events.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L9)
 
 ***
 
@@ -62,4 +62,4 @@ Defined in: [packages/types/src/events.ts:9](https://github.com/aboutcircles/sdk
 optional transactionHash: string;
 ```
 
-Defined in: [packages/types/src/events.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L10)
+Defined in: [packages/types/src/events.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L10)

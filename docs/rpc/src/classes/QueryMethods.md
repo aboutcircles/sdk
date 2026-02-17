@@ -6,7 +6,7 @@
 
 # Class: QueryMethods
 
-Defined in: [packages/rpc/src/methods/query.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L8)
+Defined in: [packages/rpc/src/methods/query.ts:26](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/query.ts#L26)
 
 Query and table RPC methods
 
@@ -18,7 +18,7 @@ Query and table RPC methods
 new QueryMethods(client): QueryMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L9)
+Defined in: [packages/rpc/src/methods/query.ts:27](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/query.ts#L27)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/query.ts:9](https://github.com/aboutcircle
 query<T>(params): Promise<T[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:45](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L45)
+Defined in: [packages/rpc/src/methods/query.ts:63](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/query.ts#L63)
 
 Query tables with filters
 
@@ -99,7 +99,7 @@ const results = await rpc.query.query({
 tables(): Promise<TableInfo[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:61](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L61)
+Defined in: [packages/rpc/src/methods/query.ts:87](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/query.ts#L87)
 
 Return all available namespaces and tables which can be queried
 
@@ -122,16 +122,19 @@ console.log(tables);
 
 ```ts
 events<T>(
+   address, 
    fromBlock, 
    toBlock, 
    eventTypes, 
-   address, 
-includeTransactionData): Promise<T[]>;
+   filterPredicates, 
+   sortAscending, 
+   limit, 
+cursor): Promise<PagedEventsResponse<T>>;
 ```
 
-Defined in: [packages/rpc/src/methods/query.ts:86](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/query.ts#L86)
+Defined in: [packages/rpc/src/methods/query.ts:125](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/query.ts#L125)
 
-Query events of specific types within a block range
+Query events of specific types within a block range with pagination support.
 
 #### Type Parameters
 
@@ -140,6 +143,12 @@ Query events of specific types within a block range
 `T` = `unknown`
 
 #### Parameters
+
+##### address
+
+Optional address filter (null for all addresses)
+
+`string` | `null`
 
 ##### fromBlock
 
@@ -159,32 +168,54 @@ Array of event types to filter (null for all)
 
 `EventType`[] | `null`
 
-##### address
+##### filterPredicates
 
-Optional address filter
+Advanced filter predicates (null for none)
 
-`string` | `null`
+`FilterPredicate`[] | `null`
 
-##### includeTransactionData
+##### sortAscending
 
 `boolean` = `false`
 
-Whether to include transaction data
+Sort order (default: false = descending)
+
+##### limit
+
+`number` = `100`
+
+Maximum events to return (default: 100, max: 1000)
+
+##### cursor
+
+Pagination cursor from previous response (null for first page)
+
+`string` | `null`
 
 #### Returns
 
-`Promise`\<`T`[]\>
+`Promise`\<`PagedEventsResponse`\<`T`\>\>
 
-Array of events
+Paginated events response with events array, hasMore flag, and nextCursor
 
 #### Example
 
 ```typescript
-const events = await rpc.query.events(
+// Basic usage - get first page of events for an address
+const result = await rpc.query.events(
+  '0xde374ece6fa50e781e81aac78e811b33d16912c7',
   38000000,
   null,
-  ['CrcV1_Trust'],
-  null,
-  false
+  ['CrcV1_Trust']
 );
+console.log(result.events);
+console.log(result.hasMore, result.nextCursor);
+
+// Paginate through results
+let cursor: string | null = null;
+do {
+  const page = await rpc.query.events(address, fromBlock, null, null, null, false, 100, cursor);
+  console.log(page.events);
+  cursor = page.nextCursor;
+} while (cursor);
 ```

@@ -6,7 +6,7 @@
 
 # Interface: QueryParams
 
-Defined in: [packages/types/src/query.ts:62](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L62)
+Defined in: [packages/types/src/query.ts:62](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L62)
 
 Query parameters for circles_query
 
@@ -18,7 +18,7 @@ Query parameters for circles_query
 Namespace: string;
 ```
 
-Defined in: [packages/types/src/query.ts:63](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L63)
+Defined in: [packages/types/src/query.ts:63](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L63)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/query.ts:63](https://github.com/aboutcircles/sdk
 Table: string;
 ```
 
-Defined in: [packages/types/src/query.ts:64](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L64)
+Defined in: [packages/types/src/query.ts:64](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L64)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/types/src/query.ts:64](https://github.com/aboutcircles/sdk
 Columns: string[];
 ```
 
-Defined in: [packages/types/src/query.ts:65](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L65)
+Defined in: [packages/types/src/query.ts:65](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L65)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/types/src/query.ts:65](https://github.com/aboutcircles/sdk
 Filter: Filter[];
 ```
 
-Defined in: [packages/types/src/query.ts:66](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L66)
+Defined in: [packages/types/src/query.ts:66](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L66)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/types/src/query.ts:66](https://github.com/aboutcircles/sdk
 Order: OrderBy[];
 ```
 
-Defined in: [packages/types/src/query.ts:67](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L67)
+Defined in: [packages/types/src/query.ts:67](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L67)
 
 ***
 
@@ -68,4 +68,4 @@ Defined in: [packages/types/src/query.ts:67](https://github.com/aboutcircles/sdk
 optional Limit: number;
 ```
 
-Defined in: [packages/types/src/query.ts:68](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L68)
+Defined in: [packages/types/src/query.ts:68](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L68)

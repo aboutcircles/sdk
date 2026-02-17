@@ -6,7 +6,7 @@
 
 # Interface: GroupRow
 
-Defined in: [packages/types/src/group.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L10)
+Defined in: [packages/types/src/group.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L10)
 
 Group row information
 
@@ -18,7 +18,7 @@ Group row information
 blockNumber: number;
 ```
 
-Defined in: [packages/types/src/group.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L11)
+Defined in: [packages/types/src/group.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L11)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/group.ts:11](https://github.com/aboutcircles/sdk
 timestamp: number;
 ```
 
-Defined in: [packages/types/src/group.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L12)
+Defined in: [packages/types/src/group.ts:12](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L12)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/types/src/group.ts:12](https://github.com/aboutcircles/sdk
 transactionIndex: number;
 ```
 
-Defined in: [packages/types/src/group.ts:13](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L13)
+Defined in: [packages/types/src/group.ts:13](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L13)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/types/src/group.ts:13](https://github.com/aboutcircles/sdk
 logIndex: number;
 ```
 
-Defined in: [packages/types/src/group.ts:14](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L14)
+Defined in: [packages/types/src/group.ts:14](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L14)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/types/src/group.ts:14](https://github.com/aboutcircles/sdk
 transactionHash: string;
 ```
 
-Defined in: [packages/types/src/group.ts:15](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L15)
+Defined in: [packages/types/src/group.ts:15](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L15)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/types/src/group.ts:15](https://github.com/aboutcircles/sdk
 group: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:16](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L16)
+Defined in: [packages/types/src/group.ts:16](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L16)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [packages/types/src/group.ts:16](https://github.com/aboutcircles/sdk
 type: string;
 ```
 
-Defined in: [packages/types/src/group.ts:17](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L17)
+Defined in: [packages/types/src/group.ts:17](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L17)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [packages/types/src/group.ts:17](https://github.com/aboutcircles/sdk
 owner: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:18](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L18)
+Defined in: [packages/types/src/group.ts:18](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L18)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [packages/types/src/group.ts:18](https://github.com/aboutcircles/sdk
 optional mintPolicy: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:19](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L19)
+Defined in: [packages/types/src/group.ts:19](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L19)
 
 ***
 
@@ -108,7 +108,7 @@ Defined in: [packages/types/src/group.ts:19](https://github.com/aboutcircles/sdk
 optional mintHandler: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L20)
+Defined in: [packages/types/src/group.ts:20](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L20)
 
 ***
 
@@ -118,7 +118,7 @@ Defined in: [packages/types/src/group.ts:20](https://github.com/aboutcircles/sdk
 optional treasury: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L21)
+Defined in: [packages/types/src/group.ts:21](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L21)
 
 ***
 
@@ -128,7 +128,7 @@ Defined in: [packages/types/src/group.ts:21](https://github.com/aboutcircles/sdk
 optional service: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L22)
+Defined in: [packages/types/src/group.ts:22](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L22)
 
 ***
 
@@ -138,7 +138,7 @@ Defined in: [packages/types/src/group.ts:22](https://github.com/aboutcircles/sdk
 optional feeCollection: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L23)
+Defined in: [packages/types/src/group.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L23)
 
 ***
 
@@ -148,7 +148,7 @@ Defined in: [packages/types/src/group.ts:23](https://github.com/aboutcircles/sdk
 optional memberCount: number;
 ```
 
-Defined in: [packages/types/src/group.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L24)
+Defined in: [packages/types/src/group.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L24)
 
 ***
 
@@ -158,7 +158,7 @@ Defined in: [packages/types/src/group.ts:24](https://github.com/aboutcircles/sdk
 optional name: string;
 ```
 
-Defined in: [packages/types/src/group.ts:25](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L25)
+Defined in: [packages/types/src/group.ts:25](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L25)
 
 ***
 
@@ -168,7 +168,7 @@ Defined in: [packages/types/src/group.ts:25](https://github.com/aboutcircles/sdk
 optional symbol: string;
 ```
 
-Defined in: [packages/types/src/group.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L26)
+Defined in: [packages/types/src/group.ts:26](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L26)
 
 ***
 
@@ -178,7 +178,7 @@ Defined in: [packages/types/src/group.ts:26](https://github.com/aboutcircles/sdk
 optional cidV0Digest: string;
 ```
 
-Defined in: [packages/types/src/group.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L27)
+Defined in: [packages/types/src/group.ts:27](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L27)
 
 ***
 
@@ -188,7 +188,7 @@ Defined in: [packages/types/src/group.ts:27](https://github.com/aboutcircles/sdk
 optional erc20WrapperDemurraged: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:28](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L28)
+Defined in: [packages/types/src/group.ts:28](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L28)
 
 ***
 
@@ -198,4 +198,4 @@ Defined in: [packages/types/src/group.ts:28](https://github.com/aboutcircles/sdk
 optional erc20WrapperStatic: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L29)
+Defined in: [packages/types/src/group.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L29)

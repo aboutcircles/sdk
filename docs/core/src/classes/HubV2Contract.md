@@ -6,7 +6,7 @@
 
 # Class: HubV2Contract
 
-Defined in: [packages/core/src/contracts/hubV2.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L9)
+Defined in: [packages/core/src/contracts/hubV2.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L9)
 
 HubV2 Contract Wrapper
 Provides type-safe methods for interacting with Circles HubV2 contract
@@ -23,7 +23,7 @@ Provides type-safe methods for interacting with Circles HubV2 contract
 new HubV2Contract(config): HubV2Contract;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L10)
+Defined in: [packages/core/src/contracts/hubV2.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L10)
 
 #### Parameters
 
@@ -53,7 +53,7 @@ Defined in: [packages/core/src/contracts/hubV2.ts:10](https://github.com/aboutci
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L9)
 
 #### Inherited from
 
@@ -146,7 +146,7 @@ readonly abi: readonly [{
 }];
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L10)
 
 #### Inherited from
 
@@ -160,7 +160,7 @@ Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/abou
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L11)
 
 #### Inherited from
 
@@ -177,7 +177,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -219,7 +219,7 @@ Optional call options
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 
@@ -249,7 +249,7 @@ readonly `unknown`[]
 isHuman(address): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L20)
+Defined in: [packages/core/src/contracts/hubV2.ts:20](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L20)
 
 Check if an address is registered as a human
 
@@ -271,7 +271,7 @@ Check if an address is registered as a human
 isGroup(address): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L27)
+Defined in: [packages/core/src/contracts/hubV2.ts:27](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L27)
 
 Check if an address is registered as a group
 
@@ -293,7 +293,7 @@ Check if an address is registered as a group
 isOrganization(address): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L34)
+Defined in: [packages/core/src/contracts/hubV2.ts:34](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L34)
 
 Check if an address is registered as an organization
 
@@ -315,7 +315,7 @@ Check if an address is registered as an organization
 balanceOf(account, id): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L41)
+Defined in: [packages/core/src/contracts/hubV2.ts:41](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L41)
 
 Get balance of a specific token ID for an account
 
@@ -341,7 +341,7 @@ Get balance of a specific token ID for an account
 balanceOfBatch(accounts, ids): Promise<readonly bigint[]>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L48)
+Defined in: [packages/core/src/contracts/hubV2.ts:48](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L48)
 
 Get balances of multiple token IDs for multiple accounts
 
@@ -367,7 +367,7 @@ readonly `bigint`[]
 totalSupply(id): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:55](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L55)
+Defined in: [packages/core/src/contracts/hubV2.ts:55](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L55)
 
 Get total supply of a specific token ID
 
@@ -389,7 +389,7 @@ Get total supply of a specific token ID
 isTrusted(truster, trustee): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:62](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L62)
+Defined in: [packages/core/src/contracts/hubV2.ts:62](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L62)
 
 Check if an address trusts another address
 
@@ -415,7 +415,7 @@ Check if an address trusts another address
 isApprovedForAll(owner, operator): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:69](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L69)
+Defined in: [packages/core/src/contracts/hubV2.ts:69](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L69)
 
 Check if an operator is approved to manage all tokens for an owner
 
@@ -441,7 +441,7 @@ Check if an operator is approved to manage all tokens for an owner
 toTokenId(avatar): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:76](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L76)
+Defined in: [packages/core/src/contracts/hubV2.ts:76](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L76)
 
 Convert token ID to avatar address
 
@@ -463,7 +463,7 @@ Convert token ID to avatar address
 calculateIssuance(human): Promise<readonly [bigint, bigint, bigint]>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:84](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L84)
+Defined in: [packages/core/src/contracts/hubV2.ts:84](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L84)
 
 Calculate issuance for a human avatar
 
@@ -485,7 +485,7 @@ Calculate issuance for a human avatar
 day(timestamp): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:91](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L91)
+Defined in: [packages/core/src/contracts/hubV2.ts:91](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L91)
 
 Get the current day based on timestamp
 
@@ -507,7 +507,7 @@ Get the current day based on timestamp
 inflationDayZero(): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:98](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L98)
+Defined in: [packages/core/src/contracts/hubV2.ts:98](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L98)
 
 Get inflation day zero
 
@@ -523,7 +523,7 @@ Get inflation day zero
 stopped(human, options?): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:107](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L107)
+Defined in: [packages/core/src/contracts/hubV2.ts:107](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L107)
 
 Check if a human has stopped their Circles minting
 
@@ -555,7 +555,7 @@ Optional call options (e.g., { from: Address })
 personalMint(): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:115](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L115)
+Defined in: [packages/core/src/contracts/hubV2.ts:115](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L115)
 
 Create a personal mint transaction
 Mints personal Circles tokens for the caller
@@ -576,7 +576,7 @@ groupMint(
    data): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:132](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L132)
+Defined in: [packages/core/src/contracts/hubV2.ts:132](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L132)
 
 Create a group mint transaction
 Mints group tokens backed by collateral from avatars
@@ -619,7 +619,7 @@ Additional data to pass to the contract (use '0x' for no data)
 trust(trustReceiver, expiry): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:149](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L149)
+Defined in: [packages/core/src/contracts/hubV2.ts:149](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L149)
 
 Create a trust transaction
 Trust another address until the specified expiry time
@@ -646,7 +646,7 @@ Trust another address until the specified expiry time
 registerHuman(inviter, metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:160](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L160)
+Defined in: [packages/core/src/contracts/hubV2.ts:160](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L160)
 
 Create a register human transaction
 
@@ -672,7 +672,7 @@ Create a register human transaction
 registerOrganization(name, metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:171](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L171)
+Defined in: [packages/core/src/contracts/hubV2.ts:171](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L171)
 
 Create a register organization transaction
 
@@ -702,7 +702,7 @@ registerGroup(
    metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:182](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L182)
+Defined in: [packages/core/src/contracts/hubV2.ts:182](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L182)
 
 Create a register group transaction
 
@@ -741,7 +741,7 @@ safeTransferFrom(
    data): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:198](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L198)
+Defined in: [packages/core/src/contracts/hubV2.ts:198](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L198)
 
 Create a safe transfer transaction
 
@@ -784,7 +784,7 @@ safeBatchTransferFrom(
    data): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:215](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L215)
+Defined in: [packages/core/src/contracts/hubV2.ts:215](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L215)
 
 Create a batch transfer transaction
 
@@ -822,7 +822,7 @@ readonly `bigint`[]
 setApprovalForAll(operator, approved): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:232](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L232)
+Defined in: [packages/core/src/contracts/hubV2.ts:232](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L232)
 
 Create an approval for all transaction
 
@@ -851,7 +851,7 @@ burn(
    data): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:243](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L243)
+Defined in: [packages/core/src/contracts/hubV2.ts:243](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L243)
 
 Create a burn transaction
 
@@ -881,7 +881,7 @@ Create a burn transaction
 stop(): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:256](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L256)
+Defined in: [packages/core/src/contracts/hubV2.ts:256](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L256)
 
 Create a stop transaction
 Permanently stops the ability to mint new personal tokens
@@ -902,7 +902,7 @@ wrap(
    circlesType): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:273](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L273)
+Defined in: [packages/core/src/contracts/hubV2.ts:273](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L273)
 
 Create a wrap transaction
 Wraps ERC1155 Circles tokens into ERC20 format
@@ -945,7 +945,7 @@ operateFlowMatrix(
    packedCoordinates): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/hubV2.ts:294](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/hubV2.ts#L294)
+Defined in: [packages/core/src/contracts/hubV2.ts:294](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/hubV2.ts#L294)
 
 Create an operateFlowMatrix transaction
 Executes a batch of token transfers based on the flow matrix

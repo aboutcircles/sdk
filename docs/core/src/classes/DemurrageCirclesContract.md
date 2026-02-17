@@ -6,7 +6,7 @@
 
 # Class: DemurrageCirclesContract
 
-Defined in: [packages/core/src/contracts/demurrageCircles.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/demurrageCircles.ts#L23)
+Defined in: [packages/core/src/contracts/demurrageCircles.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/demurrageCircles.ts#L23)
 
 DemurrageCircles Contract Wrapper
 Provides type-safe methods for interacting with Circles DemurrageCircles (ERC20 wrapper) contracts
@@ -38,7 +38,7 @@ const demurrageCircles = new DemurrageCirclesContract({
 new DemurrageCirclesContract(config): DemurrageCirclesContract;
 ```
 
-Defined in: [packages/core/src/contracts/demurrageCircles.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/demurrageCircles.ts#L24)
+Defined in: [packages/core/src/contracts/demurrageCircles.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/demurrageCircles.ts#L24)
 
 #### Parameters
 
@@ -70,7 +70,7 @@ BaseWrappedCirclesContract<typeof demurrageCirclesAbi>.constructor
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L9)
 
 #### Inherited from
 
@@ -150,7 +150,7 @@ readonly abi: readonly [{
 }];
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L10)
 
 #### Inherited from
 
@@ -166,7 +166,7 @@ BaseWrappedCirclesContract.abi
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L11)
 
 #### Inherited from
 
@@ -182,7 +182,7 @@ BaseWrappedCirclesContract.rpcUrl
 DOMAIN_SEPARATOR(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:16](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L16)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:16](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L16)
 
 Get the EIP-712 domain separator
 
@@ -204,7 +204,7 @@ BaseWrappedCirclesContract.DOMAIN_SEPARATOR
 avatar(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L23)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L23)
 
 Get the avatar address associated with this wrapper
 
@@ -226,7 +226,7 @@ BaseWrappedCirclesContract.avatar
 circlesIdentifier(): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L30)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:30](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L30)
 
 Get the Circles identifier (token ID)
 
@@ -248,7 +248,7 @@ BaseWrappedCirclesContract.circlesIdentifier
 hub(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L37)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:37](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L37)
 
 Get the Hub contract address
 
@@ -270,7 +270,7 @@ BaseWrappedCirclesContract.hub
 nameRegistry(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L44)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:44](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L44)
 
 Get the NameRegistry contract address
 
@@ -292,7 +292,7 @@ BaseWrappedCirclesContract.nameRegistry
 inflationDayZero(): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L51)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:51](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L51)
 
 Get the inflation day zero timestamp
 
@@ -314,7 +314,7 @@ BaseWrappedCirclesContract.inflationDayZero
 name(): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:58](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L58)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:58](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L58)
 
 Get the token name
 
@@ -336,7 +336,7 @@ BaseWrappedCirclesContract.name
 symbol(): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:65](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L65)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:65](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L65)
 
 Get the token symbol
 
@@ -358,7 +358,7 @@ BaseWrappedCirclesContract.symbol
 decimals(): Promise<number>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:72](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L72)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:72](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L72)
 
 Get the token decimals
 
@@ -380,7 +380,7 @@ BaseWrappedCirclesContract.decimals
 totalSupply(): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:79](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L79)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:79](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L79)
 
 Get the total supply
 
@@ -402,7 +402,7 @@ BaseWrappedCirclesContract.totalSupply
 balanceOf(account): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:86](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L86)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:86](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L86)
 
 Get the balance of an account
 
@@ -430,7 +430,7 @@ BaseWrappedCirclesContract.balanceOf
 allowance(owner, spender): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:93](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L93)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:93](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L93)
 
 Get the allowance of a spender for an owner
 
@@ -462,7 +462,7 @@ BaseWrappedCirclesContract.allowance
 nonces(owner): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:100](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L100)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:100](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L100)
 
 Get the nonce for permit signatures
 
@@ -490,7 +490,7 @@ BaseWrappedCirclesContract.nonces
 day(timestamp): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:107](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L107)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:107](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L107)
 
 Calculate the current day from a timestamp
 
@@ -518,7 +518,7 @@ BaseWrappedCirclesContract.day
 convertDemurrageToInflationaryValue(demurrageValue, dayUpdated): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:114](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L114)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:114](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L114)
 
 Convert a demurraged value to inflationary value
 
@@ -550,7 +550,7 @@ BaseWrappedCirclesContract.convertDemurrageToInflationaryValue
 convertInflationaryToDemurrageValue(inflationaryValue, day): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:121](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L121)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:121](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L121)
 
 Convert an inflationary value to demurraged value
 
@@ -582,7 +582,7 @@ BaseWrappedCirclesContract.convertInflationaryToDemurrageValue
 convertBatchDemurrageToInflationaryValues(demurrageValues, dayUpdated): Promise<readonly bigint[]>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:128](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L128)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:128](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L128)
 
 Convert batch of demurraged values to inflationary values
 
@@ -614,7 +614,7 @@ BaseWrappedCirclesContract.convertBatchDemurrageToInflationaryValues
 convertBatchInflationaryToDemurrageValues(inflationaryValues, day): Promise<readonly bigint[]>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:135](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L135)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:135](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L135)
 
 Convert batch of inflationary values to demurraged values
 
@@ -646,7 +646,7 @@ BaseWrappedCirclesContract.convertBatchInflationaryToDemurrageValues
 toTokenId(avatar): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:142](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L142)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:142](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L142)
 
 Convert avatar address to token ID
 
@@ -674,7 +674,7 @@ BaseWrappedCirclesContract.toTokenId
 eip712Domain(): Promise<readonly [`0x${string}`, string, string, bigint, `0x${string}`, `0x${string}`, readonly bigint[]]>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:149](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L149)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:149](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L149)
 
 Get EIP-712 domain information
 
@@ -696,7 +696,7 @@ BaseWrappedCirclesContract.eip712Domain
 supportsInterface(interfaceId): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:156](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L156)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:156](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L156)
 
 Check if interface is supported
 
@@ -724,7 +724,7 @@ BaseWrappedCirclesContract.supportsInterface
 transfer(to, amount): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:163](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L163)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:163](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L163)
 
 Transfer tokens to another address
 
@@ -759,7 +759,7 @@ transferFrom(
    amount): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:174](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L174)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:174](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L174)
 
 Transfer tokens from one address to another
 
@@ -795,7 +795,7 @@ BaseWrappedCirclesContract.transferFrom
 approve(spender, amount): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:185](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L185)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:185](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L185)
 
 Approve a spender to spend tokens
 
@@ -827,7 +827,7 @@ BaseWrappedCirclesContract.approve
 increaseAllowance(spender, addedValue): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:196](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L196)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:196](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L196)
 
 Increase the allowance of a spender
 
@@ -859,7 +859,7 @@ BaseWrappedCirclesContract.increaseAllowance
 decreaseAllowance(spender, subtractedValue): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:207](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L207)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:207](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L207)
 
 Decrease the allowance of a spender
 
@@ -891,7 +891,7 @@ BaseWrappedCirclesContract.decreaseAllowance
 unwrap(amount): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:218](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L218)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:218](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L218)
 
 Unwrap Circles back to ERC1155
 
@@ -926,7 +926,7 @@ permit(
    s): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:229](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseWrappedCircles.ts#L229)
+Defined in: [packages/core/src/contracts/baseWrappedCircles.ts:229](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseWrappedCircles.ts#L229)
 
 Permit approval via signature (EIP-2612)
 
@@ -981,7 +981,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -1025,7 +1025,7 @@ BaseWrappedCirclesContract.read
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 
@@ -1057,7 +1057,7 @@ BaseWrappedCirclesContract.encodeWrite
 balanceOfOnDay(account, day): Promise<readonly [bigint, bigint]>;
 ```
 
-Defined in: [packages/core/src/contracts/demurrageCircles.ts:46](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/demurrageCircles.ts#L46)
+Defined in: [packages/core/src/contracts/demurrageCircles.ts:46](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/demurrageCircles.ts#L46)
 
 Get the balance of an account on a specific day
 This is a demurrage-specific feature that calculates historical balance
@@ -1091,7 +1091,7 @@ The day number to check the balance for
 discountedBalances(account): Promise<readonly [bigint, bigint]>;
 ```
 
-Defined in: [packages/core/src/contracts/demurrageCircles.ts:57](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/demurrageCircles.ts#L57)
+Defined in: [packages/core/src/contracts/demurrageCircles.ts:57](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/demurrageCircles.ts#L57)
 
 Get the discounted balance information for an account
 Returns the current discounted balance and when it was last updated.

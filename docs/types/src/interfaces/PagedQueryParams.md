@@ -6,7 +6,7 @@
 
 # Interface: PagedQueryParams
 
-Defined in: [packages/types/src/query.ts:142](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L142)
+Defined in: [packages/types/src/query.ts:154](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L154)
 
 Parameters for a paginated query
 
@@ -18,7 +18,7 @@ Parameters for a paginated query
 namespace: string;
 ```
 
-Defined in: [packages/types/src/query.ts:146](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L146)
+Defined in: [packages/types/src/query.ts:158](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L158)
 
 The namespace of the table to query
 
@@ -30,7 +30,7 @@ The namespace of the table to query
 table: string;
 ```
 
-Defined in: [packages/types/src/query.ts:150](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L150)
+Defined in: [packages/types/src/query.ts:162](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L162)
 
 The name of the table to query
 
@@ -42,7 +42,7 @@ The name of the table to query
 sortOrder: SortOrder;
 ```
 
-Defined in: [packages/types/src/query.ts:154](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L154)
+Defined in: [packages/types/src/query.ts:166](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L166)
 
 The order to sort the results
 
@@ -54,7 +54,7 @@ The order to sort the results
 columns: string[];
 ```
 
-Defined in: [packages/types/src/query.ts:158](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L158)
+Defined in: [packages/types/src/query.ts:170](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L170)
 
 The columns to return in the results
 
@@ -66,7 +66,7 @@ The columns to return in the results
 optional filter: Filter[];
 ```
 
-Defined in: [packages/types/src/query.ts:162](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L162)
+Defined in: [packages/types/src/query.ts:174](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L174)
 
 The filters to apply to the query
 
@@ -78,6 +78,6 @@ The filters to apply to the query
 limit: number;
 ```
 
-Defined in: [packages/types/src/query.ts:166](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/query.ts#L166)
+Defined in: [packages/types/src/query.ts:178](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/query.ts#L178)
 
 The number of results to return per page

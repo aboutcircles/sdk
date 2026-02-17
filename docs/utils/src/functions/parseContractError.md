@@ -12,7 +12,7 @@ function parseContractError(error, abi):
   | null;
 ```
 
-Defined in: [packages/utils/src/contractErrors.ts:153](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/contractErrors.ts#L153)
+Defined in: [packages/utils/src/contractErrors.ts:153](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/utils/src/contractErrors.ts#L153)
 
 Parse contract error from a transaction error
 

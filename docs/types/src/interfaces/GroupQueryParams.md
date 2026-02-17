@@ -6,7 +6,7 @@
 
 # Interface: GroupQueryParams
 
-Defined in: [packages/types/src/group.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L49)
+Defined in: [packages/types/src/group.ts:49](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L49)
 
 Group query parameters
 
@@ -18,7 +18,7 @@ Group query parameters
 optional nameStartsWith: string;
 ```
 
-Defined in: [packages/types/src/group.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L50)
+Defined in: [packages/types/src/group.ts:50](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L50)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/group.ts:50](https://github.com/aboutcircles/sdk
 optional symbolStartsWith: string;
 ```
 
-Defined in: [packages/types/src/group.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L51)
+Defined in: [packages/types/src/group.ts:51](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L51)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/types/src/group.ts:51](https://github.com/aboutcircles/sdk
 optional groupAddressIn: `0x${string}`[];
 ```
 
-Defined in: [packages/types/src/group.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L52)
+Defined in: [packages/types/src/group.ts:52](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L52)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/types/src/group.ts:52](https://github.com/aboutcircles/sdk
 optional groupTypeIn: string[];
 ```
 
-Defined in: [packages/types/src/group.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L53)
+Defined in: [packages/types/src/group.ts:53](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L53)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/types/src/group.ts:53](https://github.com/aboutcircles/sdk
 optional ownerIn: `0x${string}`[];
 ```
 
-Defined in: [packages/types/src/group.ts:54](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L54)
+Defined in: [packages/types/src/group.ts:54](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L54)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/types/src/group.ts:54](https://github.com/aboutcircles/sdk
 optional mintHandlerEquals: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:55](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L55)
+Defined in: [packages/types/src/group.ts:55](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L55)
 
 ***
 
@@ -78,4 +78,4 @@ Defined in: [packages/types/src/group.ts:55](https://github.com/aboutcircles/sdk
 optional treasuryEquals: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/group.ts:56](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/group.ts#L56)
+Defined in: [packages/types/src/group.ts:56](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/group.ts#L56)

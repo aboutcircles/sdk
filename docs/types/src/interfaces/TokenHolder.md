@@ -6,7 +6,7 @@
 
 # Interface: TokenHolder
 
-Defined in: [packages/types/src/token.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L48)
+Defined in: [packages/types/src/token.ts:43](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L43)
 
 Token holder information from V_CrcV2_BalancesByAccountAndToken
 
@@ -18,7 +18,7 @@ Token holder information from V_CrcV2_BalancesByAccountAndToken
 account: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/token.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L49)
+Defined in: [packages/types/src/token.ts:44](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L44)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/token.ts:49](https://github.com/aboutcircles/sdk
 tokenAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/token.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L50)
+Defined in: [packages/types/src/token.ts:45](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L45)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/types/src/token.ts:50](https://github.com/aboutcircles/sdk
 demurragedTotalBalance: string;
 ```
 
-Defined in: [packages/types/src/token.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L51)
+Defined in: [packages/types/src/token.ts:46](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L46)

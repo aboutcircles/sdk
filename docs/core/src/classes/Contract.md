@@ -6,7 +6,7 @@
 
 # Class: Contract\<TAbi\>
 
-Defined in: [packages/core/src/contracts/contract.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L8)
+Defined in: [packages/core/src/contracts/contract.ts:8](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L8)
 
 Generic Contract class for type-safe contract interactions
 
@@ -18,6 +18,8 @@ Generic Contract class for type-safe contract interactions
 - [`NameRegistryContract`](NameRegistryContract.md)
 - [`LiftERC20Contract`](LiftERC20Contract.md)
 - [`InvitationEscrowContract`](InvitationEscrowContract.md)
+- [`InvitationFarmContract`](InvitationFarmContract.md)
+- [`ReferralsModuleContract`](ReferralsModuleContract.md)
 
 ## Type Parameters
 
@@ -33,7 +35,7 @@ Generic Contract class for type-safe contract interactions
 new Contract<TAbi>(config): Contract<TAbi>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:13](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L13)
+Defined in: [packages/core/src/contracts/contract.ts:13](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L13)
 
 #### Parameters
 
@@ -63,7 +65,7 @@ Defined in: [packages/core/src/contracts/contract.ts:13](https://github.com/abou
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L9)
 
 ***
 
@@ -73,7 +75,7 @@ Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/about
 readonly abi: TAbi;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L10)
 
 ***
 
@@ -83,7 +85,7 @@ Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/abou
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L11)
 
 ## Methods
 
@@ -96,7 +98,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -134,7 +136,7 @@ Optional call options
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 

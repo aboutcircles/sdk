@@ -10,7 +10,7 @@
 function getWrappedTokensFromPath(transferPath, tokenInfoMap): Record<string, [bigint, string]>;
 ```
 
-Defined in: [packages/pathfinder/src/path.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/pathfinder/src/path.ts#L35)
+Defined in: [packages/pathfinder/src/path.ts:35](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/pathfinder/src/path.ts#L35)
 
 ## Parameters
 

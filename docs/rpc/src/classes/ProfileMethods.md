@@ -6,7 +6,7 @@
 
 # Class: ProfileMethods
 
-Defined in: [packages/rpc/src/methods/profile.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L9)
+Defined in: [packages/rpc/src/methods/profile.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L9)
 
 Profile RPC methods
 
@@ -18,7 +18,7 @@ Profile RPC methods
 new ProfileMethods(client): ProfileMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L10)
+Defined in: [packages/rpc/src/methods/profile.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L10)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/profile.ts:10](https://github.com/aboutcir
 getProfileByCid(cid): Promise<Profile | null>;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L24)
+Defined in: [packages/rpc/src/methods/profile.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L24)
 
 Get a profile by its CID
 
@@ -71,7 +71,7 @@ console.log(profile);
 getProfileByCidBatch(cids): Promise<(Profile | null)[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:43](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L43)
+Defined in: [packages/rpc/src/methods/profile.ts:43](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L43)
 
 Get many profiles by CID in batch
 
@@ -107,7 +107,7 @@ const profiles = await rpc.profile.getProfileByCidBatch([
 getProfileByAddress(address): Promise<Profile | null>;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:62](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L62)
+Defined in: [packages/rpc/src/methods/profile.ts:62](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L62)
 
 Query the profile for an avatar address
 
@@ -140,7 +140,7 @@ console.log(profile);
 getProfileByAddressBatch(addresses): Promise<(Profile | null)[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:83](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L83)
+Defined in: [packages/rpc/src/methods/profile.ts:83](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L83)
 
 Query profiles by address in batch
 
@@ -180,7 +180,7 @@ searchProfiles(
 avatarTypes?): Promise<SearchResultProfile[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:108](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L108)
+Defined in: [packages/rpc/src/methods/profile.ts:108](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L108)
 
 Search profiles by name, description or address
 
@@ -234,11 +234,11 @@ const humans = await rpc.profile.searchProfiles('alice', 10, 0, ['CrcV2_Register
 searchByAddressOrName(
    query, 
    limit, 
-   offset, 
-avatarTypes?): Promise<SearchResultProfile[]>;
+   cursor?, 
+avatarTypes?): Promise<ProfileSearchResponse>;
 ```
 
-Defined in: [packages/rpc/src/methods/profile.ts:145](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/profile.ts#L145)
+Defined in: [packages/rpc/src/methods/profile.ts:145](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L145)
 
 Search profiles by address or username
 If the query is a valid address, it will search by address first,
@@ -258,11 +258,11 @@ Search query (address or username)
 
 Maximum number of results (default: 10)
 
-##### offset
+##### cursor?
 
-`number` = `0`
+Pagination cursor from previous response (null for first page)
 
-Offset for pagination (default: 0)
+`string` | `null`
 
 ##### avatarTypes?
 
@@ -272,9 +272,9 @@ Optional array of avatar types to filter by
 
 #### Returns
 
-`Promise`\<[`SearchResultProfile`](../interfaces/SearchResultProfile.md)[]\>
+`Promise`\<`ProfileSearchResponse`\>
 
-Array of matching profiles, with exact address match (if valid) at the top
+Search results with profiles and search type indicator
 
 #### Example
 
@@ -285,3 +285,30 @@ const results = await rpc.profile.searchByAddressOrName('alice', 20);
 // Search by address
 const results = await rpc.profile.searchByAddressOrName('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb', 20);
 ```
+
+***
+
+### getProfileView()
+
+```ts
+getProfileView(address): Promise<ProfileView>;
+```
+
+Defined in: [packages/rpc/src/methods/profile.ts:163](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/profile.ts#L163)
+
+Get a consolidated profile view
+Combines avatar info, profile data, trust stats, and balances in a single call
+
+#### Parameters
+
+##### address
+
+`` `0x${string}` ``
+
+The address to get the view for
+
+#### Returns
+
+`Promise`\<`ProfileView`\>
+
+Profile view data

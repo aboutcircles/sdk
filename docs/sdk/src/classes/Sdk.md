@@ -6,7 +6,7 @@
 
 # Class: Sdk
 
-Defined in: [packages/sdk/src/Sdk.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L50)
+Defined in: [packages/sdk/src/Sdk.ts:50](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L50)
 
 Simplified Circles SDK
 Provides a user-friendly API for non-crypto users with low entrance barrier
@@ -40,7 +40,7 @@ await avatar.personalToken.mint();
 new Sdk(config, contractRunner?): Sdk;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:77](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L77)
+Defined in: [packages/sdk/src/Sdk.ts:80](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L80)
 
 Create a new Sdk instance
 
@@ -74,7 +74,7 @@ Error if contractRunner is provided but doesn't support sendTransaction or has n
 readonly circlesConfig: CirclesConfig;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L51)
+Defined in: [packages/sdk/src/Sdk.ts:51](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L51)
 
 ***
 
@@ -84,7 +84,7 @@ Defined in: [packages/sdk/src/Sdk.ts:51](https://github.com/aboutcircles/sdk-v2/
 readonly optional contractRunner: ContractRunner;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L52)
+Defined in: [packages/sdk/src/Sdk.ts:52](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L52)
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: [packages/sdk/src/Sdk.ts:52](https://github.com/aboutcircles/sdk-v2/
 readonly optional senderAddress: `0x${string}`;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L53)
+Defined in: [packages/sdk/src/Sdk.ts:53](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L53)
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: [packages/sdk/src/Sdk.ts:53](https://github.com/aboutcircles/sdk-v2/
 readonly core: Core;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:54](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L54)
+Defined in: [packages/sdk/src/Sdk.ts:54](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L54)
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: [packages/sdk/src/Sdk.ts:54](https://github.com/aboutcircles/sdk-v2/
 readonly rpc: CirclesRpc;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:55](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L55)
+Defined in: [packages/sdk/src/Sdk.ts:55](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L55)
 
 ***
 
@@ -124,7 +124,7 @@ Defined in: [packages/sdk/src/Sdk.ts:55](https://github.com/aboutcircles/sdk-v2/
 readonly data: CirclesData;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:58](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L58)
+Defined in: [packages/sdk/src/Sdk.ts:58](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L58)
 
 ***
 
@@ -134,7 +134,7 @@ Defined in: [packages/sdk/src/Sdk.ts:58](https://github.com/aboutcircles/sdk-v2/
 readonly register: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:129](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L129)
+Defined in: [packages/sdk/src/Sdk.ts:148](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L148)
 
 Registration methods for creating new Circles identities
 
@@ -304,7 +304,7 @@ const groupAvatar = await sdk.register.asGroup(
 readonly profiles: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:426](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L426)
+Defined in: [packages/sdk/src/Sdk.ts:445](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L445)
 
 Profile management methods
 
@@ -360,7 +360,7 @@ Profile data or undefined if not found
 readonly tokens: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:449](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L449)
+Defined in: [packages/sdk/src/Sdk.ts:468](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L468)
 
 Token utilities
 
@@ -411,7 +411,7 @@ The ERC20 demurraged wrapper address, or zero address if not deployed
 #### getHolders()
 
 ```ts
-getHolders: (tokenAddress, limit, sortOrder) => PagedQuery<TokenHolder>;
+getHolders: (tokenAddress, limit) => Promise<PagedResponse<TokenHolderRow>>;
 ```
 
 Get token holders for a specific token address with pagination
@@ -430,15 +430,9 @@ The token address to query holders for
 
 Maximum number of results per page (default: 100)
 
-###### sortOrder
-
-`SortOrder` = `'DESC'`
-
-Sort order for results (default: 'DESC' - highest balance first)
-
 ##### Returns
 
-`PagedQuery`\<`TokenHolder`\>
+`Promise`\<`PagedResponse`\<`TokenHolderRow`\>\>
 
 PagedQuery instance for token holders
 
@@ -464,7 +458,7 @@ while (await holdersQuery.queryNextPage()) {
 readonly groups: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:500](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L500)
+Defined in: [packages/sdk/src/Sdk.ts:518](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L518)
 
 Group utilities
 
@@ -493,7 +487,7 @@ Group type or undefined if not a group
 #### getMembers()
 
 ```ts
-getMembers: (groupAddress, limit, sortOrder) => PagedQuery<GroupMembershipRow>;
+getMembers: (groupAddress, limit) => Promise<PagedResponse<GroupMembershipRow>>;
 ```
 
 Get all members of a specific group using cursor-based pagination
@@ -515,15 +509,9 @@ The address of the group to query members for
 
 Number of members per page (default: 100)
 
-###### sortOrder
-
-Sort order for results (default: 'DESC')
-
-`"ASC"` | `"DESC"`
-
 ##### Returns
 
-`PagedQuery`\<`GroupMembershipRow`\>
+`Promise`\<`PagedResponse`\<`GroupMembershipRow`\>\>
 
 PagedQuery instance for iterating through group members
 
@@ -639,13 +627,13 @@ while (await query.queryNextPage()) {
 ### getAvatar()
 
 ```ts
-getAvatar(avatarAddress): Promise<
+getAvatar(avatarAddress, autoSubscribeEvents): Promise<
   | HumanAvatar
   | OrganisationAvatar
 | BaseGroupAvatar>;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:104](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L104)
+Defined in: [packages/sdk/src/Sdk.ts:111](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/sdk/src/Sdk.ts#L111)
 
 Get an avatar by address
 Automatically detects the avatar type and returns the appropriate avatar instance
@@ -655,6 +643,15 @@ Automatically detects the avatar type and returns the appropriate avatar instanc
 ##### avatarAddress
 
 `` `0x${string}` ``
+
+The address of the avatar to fetch
+
+##### autoSubscribeEvents
+
+`boolean` = `false`
+
+Whether to automatically subscribe to events for this avatar (default: false)
+                           If true, waits for event subscription to complete before returning
 
 #### Returns
 

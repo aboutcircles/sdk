@@ -6,15 +6,14 @@
 
 # Class: PagedQuery\<TRow\>
 
-Defined in: [packages/rpc/src/pagedQuery.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L50)
+Defined in: [packages/rpc/src/pagedQuery.ts:42](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/pagedQuery.ts#L42)
 
-A class for querying Circles RPC nodes with cursor-based pagination.
-Supports both event-based pagination (default) and custom cursor pagination (for view tables).
+A class for querying Circles RPC nodes with server-side cursor-based pagination.
+Uses circles_paginated_query which returns {columns, rows, hasMore, nextCursor}.
 
 ## Example
 
 ```typescript
-// Event-based pagination
 const query = new PagedQuery<GroupMembershipRow>(rpc.client, {
   namespace: 'V_CrcV2',
   table: 'GroupMemberships',
@@ -24,16 +23,10 @@ const query = new PagedQuery<GroupMembershipRow>(rpc.client, {
   limit: 100
 });
 
-// Custom cursor pagination (for view tables)
-const viewQuery = new PagedQuery<GroupTokenHolderRow>(rpc.client, {
-  namespace: 'V_CrcV2',
-  table: 'GroupTokenHoldersBalance',
-  sortOrder: 'ASC',
-  columns: ['group', 'holder', 'totalBalance'],
-  cursorColumns: [{ name: 'holder', sortOrder: 'ASC' }],
-  filter: [{ Type: 'FilterPredicate', FilterType: 'Equals', Column: 'group', Value: '0x...' }],
-  limit: 100
-});
+while (await query.queryNextPage()) {
+  console.log(query.currentPage!.results);
+  if (!query.currentPage!.hasMore) break;
+}
 ```
 
 ## Type Parameters
@@ -55,7 +48,7 @@ new PagedQuery<TRow>(
 rowTransformer?): PagedQuery<TRow>;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:67](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L67)
+Defined in: [packages/rpc/src/pagedQuery.ts:59](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/pagedQuery.ts#L59)
 
 #### Parameters
 
@@ -87,7 +80,7 @@ get currentPage():
   | undefined;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:61](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L61)
+Defined in: [packages/rpc/src/pagedQuery.ts:53](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/pagedQuery.ts#L53)
 
 ##### Returns
 
@@ -102,9 +95,9 @@ Defined in: [packages/rpc/src/pagedQuery.ts:61](https://github.com/aboutcircles/
 queryNextPage(): Promise<boolean>;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:271](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L271)
+Defined in: [packages/rpc/src/pagedQuery.ts:129](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/pagedQuery.ts#L129)
 
-Queries the next page of results.
+Queries the next page of results using server-side cursor pagination.
 
 #### Returns
 
@@ -120,7 +113,7 @@ True if results were found, false otherwise
 reset(): void;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:304](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L304)
+Defined in: [packages/rpc/src/pagedQuery.ts:166](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/pagedQuery.ts#L166)
 
 Resets the query to start from the beginning
 

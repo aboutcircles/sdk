@@ -6,7 +6,7 @@
 
 # Interface: Profile
 
-Defined in: [packages/types/src/avatar.ts:95](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L95)
+Defined in: [packages/types/src/avatar.ts:95](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L95)
 
 Profile information
 
@@ -22,7 +22,7 @@ Profile information
 name: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:96](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L96)
+Defined in: [packages/types/src/avatar.ts:96](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L96)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/types/src/avatar.ts:96](https://github.com/aboutcircles/sd
 optional description: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:97](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L97)
+Defined in: [packages/types/src/avatar.ts:97](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L97)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [packages/types/src/avatar.ts:97](https://github.com/aboutcircles/sd
 optional previewImageUrl: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:98](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L98)
+Defined in: [packages/types/src/avatar.ts:98](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L98)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [packages/types/src/avatar.ts:98](https://github.com/aboutcircles/sd
 optional imageUrl: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:99](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L99)
+Defined in: [packages/types/src/avatar.ts:99](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L99)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/types/src/avatar.ts:99](https://github.com/aboutcircles/sd
 optional location: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:100](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L100)
+Defined in: [packages/types/src/avatar.ts:100](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L100)
 
 ***
 
@@ -72,7 +72,7 @@ Defined in: [packages/types/src/avatar.ts:100](https://github.com/aboutcircles/s
 optional geoLocation: [number, number];
 ```
 
-Defined in: [packages/types/src/avatar.ts:101](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L101)
+Defined in: [packages/types/src/avatar.ts:101](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L101)
 
 ***
 
@@ -82,4 +82,4 @@ Defined in: [packages/types/src/avatar.ts:101](https://github.com/aboutcircles/s
 optional extensions: Record<string, any>;
 ```
 
-Defined in: [packages/types/src/avatar.ts:102](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L102)
+Defined in: [packages/types/src/avatar.ts:102](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L102)

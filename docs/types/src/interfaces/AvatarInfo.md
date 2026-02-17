@@ -6,7 +6,7 @@
 
 # Interface: AvatarInfo
 
-Defined in: [packages/types/src/avatar.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L11)
+Defined in: [packages/types/src/avatar.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L11)
 
 Avatar information
 Contains basic information about a Circles avatar.
@@ -19,7 +19,7 @@ Contains basic information about a Circles avatar.
 blockNumber: number;
 ```
 
-Defined in: [packages/types/src/avatar.ts:15](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L15)
+Defined in: [packages/types/src/avatar.ts:15](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L15)
 
 The block number of the event
 
@@ -31,7 +31,7 @@ The block number of the event
 optional timestamp: number;
 ```
 
-Defined in: [packages/types/src/avatar.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L20)
+Defined in: [packages/types/src/avatar.ts:20](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L20)
 
 The timestamp of the last change to the avatar
 Note: May be undefined for some avatars
@@ -44,7 +44,7 @@ Note: May be undefined for some avatars
 transactionIndex: number;
 ```
 
-Defined in: [packages/types/src/avatar.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L24)
+Defined in: [packages/types/src/avatar.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L24)
 
 The transaction index
 
@@ -56,7 +56,7 @@ The transaction index
 logIndex: number;
 ```
 
-Defined in: [packages/types/src/avatar.ts:28](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L28)
+Defined in: [packages/types/src/avatar.ts:28](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L28)
 
 The log index
 
@@ -68,7 +68,7 @@ The log index
 transactionHash: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L32)
+Defined in: [packages/types/src/avatar.ts:32](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L32)
 
 The hash of the transaction that last changed the avatar
 
@@ -80,7 +80,7 @@ The hash of the transaction that last changed the avatar
 version: number;
 ```
 
-Defined in: [packages/types/src/avatar.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L37)
+Defined in: [packages/types/src/avatar.ts:37](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L37)
 
 If the avatar is currently active in version 1 or 2
 Note: An avatar that's active in v2 can still have a v1 token. See `hasV1` and `v1Token`.
@@ -98,7 +98,7 @@ type:
   | "CrcV1_OrganizationSignup";
 ```
 
-Defined in: [packages/types/src/avatar.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L41)
+Defined in: [packages/types/src/avatar.ts:41](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L41)
 
 The type of the avatar
 
@@ -110,7 +110,7 @@ The type of the avatar
 avatar: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/avatar.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L50)
+Defined in: [packages/types/src/avatar.ts:50](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L50)
 
 The address of the avatar
 
@@ -122,7 +122,7 @@ The address of the avatar
 optional tokenId: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:56](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L56)
+Defined in: [packages/types/src/avatar.ts:56](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L56)
 
 The personal or group token address (v1) or tokenId (v2)
 Note: v1 tokens are erc20 and have a token address. v2 tokens are erc1155 and have a tokenId.
@@ -136,7 +136,7 @@ Note: v1 tokens are erc20 and have a token address. v2 tokens are erc1155 and ha
 hasV1: boolean;
 ```
 
-Defined in: [packages/types/src/avatar.ts:60](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L60)
+Defined in: [packages/types/src/avatar.ts:60](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L60)
 
 If the avatar is signed up at v1
 
@@ -148,7 +148,7 @@ If the avatar is signed up at v1
 optional v1Token: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/avatar.ts:64](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L64)
+Defined in: [packages/types/src/avatar.ts:64](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L64)
 
 If the avatar has a v1 token, this is the token address
 
@@ -160,7 +160,7 @@ If the avatar has a v1 token, this is the token address
 optional cidV0Digest: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:68](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L68)
+Defined in: [packages/types/src/avatar.ts:68](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L68)
 
 The bytes of the avatar's metadata cidv0
 
@@ -172,7 +172,7 @@ The bytes of the avatar's metadata cidv0
 optional cidV0: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:72](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L72)
+Defined in: [packages/types/src/avatar.ts:72](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L72)
 
 The CIDv0 of the avatar's metadata (profile)
 
@@ -184,7 +184,7 @@ The CIDv0 of the avatar's metadata (profile)
 optional v1Stopped: boolean;
 ```
 
-Defined in: [packages/types/src/avatar.ts:77](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L77)
+Defined in: [packages/types/src/avatar.ts:77](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L77)
 
 If the avatar is stopped in v1
 Note: This is only set during Avatar initialization.
@@ -197,7 +197,7 @@ Note: This is only set during Avatar initialization.
 isHuman: boolean;
 ```
 
-Defined in: [packages/types/src/avatar.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L81)
+Defined in: [packages/types/src/avatar.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L81)
 
 Indicates whether the entity is a human
 
@@ -209,7 +209,7 @@ Indicates whether the entity is a human
 optional name: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:85](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L85)
+Defined in: [packages/types/src/avatar.ts:85](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L85)
 
 Groups have a name
 
@@ -221,6 +221,6 @@ Groups have a name
 optional symbol: string;
 ```
 
-Defined in: [packages/types/src/avatar.ts:89](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/avatar.ts#L89)
+Defined in: [packages/types/src/avatar.ts:89](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/avatar.ts#L89)
 
 Groups have a symbol

@@ -6,46 +6,27 @@
 
 # Interface: NetworkSnapshot
 
-Defined in: [packages/types/src/network.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L26)
+Defined in: [packages/types/src/network.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/network.ts#L24)
 
-Network snapshot structure
+Network snapshot from circles_getNetworkSnapshot (proxied to pathfinder).
+PascalCase matches the RPC response format.
 
 ## Properties
 
-### trustRelations
+### BlockNumber
 
 ```ts
-trustRelations: TrustRelation[];
+BlockNumber: number;
 ```
 
-Defined in: [packages/types/src/network.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L27)
+Defined in: [packages/types/src/network.ts:25](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/network.ts#L25)
 
 ***
 
-### balances
+### Addresses
 
 ```ts
-balances: TokenBalance[];
+Addresses: string[];
 ```
 
-Defined in: [packages/types/src/network.ts:28](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L28)
-
-***
-
-### blockNumber
-
-```ts
-blockNumber: number;
-```
-
-Defined in: [packages/types/src/network.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L29)
-
-***
-
-### timestamp
-
-```ts
-timestamp: number;
-```
-
-Defined in: [packages/types/src/network.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L30)
+Defined in: [packages/types/src/network.ts:26](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/network.ts#L26)

@@ -6,7 +6,7 @@
 
 # Interface: CallResult\<T\>
 
-Defined in: [packages/types/src/base.ts:47](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/base.ts#L47)
+Defined in: [packages/types/src/base.ts:47](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/base.ts#L47)
 
 Call result
 
@@ -24,7 +24,7 @@ Call result
 success: boolean;
 ```
 
-Defined in: [packages/types/src/base.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/base.ts#L48)
+Defined in: [packages/types/src/base.ts:48](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/base.ts#L48)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [packages/types/src/base.ts:48](https://github.com/aboutcircles/sdk-
 optional data: T;
 ```
 
-Defined in: [packages/types/src/base.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/base.ts#L49)
+Defined in: [packages/types/src/base.ts:49](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/base.ts#L49)
 
 ***
 
@@ -44,4 +44,4 @@ Defined in: [packages/types/src/base.ts:49](https://github.com/aboutcircles/sdk-
 optional error: Error;
 ```
 
-Defined in: [packages/types/src/base.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/base.ts#L50)
+Defined in: [packages/types/src/base.ts:50](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/base.ts#L50)

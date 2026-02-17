@@ -6,7 +6,7 @@
 
 # Class: SafeBatchRun
 
-Defined in: [packages/runner/src/safe-runner.ts:19](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L19)
+Defined in: [packages/runner/src/safe-runner.ts:15](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L15)
 
 Batch transaction runner for Safe
 Allows multiple transactions to be batched and executed together
@@ -23,13 +23,13 @@ Allows multiple transactions to be batched and executed together
 new SafeBatchRun(safe, publicClient): SafeBatchRun;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L22)
+Defined in: [packages/runner/src/safe-runner.ts:18](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L18)
 
 #### Parameters
 
 ##### safe
 
-`any`
+`Safe`
 
 ##### publicClient
 
@@ -45,7 +45,7 @@ Defined in: [packages/runner/src/safe-runner.ts:22](https://github.com/aboutcirc
 addTransaction(tx): void;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L30)
+Defined in: [packages/runner/src/safe-runner.ts:26](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L26)
 
 Add a transaction to the batch
 
@@ -70,16 +70,16 @@ BatchRun.addTransaction
 ### getSafeTransaction()
 
 ```ts
-getSafeTransaction(): Promise<any>;
+getSafeTransaction(): Promise<SafeTransaction>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L37)
+Defined in: [packages/runner/src/safe-runner.ts:33](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L33)
 
 Get the Safe transaction data for all batched transactions
 
 #### Returns
 
-`Promise`\<`any`\>
+`Promise`\<`SafeTransaction`\>
 
 ***
 
@@ -89,7 +89,7 @@ Get the Safe transaction data for all batched transactions
 run(): Promise<TransactionReceipt>;
 ```
 
-Defined in: [packages/runner/src/safe-runner.ts:56](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-runner.ts#L56)
+Defined in: [packages/runner/src/safe-runner.ts:52](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/runner/src/safe-runner.ts#L52)
 
 Execute all batched transactions and wait for confirmation
 

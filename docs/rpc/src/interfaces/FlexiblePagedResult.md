@@ -6,9 +6,9 @@
 
 # Interface: FlexiblePagedResult\<TRow\>
 
-Defined in: [packages/rpc/src/types.ts:79](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L79)
+Defined in: [packages/rpc/src/types.ts:79](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L79)
 
-Flexible paged result that works with both event-based and custom cursors
+Flexible paged result using server-side opaque cursors
 
 ## Type Parameters
 
@@ -24,7 +24,7 @@ Flexible paged result that works with both event-based and custom cursors
 limit: number;
 ```
 
-Defined in: [packages/rpc/src/types.ts:80](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L80)
+Defined in: [packages/rpc/src/types.ts:80](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L80)
 
 ***
 
@@ -34,27 +34,7 @@ Defined in: [packages/rpc/src/types.ts:80](https://github.com/aboutcircles/sdk-v
 size: number;
 ```
 
-Defined in: [packages/rpc/src/types.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L81)
-
-***
-
-### firstCursor?
-
-```ts
-optional firstCursor: Record<string, any>;
-```
-
-Defined in: [packages/rpc/src/types.ts:82](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L82)
-
-***
-
-### lastCursor?
-
-```ts
-optional lastCursor: Record<string, any>;
-```
-
-Defined in: [packages/rpc/src/types.ts:83](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L83)
+Defined in: [packages/rpc/src/types.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L81)
 
 ***
 
@@ -64,7 +44,7 @@ Defined in: [packages/rpc/src/types.ts:83](https://github.com/aboutcircles/sdk-v
 sortOrder: "ASC" | "DESC";
 ```
 
-Defined in: [packages/rpc/src/types.ts:84](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L84)
+Defined in: [packages/rpc/src/types.ts:82](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L82)
 
 ***
 
@@ -74,7 +54,17 @@ Defined in: [packages/rpc/src/types.ts:84](https://github.com/aboutcircles/sdk-v
 hasMore: boolean;
 ```
 
-Defined in: [packages/rpc/src/types.ts:85](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L85)
+Defined in: [packages/rpc/src/types.ts:83](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L83)
+
+***
+
+### nextCursor?
+
+```ts
+optional nextCursor: string;
+```
+
+Defined in: [packages/rpc/src/types.ts:84](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L84)
 
 ***
 
@@ -84,4 +74,4 @@ Defined in: [packages/rpc/src/types.ts:85](https://github.com/aboutcircles/sdk-v
 results: TRow[];
 ```
 
-Defined in: [packages/rpc/src/types.ts:86](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L86)
+Defined in: [packages/rpc/src/types.ts:85](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/types.ts#L85)

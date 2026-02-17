@@ -6,7 +6,7 @@
 
 # Interface: AggregatedTrustRelation
 
-Defined in: [packages/types/src/trust.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L23)
+Defined in: [packages/types/src/trust.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L23)
 
 ## Properties
 
@@ -16,7 +16,7 @@ Defined in: [packages/types/src/trust.ts:23](https://github.com/aboutcircles/sdk
 subjectAvatar: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/trust.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L24)
+Defined in: [packages/types/src/trust.ts:24](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L24)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [packages/types/src/trust.ts:24](https://github.com/aboutcircles/sdk
 relation: TrustRelationType;
 ```
 
-Defined in: [packages/types/src/trust.ts:25](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L25)
+Defined in: [packages/types/src/trust.ts:25](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L25)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/types/src/trust.ts:25](https://github.com/aboutcircles/sdk
 objectAvatar: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/trust.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L26)
+Defined in: [packages/types/src/trust.ts:26](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L26)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [packages/types/src/trust.ts:26](https://github.com/aboutcircles/sdk
 timestamp: number;
 ```
 
-Defined in: [packages/types/src/trust.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/trust.ts#L27)
+Defined in: [packages/types/src/trust.ts:27](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/trust.ts#L27)

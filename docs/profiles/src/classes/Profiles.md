@@ -6,7 +6,7 @@
 
 # Class: Profiles
 
-Defined in: [packages/profiles/src/index.ts:5](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/profiles/src/index.ts#L5)
+Defined in: [packages/profiles/src/index.ts:5](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/profiles/src/index.ts#L5)
 
 ## Constructors
 
@@ -16,7 +16,7 @@ Defined in: [packages/profiles/src/index.ts:5](https://github.com/aboutcircles/s
 new Profiles(profileServiceUrl): Profiles;
 ```
 
-Defined in: [packages/profiles/src/index.ts:6](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/profiles/src/index.ts#L6)
+Defined in: [packages/profiles/src/index.ts:6](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/profiles/src/index.ts#L6)
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Defined in: [packages/profiles/src/index.ts:6](https://github.com/aboutcircles/s
 create(profile): Promise<string>;
 ```
 
-Defined in: [packages/profiles/src/index.ts:19](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/profiles/src/index.ts#L19)
+Defined in: [packages/profiles/src/index.ts:19](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/profiles/src/index.ts#L19)
 
 Creates and pins a new profile, returning its CID.
 
@@ -62,7 +62,7 @@ The CID of the pinned profile.
 get(cid): Promise<Profile | undefined>;
 ```
 
-Defined in: [packages/profiles/src/index.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/profiles/src/index.ts#L41)
+Defined in: [packages/profiles/src/index.ts:41](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/profiles/src/index.ts#L41)
 
 Retrieves a profile by its CID.
 

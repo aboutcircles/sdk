@@ -6,7 +6,7 @@
 
 # Class: BaseGroupFactoryContract
 
-Defined in: [packages/core/src/contracts/baseGroupFactory.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroupFactory.ts#L11)
+Defined in: [packages/core/src/contracts/baseGroupFactory.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseGroupFactory.ts#L11)
 
 BaseGroupFactory Contract Wrapper
 Provides type-safe methods for creating and managing BaseGroup instances
@@ -25,7 +25,7 @@ This is a singleton contract deployed at a fixed address.
 new BaseGroupFactoryContract(config): BaseGroupFactoryContract;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroupFactory.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroupFactory.ts#L12)
+Defined in: [packages/core/src/contracts/baseGroupFactory.ts:12](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseGroupFactory.ts#L12)
 
 #### Parameters
 
@@ -55,7 +55,7 @@ Defined in: [packages/core/src/contracts/baseGroupFactory.ts:12](https://github.
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L9)
 
 #### Inherited from
 
@@ -75,7 +75,7 @@ readonly abi: (
 })[];
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L10)
 
 #### Inherited from
 
@@ -89,7 +89,7 @@ Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/abou
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L11)
 
 #### Inherited from
 
@@ -103,7 +103,7 @@ Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/abou
 deployedByFactory(group): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroupFactory.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroupFactory.ts#L23)
+Defined in: [packages/core/src/contracts/baseGroupFactory.ts:23](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseGroupFactory.ts#L23)
 
 Check if a group was deployed by this factory
 
@@ -132,7 +132,7 @@ createBaseGroup(
    metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroupFactory.ts:39](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroupFactory.ts#L39)
+Defined in: [packages/core/src/contracts/baseGroupFactory.ts:39](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/baseGroupFactory.ts#L39)
 
 Create a new BaseGroup instance
 
@@ -197,7 +197,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -239,7 +239,7 @@ Optional call options
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 

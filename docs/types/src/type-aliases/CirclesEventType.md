@@ -40,4 +40,4 @@ type CirclesEventType =
   | "Crc_UnknownEvent";
 ```
 
-Defined in: [packages/types/src/events.ts:13](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/events.ts#L13)
+Defined in: [packages/types/src/events.ts:13](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/events.ts#L13)

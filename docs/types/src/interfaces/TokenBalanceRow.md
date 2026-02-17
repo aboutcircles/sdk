@@ -6,7 +6,7 @@
 
 # Interface: TokenBalanceRow
 
-Defined in: [packages/types/src/sdk.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L21)
+Defined in: [packages/types/src/sdk.ts:41](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L41)
 
 Token balance row from RPC
 
@@ -18,7 +18,7 @@ Token balance row from RPC
 tokenAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/sdk.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L22)
+Defined in: [packages/types/src/sdk.ts:42](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L42)
 
 ***
 
@@ -28,4 +28,4 @@ Defined in: [packages/types/src/sdk.ts:22](https://github.com/aboutcircles/sdk-v
 balance: bigint;
 ```
 
-Defined in: [packages/types/src/sdk.ts:23](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L23)
+Defined in: [packages/types/src/sdk.ts:43](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L43)

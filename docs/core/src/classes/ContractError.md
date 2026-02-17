@@ -6,7 +6,7 @@
 
 # Class: ContractError
 
-Defined in: [packages/core/src/errors.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L20)
+Defined in: [packages/core/src/errors.ts:20](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L20)
 
 Contract and transaction errors
 
@@ -22,7 +22,7 @@ Contract and transaction errors
 new ContractError(message, options?): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L21)
+Defined in: [packages/core/src/errors.ts:21](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L21)
 
 #### Parameters
 
@@ -69,7 +69,7 @@ static transactionFailed(
    cause?): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L36)
+Defined in: [packages/core/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L36)
 
 Create error for transaction failures
 
@@ -102,7 +102,7 @@ static revert(
    cause?): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L48)
+Defined in: [packages/core/src/errors.ts:48](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L48)
 
 Create error for contract reverts
 
@@ -132,7 +132,7 @@ Create error for contract reverts
 static insufficientGas(estimated, provided?): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:63](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L63)
+Defined in: [packages/core/src/errors.ts:63](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L63)
 
 Create error for insufficient gas
 
@@ -158,7 +158,7 @@ Create error for insufficient gas
 static gasEstimationFailed(method, cause?): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:74](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L74)
+Defined in: [packages/core/src/errors.ts:74](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L74)
 
 Create error for gas estimation failures
 
@@ -184,7 +184,7 @@ Create error for gas estimation failures
 static encodingError(method, cause?): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:86](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L86)
+Defined in: [packages/core/src/errors.ts:86](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L86)
 
 Create error for encoding failures
 
@@ -210,7 +210,7 @@ Create error for encoding failures
 static notFound(address, contractType): ContractError;
 ```
 
-Defined in: [packages/core/src/errors.ts:98](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L98)
+Defined in: [packages/core/src/errors.ts:98](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/errors.ts#L98)
 
 Create error for contract not found
 

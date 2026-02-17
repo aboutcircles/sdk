@@ -10,7 +10,7 @@
 function isCirclesEvent(obj): obj is CirclesEvent;
 ```
 
-Defined in: [packages/rpc/src/events/types.ts:6](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/events/types.ts#L6)
+Defined in: [packages/rpc/src/events/types.ts:6](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/events/types.ts#L6)
 
 Type guard to check if an object is a CirclesEvent
 

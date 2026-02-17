@@ -6,7 +6,7 @@
 
 # Class: PathfinderMethods
 
-Defined in: [packages/rpc/src/methods/pathfinder.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/pathfinder.ts#L8)
+Defined in: [packages/rpc/src/methods/pathfinder.ts:8](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/pathfinder.ts#L8)
 
 Circles V1 and V2 balance and pathfinding methods
 
@@ -18,7 +18,7 @@ Circles V1 and V2 balance and pathfinding methods
 new PathfinderMethods(client): PathfinderMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/pathfinder.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/pathfinder.ts#L9)
+Defined in: [packages/rpc/src/methods/pathfinder.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/pathfinder.ts#L9)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/pathfinder.ts:9](https://github.com/aboutc
 findPath(params): Promise<PathfindingResult>;
 ```
 
-Defined in: [packages/rpc/src/methods/pathfinder.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/pathfinder.ts#L26)
+Defined in: [packages/rpc/src/methods/pathfinder.ts:26](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/pathfinder.ts#L26)
 
 Calculate a path between two addresses with a target flow
 
@@ -74,7 +74,7 @@ const path = await rpc.pathfinder.findPath({
 findMaxFlow(params): Promise<bigint>;
 ```
 
-Defined in: [packages/rpc/src/methods/pathfinder.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/pathfinder.ts#L52)
+Defined in: [packages/rpc/src/methods/pathfinder.ts:52](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/pathfinder.ts#L52)
 
 Find the maximum flow between two addresses
 

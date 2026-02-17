@@ -6,7 +6,7 @@
 
 # Class: LiftERC20Contract
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:15](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L15)
+Defined in: [packages/core/src/contracts/liftERC20.ts:15](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L15)
 
 LiftERC20 Contract Wrapper
 Provides type-safe methods for interacting with the Circles Lift (ERC20Lift) contract
@@ -28,7 +28,7 @@ This is a singleton contract deployed at a fixed address.
 new LiftERC20Contract(config): LiftERC20Contract;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:16](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L16)
+Defined in: [packages/core/src/contracts/liftERC20.ts:16](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L16)
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: [packages/core/src/contracts/liftERC20.ts:16](https://github.com/abo
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L9)
 
 #### Inherited from
 
@@ -83,7 +83,7 @@ readonly abi: readonly [{
 }];
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L10)
 
 #### Inherited from
 
@@ -97,7 +97,7 @@ Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/abou
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L11)
 
 #### Inherited from
 
@@ -114,7 +114,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -156,7 +156,7 @@ Optional call options
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 
@@ -186,7 +186,7 @@ readonly `unknown`[]
 ERC20_WRAPPER_SETUP_CALLPREFIX(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L27)
+Defined in: [packages/core/src/contracts/liftERC20.ts:27](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L27)
 
 Get the ERC20 wrapper setup call prefix constant
 
@@ -202,7 +202,7 @@ Get the ERC20 wrapper setup call prefix constant
 hub(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L34)
+Defined in: [packages/core/src/contracts/liftERC20.ts:34](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L34)
 
 Get the Hub contract address
 
@@ -218,7 +218,7 @@ Get the Hub contract address
 nameRegistry(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L41)
+Defined in: [packages/core/src/contracts/liftERC20.ts:41](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L41)
 
 Get the NameRegistry contract address
 
@@ -234,7 +234,7 @@ Get the NameRegistry contract address
 masterCopyERC20Wrapper(circlesType): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L49)
+Defined in: [packages/core/src/contracts/liftERC20.ts:49](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L49)
 
 Get the master copy address for a specific CirclesType
 
@@ -258,7 +258,7 @@ Get the master copy address for a specific CirclesType
 erc20Circles(circlesType, avatar): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:59](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L59)
+Defined in: [packages/core/src/contracts/liftERC20.ts:59](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L59)
 
 Get the ERC20 wrapper address for a specific avatar and CirclesType
 
@@ -290,7 +290,7 @@ The ERC20 wrapper address, or zero address if not deployed
 ensureERC20(avatar, circlesType): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/liftERC20.ts:71](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/liftERC20.ts#L71)
+Defined in: [packages/core/src/contracts/liftERC20.ts:71](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/core/src/contracts/liftERC20.ts#L71)
 
 Ensure an ERC20 wrapper exists for an avatar
 Creates a new wrapper if it doesn't exist, or returns the existing one

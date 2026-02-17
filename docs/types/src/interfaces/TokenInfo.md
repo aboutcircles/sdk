@@ -6,99 +6,19 @@
 
 # Interface: TokenInfo
 
-Defined in: [packages/types/src/token.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L32)
+Defined in: [packages/types/src/token.ts:32](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L32)
 
-Token information
+Token information from circles_getTokenInfoBatch
 
 ## Properties
 
-### blockNumber
+### tokenAddress
 
 ```ts
-blockNumber: number;
+tokenAddress: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/token.ts:33](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L33)
-
-***
-
-### timestamp
-
-```ts
-timestamp: number;
-```
-
-Defined in: [packages/types/src/token.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L34)
-
-***
-
-### transactionIndex
-
-```ts
-transactionIndex: number;
-```
-
-Defined in: [packages/types/src/token.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L35)
-
-***
-
-### logIndex
-
-```ts
-logIndex: number;
-```
-
-Defined in: [packages/types/src/token.ts:36](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L36)
-
-***
-
-### transactionHash
-
-```ts
-transactionHash: string;
-```
-
-Defined in: [packages/types/src/token.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L37)
-
-***
-
-### version
-
-```ts
-version: number;
-```
-
-Defined in: [packages/types/src/token.ts:38](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L38)
-
-***
-
-### type?
-
-```ts
-optional type: string;
-```
-
-Defined in: [packages/types/src/token.ts:39](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L39)
-
-***
-
-### tokenType
-
-```ts
-tokenType: string;
-```
-
-Defined in: [packages/types/src/token.ts:40](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L40)
-
-***
-
-### token
-
-```ts
-token: `0x${string}`;
-```
-
-Defined in: [packages/types/src/token.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L41)
+Defined in: [packages/types/src/token.ts:33](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L33)
 
 ***
 
@@ -108,4 +28,34 @@ Defined in: [packages/types/src/token.ts:41](https://github.com/aboutcircles/sdk
 tokenOwner: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/token.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L42)
+Defined in: [packages/types/src/token.ts:34](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L34)
+
+***
+
+### tokenType
+
+```ts
+tokenType: string;
+```
+
+Defined in: [packages/types/src/token.ts:35](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L35)
+
+***
+
+### version
+
+```ts
+version: number;
+```
+
+Defined in: [packages/types/src/token.ts:36](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L36)
+
+***
+
+### type?
+
+```ts
+optional type: string;
+```
+
+Defined in: [packages/types/src/token.ts:37](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/token.ts#L37)

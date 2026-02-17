@@ -6,7 +6,7 @@
 
 # Interface: TrustRelationRow
 
-Defined in: [packages/types/src/sdk.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L30)
+Defined in: [packages/types/src/sdk.ts:50](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L50)
 
 Trust relation row from RPC
 
@@ -18,7 +18,7 @@ Trust relation row from RPC
 truster: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/sdk.ts:31](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L31)
+Defined in: [packages/types/src/sdk.ts:51](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L51)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/sdk.ts:31](https://github.com/aboutcircles/sdk-v
 trustee: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/sdk.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L32)
+Defined in: [packages/types/src/sdk.ts:52](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L52)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/types/src/sdk.ts:32](https://github.com/aboutcircles/sdk-v
 expiryTime: number;
 ```
 
-Defined in: [packages/types/src/sdk.ts:33](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L33)
+Defined in: [packages/types/src/sdk.ts:53](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L53)

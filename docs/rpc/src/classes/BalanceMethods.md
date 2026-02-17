@@ -6,7 +6,7 @@
 
 # Class: BalanceMethods
 
-Defined in: [packages/rpc/src/methods/balance.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/balance.ts#L9)
+Defined in: [packages/rpc/src/methods/balance.ts:9](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/balance.ts#L9)
 
 Balance query RPC methods
 
@@ -18,7 +18,7 @@ Balance query RPC methods
 new BalanceMethods(client): BalanceMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/balance.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/balance.ts#L10)
+Defined in: [packages/rpc/src/methods/balance.ts:10](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/balance.ts#L10)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/balance.ts:10](https://github.com/aboutcir
 getTotalBalance(address, asTimeCircles): Promise<bigint>;
 ```
 
-Defined in: [packages/rpc/src/methods/balance.ts:25](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/balance.ts#L25)
+Defined in: [packages/rpc/src/methods/balance.ts:25](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/balance.ts#L25)
 
 Get the total v2 Circles balance of an account
 
@@ -77,7 +77,7 @@ console.log(balance); // 1000000000000000000n (1 Circle in attoCircles)
 getTokenBalances(address): Promise<TokenBalance[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/balance.ts:45](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/balance.ts#L45)
+Defined in: [packages/rpc/src/methods/balance.ts:45](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/rpc/src/methods/balance.ts#L45)
 
 Query the balance breakdown of a specific avatar address
 

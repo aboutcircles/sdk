@@ -6,7 +6,7 @@
 
 # Interface: CirclesQuery\<T\>
 
-Defined in: [packages/types/src/sdk.ts:39](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L39)
+Defined in: [packages/types/src/sdk.ts:59](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L59)
 
 Circles query result with pagination
 
@@ -24,7 +24,7 @@ Circles query result with pagination
 rows: T[];
 ```
 
-Defined in: [packages/types/src/sdk.ts:40](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L40)
+Defined in: [packages/types/src/sdk.ts:60](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L60)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [packages/types/src/sdk.ts:40](https://github.com/aboutcircles/sdk-v
 hasMore: boolean;
 ```
 
-Defined in: [packages/types/src/sdk.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L41)
+Defined in: [packages/types/src/sdk.ts:61](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L61)
 
 ## Methods
 
@@ -44,7 +44,7 @@ Defined in: [packages/types/src/sdk.ts:41](https://github.com/aboutcircles/sdk-v
 nextPage(): Promise<CirclesQuery<T>>;
 ```
 
-Defined in: [packages/types/src/sdk.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/sdk.ts#L42)
+Defined in: [packages/types/src/sdk.ts:62](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/sdk.ts#L62)
 
 #### Returns
 

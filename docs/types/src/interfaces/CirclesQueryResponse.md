@@ -6,7 +6,7 @@
 
 # Interface: CirclesQueryResponse
 
-Defined in: [packages/types/src/rpc.ts:33](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L33)
+Defined in: [packages/types/src/rpc.ts:33](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L33)
 
 Circles query response format
 Used for circles_query RPC method results
@@ -19,7 +19,7 @@ Used for circles_query RPC method results
 columns: string[];
 ```
 
-Defined in: [packages/types/src/rpc.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L34)
+Defined in: [packages/types/src/rpc.ts:34](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L34)
 
 ***
 
@@ -29,4 +29,4 @@ Defined in: [packages/types/src/rpc.ts:34](https://github.com/aboutcircles/sdk-v
 rows: any[][];
 ```
 
-Defined in: [packages/types/src/rpc.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L35)
+Defined in: [packages/types/src/rpc.ts:35](https://github.com/aboutcircles/sdk-v2/blob/45d133ca74f094abc936c2091f055ab0e8645a15/packages/types/src/rpc.ts#L35)
