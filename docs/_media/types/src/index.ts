@@ -28,12 +28,16 @@ export type {
   ParticipantInfo,
   EnrichedTransaction,
   ProfileSearchResponse,
+  InvitationType,
+  InvitationOriginResponse,
   InvitationSource,
   InvitationInfo,
   TrustInvitation,
   EscrowInvitation,
   AtScaleInvitation,
   Invitation,
+  InvitedAccountInfo,
+  InvitationsFromResponse,
   AllInvitationsResponse
 } from './rpc-responses';
 export type {

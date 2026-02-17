@@ -64,6 +64,8 @@ export interface ProfileSearchResponse {
   query: string;
   searchType: 'address' | 'text';
   results: Profile[];
+  hasMore: boolean;
+  nextCursor: string | null;
 }
 
 export interface EnrichedTransaction {
@@ -74,6 +76,23 @@ export interface EnrichedTransaction {
   transactionHash: string;
   event: Record<string, unknown>;
   participants: Record<string, ParticipantInfo>;
+}
+
+/**
+ * Invitation origin — how an address was invited to Circles
+ */
+export type InvitationType = 'v1_signup' | 'v2_standard' | 'v2_escrow' | 'v2_at_scale';
+
+export interface InvitationOriginResponse {
+  address: Address;
+  invitationType: InvitationType;
+  inviter?: Address | null;
+  proxyInviter?: Address | null;
+  escrowAmount?: string | null;
+  blockNumber: number;
+  timestamp: number;
+  transactionHash: string;
+  version: number;
 }
 
 /**
@@ -134,6 +153,26 @@ export interface AtScaleInvitation extends InvitationInfo {
  * Union type for all invitation types
  */
 export type Invitation = TrustInvitation | EscrowInvitation | AtScaleInvitation;
+
+/**
+ * Account invited by a specific avatar
+ */
+export interface InvitedAccountInfo {
+  address: Address;
+  status: 'accepted' | 'pending';
+  blockNumber?: number;
+  timestamp?: number;
+  avatarInfo?: AvatarInfo;
+}
+
+/**
+ * Response for getInvitationsFrom — accounts invited by a specific avatar
+ */
+export interface InvitationsFromResponse {
+  address: Address;
+  accepted: boolean;
+  results: InvitedAccountInfo[];
+}
 
 /**
  * Response containing all available invitations from all sources
