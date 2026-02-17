@@ -27,19 +27,14 @@ export interface TokenBalance {
 }
 
 /**
- * Token information
+ * Token information from circles_getTokenInfoBatch
  */
 export interface TokenInfo {
-  blockNumber: number;
-  timestamp: number;
-  transactionIndex: number;
-  logIndex: number;
-  transactionHash: string;
+  tokenAddress: Address;
+  tokenOwner: Address;
+  tokenType: string;
   version: number;
   type?: string;
-  tokenType: string;
-  token: Address;
-  tokenOwner: Address;
 }
 
 /**
