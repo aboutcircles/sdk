@@ -48,6 +48,8 @@ export type {
   SortOrder,
   OrderBy,
   QueryParams,
+  TableColumnInfo,
+  TableDefinition,
   TableInfo,
   EventRow,
   Cursor,

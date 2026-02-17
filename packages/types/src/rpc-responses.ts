@@ -41,9 +41,7 @@ export interface TrustRelationInfo {
 
 export interface AggregatedTrustRelationsResponse {
   address: Address;
-  mutual: TrustRelationInfo[];
-  trusts: TrustRelationInfo[];
-  trustedBy: TrustRelationInfo[];
+  results: TrustRelationInfo[];
 }
 
 export interface InviterInfo {
@@ -54,7 +52,7 @@ export interface InviterInfo {
 
 export interface ValidInvitersResponse {
   address: Address;
-  validInviters: InviterInfo[];
+  results: InviterInfo[];
 }
 
 export interface ParticipantInfo {
@@ -62,29 +60,10 @@ export interface ParticipantInfo {
   profile?: Profile | null;
 }
 
-export interface EnrichedTransactionEvent {
-  blockNumber: number;
-  timestamp: number;
-  transactionIndex: number;
-  logIndex: number;
-  transactionHash: string;
-  event: Record<string, unknown>;
-}
-
-export interface EnrichedTransaction {
-  blockNumber: number;
-  transactionHash: string;
-  transactionIndex: number;
-  logIndex: number;
-  event: Record<string, unknown>;
-  participants: Record<Address, ParticipantInfo>;
-}
-
 export interface ProfileSearchResponse {
   query: string;
   searchType: 'address' | 'text';
   results: Profile[];
-  totalCount: number;
 }
 
 export interface EnrichedTransaction {
@@ -93,20 +72,8 @@ export interface EnrichedTransaction {
   transactionIndex: number;
   logIndex: number;
   transactionHash: string;
-  version: number;
-  from: Address;
-  to: Address;
-  operator?: Address;
-  id?: string;
-  value: string;
-  circles: string;
-  attoCircles: string;
-  crc: string;
-  attoCrc: string;
-  staticCircles: string;
-  staticAttoCircles: string;
-  fromProfile?: Profile;
-  toProfile?: Profile;
+  event: Record<string, unknown>;
+  participants: Record<string, ParticipantInfo>;
 }
 
 /**
@@ -179,6 +146,4 @@ export interface AllInvitationsResponse {
   escrowInvitations: EscrowInvitation[];
   /** At-scale invitations (pre-created accounts) */
   atScaleInvitations: AtScaleInvitation[];
-  /** All invitations combined and sorted */
-  all: Invitation[];
 }

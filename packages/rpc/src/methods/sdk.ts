@@ -2,7 +2,7 @@ import type {
   Address,
   ProfileView,
   TrustNetworkSummary,
-  AggregatedTrustRelationsResponse,
+  AggregatedTrustRelation,
   ValidInvitersResponse,
   PagedResponse,
   EnrichedTransaction,
@@ -86,14 +86,14 @@ export class SdkMethods {
    * @example
    * ```typescript
    * const relations = await rpc.sdk.getAggregatedTrustRelations('0xde374ece6fa50e781e81aac78e811b33d16912c7');
-   * console.log(`Mutual trusts: ${relations.mutual.length}`);
-   * console.log(`One-way trusts: ${relations.trusts.length}`);
-   * console.log(`Trusted by: ${relations.trustedBy.length}`);
+   * // Returns flat array: [{subjectAvatar, relation, objectAvatar, ...}]
+   * const mutual = relations.filter(r => r.relation === 'mutuallyTrusts');
+   * console.log(`Mutual trusts: ${mutual.length}`);
    * ```
    */
-  async getAggregatedTrustRelations(address: Address): Promise<AggregatedTrustRelationsResponse> {
+  async getAggregatedTrustRelations(address: Address): Promise<AggregatedTrustRelation[]> {
     const normalizedAddress = normalizeAddress(address);
-    return this.client.call<[Address], AggregatedTrustRelationsResponse>(
+    return this.client.call<[Address], AggregatedTrustRelation[]>(
       'circles_getAggregatedTrustRelations',
       [normalizedAddress]
     );
@@ -154,11 +154,10 @@ export class SdkMethods {
    *   null,
    *   20
    * );
-   * 
-   * for (const tx of history.transactions) {
-   *   const from = tx.event.values.from;
-   *   const fromProfile = tx.participants[from]?.profile;
-   *   console.log(`From: ${fromProfile?.name || from}`);
+   *
+   * for (const tx of history.results) {
+   *   console.log(`Tx: ${tx.transactionHash}, event: ${JSON.stringify(tx.event)}`);
+   *   // Access participant profiles via tx.participants[address]
    * }
    * ```
    */

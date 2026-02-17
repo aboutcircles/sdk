@@ -70,7 +70,7 @@ export class InvitationMethods {
   async getInvitedBy(address: Address): Promise<Address | undefined> {
     const normalized = normalizeAddress(address);
 
-    const results = await this.client.call<[any], InviterRow[]>('circles_query', [
+    const response = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
       {
         Namespace: 'CrcV2',
         Table: 'RegisterHuman',
@@ -93,6 +93,7 @@ export class InvitationMethods {
       },
     ]);
 
+    const results = this.transformQueryResponse<InviterRow>(response);
     if (results.length > 0) {
       return checksumAddresses(results[0].inviter);
     }
@@ -118,7 +119,7 @@ export class InvitationMethods {
   async getInvitations(address: Address, minimumBalance?: string): Promise<AvatarInfo[]> {
     const response = await this.getValidInviters(address, minimumBalance);
 
-    const inviters = response.validInviters
+    const inviters = response.results
       .map((entry) => entry.avatarInfo)
       .filter((info): info is AvatarInfo => info !== undefined && info !== null);
 
