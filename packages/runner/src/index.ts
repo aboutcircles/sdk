@@ -13,6 +13,10 @@ export { SafeContractRunner, SafeBatchRun } from './safe-runner.js';
 // Safe Browser Runner (client-side with Web3 wallet)
 export { SafeBrowserRunner, SafeBrowserBatchRun } from './safe-browser-runner.js';
 
+// Chain configuration types and presets
+export type { ChainConfig, ChainLike } from './chain-types';
+export { chains, asViemChain } from './chain-types';
+
 // Error handling
 export { RunnerError } from './errors.js';
 export type { RunnerErrorSource } from './errors.js';
