@@ -434,11 +434,27 @@ integration('Invitation methods', () => {
     }
   }, TEST_TIMEOUT);
 
-  test('getInvitationsFrom returns Address array', async () => {
-    const accepted = await rpc.invitation.getInvitationsFrom(TEST_AVATAR, true);
-    expect(Array.isArray(accepted)).toBe(true);
-    for (const addr of accepted) {
-      expect(addr).toMatch(/^0x[0-9a-fA-F]{40}$/);
+  test('getInvitationsFrom (accepted) returns InvitationsFromResponse', async () => {
+    const result = await rpc.invitation.getInvitationsFrom(TEST_AVATAR, true);
+    expect(result).toBeDefined();
+    expect(result.address.toLowerCase()).toBe(TEST_AVATAR.toLowerCase());
+    expect(result.accepted).toBe(true);
+    expect(Array.isArray(result.results)).toBe(true);
+    for (const entry of result.results) {
+      expect(entry.address).toMatch(/^0x[0-9a-fA-F]{40}$/);
+      expect(entry.status).toBe('accepted');
+    }
+  }, TEST_TIMEOUT);
+
+  test('getInvitationsFrom (pending) returns InvitationsFromResponse', async () => {
+    const result = await rpc.invitation.getInvitationsFrom(TEST_AVATAR, false);
+    expect(result).toBeDefined();
+    expect(result.address.toLowerCase()).toBe(TEST_AVATAR.toLowerCase());
+    expect(result.accepted).toBe(false);
+    expect(Array.isArray(result.results)).toBe(true);
+    for (const entry of result.results) {
+      expect(entry.address).toMatch(/^0x[0-9a-fA-F]{40}$/);
+      expect(entry.status).toBe('pending');
     }
   }, TEST_TIMEOUT);
 

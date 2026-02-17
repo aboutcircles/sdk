@@ -36,6 +36,8 @@ export type {
   EscrowInvitation,
   AtScaleInvitation,
   Invitation,
+  InvitedAccountInfo,
+  InvitationsFromResponse,
   AllInvitationsResponse
 } from './rpc-responses.js';
 export type { TransactionHistoryRow } from './rows.js';
