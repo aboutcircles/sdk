@@ -811,8 +811,8 @@ export class HumanAvatar extends CommonAvatar {
      * }
      * ```
      */
-    getGroupMemberships: (limit: number = 50, sortOrder: 'ASC' | 'DESC' = 'DESC') => {
-      return this.rpc.group.getGroupMemberships(this.address, limit, sortOrder);
+    getGroupMemberships: (limit: number = 50) => {
+      return this.rpc.group.getGroupMemberships(this.address, limit);
     },
 
     /**
@@ -839,28 +839,21 @@ export class HumanAvatar extends CommonAvatar {
      */
     getGroupMembershipsWithDetails: async (limit: number = 50): Promise<GroupRow[]> => {
       // Get memberships for this avatar using pagination
-      const query = this.rpc.group.getGroupMemberships(this.address, limit);
-      const memberships: GroupMembershipRow[] = [];
+      const memberships = await this.rpc.group.getGroupMemberships(this.address, limit);
 
-      // Fetch all memberships
-      while (await query.queryNextPage()) {
-        memberships.push(...query.currentPage!.results);
-        if (!query.currentPage!.hasMore) break;
-      }
-
-      if (memberships.length === 0) {
+      if (memberships.results.length === 0) {
         return [];
       }
 
       // Extract group addresses
-      const groupAddresses = memberships.map((m: GroupMembershipRow) => m.group);
+      const groupAddresses = memberships.results.map((m: GroupMembershipRow) => m.group);
 
       // Fetch group details using groupAddressIn filter
       const groups = await this.rpc.group.findGroups(groupAddresses.length, {
         groupAddressIn: groupAddresses,
       });
 
-      return groups;
+      return groups.results;
     },
   };
 

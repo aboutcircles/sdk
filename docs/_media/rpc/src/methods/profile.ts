@@ -1,5 +1,5 @@
 import type { RpcClient } from '../client';
-import type { Address, Profile } from '@aboutcircles/sdk-types';
+import type { Address, Profile, ProfileView, ProfileSearchResponse } from '@aboutcircles/sdk-types';
 import type { SearchResultProfile } from '../types';
 import { normalizeAddress } from '../utils';
 
@@ -147,50 +147,22 @@ export class ProfileMethods {
     limit: number = 10,
     offset: number = 0,
     avatarTypes?: string[]
-  ): Promise<SearchResultProfile[]> {
-    const results: SearchResultProfile[] = [];
-
-    // Check if query is a valid address
-    const isAddress = /^0x[a-fA-F0-9]{40}$/.test(query);
-
-    if (isAddress) {
-      // Try to get profile by address first
-      try {
-        const profile = await this.getProfileByAddress(query as Address);
-        if (profile) {
-          // Convert Profile to SearchResultProfile by adding address
-          const searchResult: SearchResultProfile = {
-            ...profile,
-            address: query as Address
-          };
-          // Check if profile matches avatar type filter
-          if (!avatarTypes || !searchResult.avatarType || avatarTypes.includes(searchResult.avatarType)) {
-            results.push(searchResult);
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to get profile by address:', error);
-      }
-    }
-
-    // Always search by text as well
-    try {
-      const textResults = await this.searchProfiles(query, limit, offset, avatarTypes);
-
-      // If we already added an address match, filter it out from text results to avoid duplicates
-      if (isAddress && results.length > 0) {
-        const addressLower = query.toLowerCase();
-        const filteredResults = textResults.filter(
-          p => p.address?.toLowerCase() !== addressLower
-        );
-        results.push(...filteredResults);
-      } else {
-        results.push(...textResults);
-      }
-    } catch (error) {
-      console.warn('Failed to search profiles by text:', error);
-    }
-
-    return results.slice(0, limit);
+  ): Promise<ProfileSearchResponse> {
+    return this.client.call<[string, number, number, string[]?], ProfileSearchResponse>(
+      'circles_searchProfileByAddressOrName',
+      avatarTypes ? [query, limit, offset, avatarTypes] : [query, limit, offset]
+    );
+  }
+  /**
+   * Get a consolidated profile view
+   * Combines avatar info, profile data, trust stats, and balances in a single call
+   *
+   * @param address - The address to get the view for
+   * @returns Profile view data
+   */
+  async getProfileView(address: Address): Promise<ProfileView> {
+    return this.client.call<[Address], ProfileView>('circles_getProfileView', [
+      normalizeAddress(address),
+    ]);
   }
 }

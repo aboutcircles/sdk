@@ -69,15 +69,27 @@ export interface QueryParams {
 }
 
 /**
- * Table information from circles_tables
+ * Column information within a table from circles_tables
+ */
+export interface TableColumnInfo {
+  column: string;
+  type: string;
+}
+
+/**
+ * Table definition within a namespace from circles_tables
+ */
+export interface TableDefinition {
+  table: string;
+  columns: TableColumnInfo[];
+}
+
+/**
+ * Namespace info from circles_tables (top-level array element)
  */
 export interface TableInfo {
-  Namespace: string;
-  Table: string;
-  Columns: {
-    Name: string;
-    Type: string;
-  }[];
+  namespace: string;
+  tables: TableDefinition[];
 }
 
 /**
