@@ -129,9 +129,9 @@ export class ProfileMethods {
    *
    * @param query - Search query (address or username)
    * @param limit - Maximum number of results (default: 10)
-   * @param offset - Offset for pagination (default: 0)
+   * @param cursor - Pagination cursor from previous response (null for first page)
    * @param avatarTypes - Optional array of avatar types to filter by
-   * @returns Array of matching profiles, with exact address match (if valid) at the top
+   * @returns Search results with profiles and search type indicator
    *
    * @example
    * ```typescript
@@ -145,12 +145,12 @@ export class ProfileMethods {
   async searchByAddressOrName(
     query: string,
     limit: number = 10,
-    offset: number = 0,
+    cursor?: string | null,
     avatarTypes?: string[]
   ): Promise<ProfileSearchResponse> {
-    return this.client.call<[string, number, number, string[]?], ProfileSearchResponse>(
+    return this.client.call<[string, number, string | null, string[]?], ProfileSearchResponse>(
       'circles_searchProfileByAddressOrName',
-      avatarTypes ? [query, limit, offset, avatarTypes] : [query, limit, offset]
+      avatarTypes ? [query, limit, cursor ?? null, avatarTypes] : [query, limit, cursor ?? null]
     );
   }
   /**

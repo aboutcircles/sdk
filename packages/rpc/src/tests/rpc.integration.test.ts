@@ -614,13 +614,11 @@ integration('SDK methods', () => {
     const searchTypes = SEARCH_TYPES && SEARCH_TYPES.length > 0 ? SEARCH_TYPES : undefined;
 
     // Text search
-    const textResult = await rpc.sdk.searchProfileByAddressOrName(SEARCH_TERM, 5, 0, searchTypes);
+    const textResult = await rpc.sdk.searchProfileByAddressOrName(SEARCH_TERM, 5, null, searchTypes);
     expect(textResult.searchType).toBe('text');
     expect(textResult.results.length).toBeLessThanOrEqual(5);
     expect(textResult.results.length).toBeGreaterThan(0);
-
-    // NOTE: offset parameter is currently ignored by the RPC host — offset=0 and offset=5
-    // return identical results. Known RPC bug. Skipping disjointness check until fixed.
+    expect(typeof textResult.hasMore).toBe('boolean');
 
     // Address search
     const addrResult = await rpc.sdk.searchProfileByAddressOrName(TEST_AVATAR);
@@ -629,6 +627,18 @@ integration('SDK methods', () => {
     const bestMatch = addrResult.results[0] as Record<string, any>;
     const avatar = (bestMatch.address ?? bestMatch.avatar ?? '').toLowerCase();
     expect(avatar.startsWith(TEST_AVATAR.toLowerCase().slice(0, 6))).toBe(true);
+  }, TEST_TIMEOUT);
+
+  test('searchProfileByAddressOrName cursor pagination yields disjoint pages', async () => {
+    const page1 = await rpc.sdk.searchProfileByAddressOrName(SEARCH_TERM, 2);
+    expect(page1.hasMore).toBe(true);
+    expect(page1.nextCursor).toBeTruthy();
+
+    const page2 = await rpc.sdk.searchProfileByAddressOrName(SEARCH_TERM, 2, page1.nextCursor);
+    const page1Keys = new Set(page1.results.map(profileKey));
+    for (const p of page2.results) {
+      expect(page1Keys.has(profileKey(p))).toBe(false);
+    }
   }, TEST_TIMEOUT);
 });
 

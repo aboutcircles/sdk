@@ -64,6 +64,8 @@ export interface ProfileSearchResponse {
   query: string;
   searchType: 'address' | 'text';
   results: Profile[];
+  hasMore: boolean;
+  nextCursor: string | null;
 }
 
 export interface EnrichedTransaction {
