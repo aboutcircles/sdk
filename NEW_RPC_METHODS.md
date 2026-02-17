@@ -271,6 +271,25 @@ const humans = await rpc.profile.searchByAddressOrName(
 
 ---
 
+## WebSocket endpoints
+
+| Path | Purpose | Method |
+|------|---------|--------|
+| `/ws/subscribe` | Circles event stream (PostgreSQL LISTEN/NOTIFY) | `circles_subscribe` |
+| `/ws/chain` | Ethereum subscriptions (via Nethermind) | `eth_subscribe` (`newHeads`, `logs`, `newPendingTransactions`) |
+
+```ts
+// Circles events
+const circlesWs = new WebSocket('wss://rpc.circlesubi.network/ws/subscribe');
+circlesWs.send(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'circles_subscribe', params: [] }));
+
+// Ethereum new blocks
+const chainWs = new WebSocket('wss://rpc.circlesubi.network/ws/chain');
+chainWs.send(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_subscribe', params: ['newHeads'] }));
+```
+
+---
+
 ## Checklist
 
 - [x] Replace multi-call profile code with `getProfileView` when possible.
