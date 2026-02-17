@@ -65,23 +65,22 @@ export interface GroupTokenHolderRow {
 }
 
 /**
- * Configuration for a cursor column in pagination
+ * Configuration for a cursor column in pagination.
+ * Used only for buildOrderBy() — cursor columns define the sort order.
  */
 export interface CursorColumn {
   name: string;
   sortOrder: 'ASC' | 'DESC';
-  toValue?: (value: any) => string | number | boolean;
 }
 
 /**
- * Flexible paged result that works with both event-based and custom cursors
+ * Flexible paged result using server-side opaque cursors
  */
 export interface FlexiblePagedResult<TRow> {
   limit: number;
   size: number;
-  firstCursor?: Record<string, any>;
-  lastCursor?: Record<string, any>;
   sortOrder: 'ASC' | 'DESC';
   hasMore: boolean;
+  nextCursor?: string;
   results: TRow[];
 }
