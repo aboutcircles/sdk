@@ -2,12 +2,12 @@ import type { RpcClient } from '../client';
 import type {
   Address,
   AvatarInfo,
-  CirclesQueryResponse,
   ValidInvitersResponse,
   TrustInvitation,
   EscrowInvitation,
   AtScaleInvitation,
   InvitationOriginResponse,
+  InvitationsFromResponse,
   AllInvitationsResponse
 } from '@aboutcircles/sdk-types';
 import { normalizeAddress, checksumAddresses } from '../utils';
@@ -15,22 +15,10 @@ import { normalizeAddress, checksumAddresses } from '../utils';
 /**
  * Invitation RPC methods
  *
- * Most methods delegate to dedicated RPC endpoints for server-side SQL optimization.
- * `getInvitationsFrom` still uses raw circles_query (no dedicated endpoint yet).
+ * All methods delegate to dedicated RPC endpoints for server-side SQL optimization.
  */
 export class InvitationMethods {
   constructor(private client: RpcClient) {}
-
-  private transformQueryResponse<T>(response: CirclesQueryResponse): T[] {
-    const { columns, rows } = response;
-    return rows.map((row) => {
-      const obj: any = {};
-      columns.forEach((col, index) => {
-        obj[col] = row[index];
-      });
-      return obj as T;
-    });
-  }
 
   /**
    * Get the invitation origin for an address — how they were invited to Circles
@@ -140,11 +128,11 @@ export class InvitationMethods {
   /**
    * Get the list of accounts that were invited by a specific avatar
    *
-   * Note: This method still uses raw circles_query — no dedicated RPC endpoint yet.
+   * Uses dedicated `circles_getInvitationsFrom` endpoint with server-side SQL.
    *
    * @param address - The address of the inviter
    * @param accepted - If true, returns accepted invitations; if false, returns pending invitations
-   * @returns Array of invited addresses
+   * @returns Enriched response with invited account info and avatar data
    *
    * @example
    * ```typescript
@@ -153,97 +141,23 @@ export class InvitationMethods {
    *   '0xde374ece6fa50e781e81aac78e811b33d16912c7',
    *   true
    * );
+   * console.log(accepted.results); // [{address, status: 'accepted', avatarInfo, ...}]
    *
    * // Get pending invitations
    * const pending = await rpc.invitation.getInvitationsFrom(
    *   '0xde374ece6fa50e781e81aac78e811b33d16912c7',
    *   false
    * );
+   * console.log(pending.results); // [{address, status: 'pending'}]
    * ```
    */
-  async getInvitationsFrom(address: Address, accepted: boolean = false): Promise<Address[]> {
+  async getInvitationsFrom(address: Address, accepted: boolean = false): Promise<InvitationsFromResponse> {
     const normalized = normalizeAddress(address);
-
-    if (accepted) {
-      // Query for accounts that have registered using this avatar as inviter
-      const response = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
-        {
-          Namespace: 'CrcV2',
-          Table: 'RegisterHuman',
-          Columns: ['avatar'],
-          Filter: [
-            {
-              Type: 'FilterPredicate',
-              FilterType: 'Equals',
-              Column: 'inviter',
-              Value: normalized,
-            },
-          ],
-          Order: [
-            {
-              Column: 'blockNumber',
-              SortOrder: 'DESC',
-            },
-          ],
-        },
-      ]);
-
-      const results = this.transformQueryResponse<{ avatar: Address }>(response);
-      const avatars = results.map((r) => r.avatar);
-      return checksumAddresses(avatars);
-    } else {
-      // Find accounts that this avatar trusts without mutual trust
-      const response = await this.client.call<[any], CirclesQueryResponse>('circles_query', [
-        {
-          Namespace: 'V_Crc',
-          Table: 'TrustRelations',
-          Columns: ['trustee', 'truster'],
-          Filter: [
-            {
-              Type: 'Conjunction',
-              ConjunctionType: 'And',
-              Predicates: [
-                {
-                  Type: 'FilterPredicate',
-                  FilterType: 'Equals',
-                  Column: 'version',
-                  Value: 2,
-                },
-                {
-                  Type: 'FilterPredicate',
-                  FilterType: 'Equals',
-                  Column: 'truster',
-                  Value: normalized,
-                },
-              ],
-            },
-          ],
-          Order: [],
-        },
-      ]);
-
-      const trustRelations = this.transformQueryResponse<{ trustee: Address; truster: Address }>(response);
-      const v2Trusted = trustRelations.map((r) => r.trustee);
-
-      if (v2Trusted.length === 0) {
-        return [];
-      }
-
-      // Get avatar info for trusted accounts
-      const trustedAvatarsInfo = await this.client.call<[Address[]], (AvatarInfo | null)[]>(
-        'circles_getAvatarInfoBatch',
-        [v2Trusted]
-      );
-
-      // Create a Set of registered avatars (filter out null values) - normalize for comparison
-      const registeredAvatarsSet = new Set(
-        trustedAvatarsInfo.filter((a): a is AvatarInfo => a !== null).map((a) => normalizeAddress(a.avatar))
-      );
-
-      // Return only unregistered accounts (pending invitations)
-      const pending = v2Trusted.filter((addr) => !registeredAvatarsSet.has(normalizeAddress(addr)));
-      return checksumAddresses(pending);
-    }
+    const response = await this.client.call<[Address, boolean], InvitationsFromResponse>(
+      'circles_getInvitationsFrom',
+      [normalized, accepted]
+    );
+    return checksumAddresses(response);
   }
 
   /**

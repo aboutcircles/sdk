@@ -155,6 +155,26 @@ export interface AtScaleInvitation extends InvitationInfo {
 export type Invitation = TrustInvitation | EscrowInvitation | AtScaleInvitation;
 
 /**
+ * Account invited by a specific avatar
+ */
+export interface InvitedAccountInfo {
+  address: Address;
+  status: 'accepted' | 'pending';
+  blockNumber?: number;
+  timestamp?: number;
+  avatarInfo?: AvatarInfo;
+}
+
+/**
+ * Response for getInvitationsFrom — accounts invited by a specific avatar
+ */
+export interface InvitationsFromResponse {
+  address: Address;
+  accepted: boolean;
+  results: InvitedAccountInfo[];
+}
+
+/**
  * Response containing all available invitations from all sources
  */
 export interface AllInvitationsResponse {

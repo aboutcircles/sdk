@@ -36,6 +36,8 @@ export type {
   EscrowInvitation,
   AtScaleInvitation,
   Invitation,
+  InvitedAccountInfo,
+  InvitationsFromResponse,
   AllInvitationsResponse
 } from './rpc-responses';
 export type {
