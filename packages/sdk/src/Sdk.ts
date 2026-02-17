@@ -126,10 +126,13 @@ export class Sdk {
         avatar = new HumanAvatar(avatarAddress, this.core, this.contractRunner, avatarInfo as any);
       }
 
+      // Set the SDK reference on the avatar for access to SDK-level RPC methods
+      avatar.setSdk(this);
+
       // If auto-subscription is enabled, wait for it to complete before returning
       // This prevents race conditions where stores subscribe to avatar.events before it's ready
       if (autoSubscribeEvents) {
-        console.log('🔔 Sdk.getAvatar: Auto-subscribing to events for', avatarAddress);
+        console.log('[Sdk.getAvatar] Auto-subscribing to events for', avatarAddress);
         await avatar.subscribeToEvents();
       }
 
