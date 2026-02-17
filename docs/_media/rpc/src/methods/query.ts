@@ -1,5 +1,5 @@
 import type { RpcClient } from '../client';
-import type { QueryParams, TableInfo, EventType, PagedResult } from '@aboutcircles/sdk-types';
+import type { QueryParams, TableInfo, EventType, PagedResult, CirclesQueryResponse } from '@aboutcircles/sdk-types';
 import { checksumAddresses } from '../utils';
 
 /**
@@ -61,8 +61,16 @@ export class QueryMethods {
    * ```
    */
   async query<T = unknown>(params: QueryParams): Promise<T[]> {
-    const result = await this.client.call<[QueryParams], T[]>('circles_query', [params]);
-    return checksumAddresses(result);
+    const response = await this.client.call<[QueryParams], CirclesQueryResponse>('circles_query', [params]);
+    const { columns, rows } = response;
+    const objects = rows.map(row => {
+      const obj: any = {};
+      columns.forEach((col, index) => {
+        obj[col] = row[index];
+      });
+      return obj as T;
+    });
+    return checksumAddresses(objects);
   }
 
   /**

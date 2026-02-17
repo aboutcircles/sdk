@@ -10,6 +10,8 @@ import type { Address } from './base';
 export interface CirclesConfig {
   /** RPC URL for Circles-specific endpoints */
   circlesRpcUrl: string;
+  /** RPC URL for direct chain calls (eth_call, etc). Defaults to circlesRpcUrl if not provided */
+  chainRpcUrl?: string;
   /** Pathfinder service URL for computing transfer paths */
   pathfinderUrl: string;
   /** Profile service URL for user profiles and metadata */
