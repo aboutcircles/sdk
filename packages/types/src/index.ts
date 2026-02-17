@@ -15,7 +15,7 @@ export type {
 } from './base.js';
 
 // JSON-RPC types
-export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, QueryResponse } from './rpc.js';
+export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, PaginatedQueryResponse, QueryResponse } from './rpc.js';
 export type {
   PagedResponse,
   ProfileView,
@@ -92,7 +92,7 @@ export type { WrappedTokenInfo, WrappedTokensRecord } from './wrapper.js';
 
 // SDK types
 export { GroupType } from './sdk.js';
-export type { AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery } from './sdk.js';
+export type { AvatarType, AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery } from './sdk.js';
 
 // Event types
 export type { CirclesBaseEvent, CirclesEventType, CirclesEvent, CirclesEventOfType, RpcSubscriptionEvent } from './events.js';
