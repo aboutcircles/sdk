@@ -183,13 +183,13 @@ export class SdkMethods {
 
   /**
    * Unified search across profiles by address prefix OR name/description text
-   * 
+   *
    * Combines address lookup and full-text search in a single endpoint.
    * Automatically detects search type based on query format (0x prefix = address search).
    *
    * @param query - Search query (address prefix or name/description text)
    * @param limit - Maximum number of results (default: 20)
-   * @param offset - Pagination offset (default: 0)
+   * @param cursor - Pagination cursor from previous response (null for first page)
    * @param types - Optional array of avatar types to filter by
    * @returns Unified search results with profiles
    *
@@ -197,28 +197,21 @@ export class SdkMethods {
    * ```typescript
    * // Search by name
    * const byName = await rpc.sdk.searchProfileByAddressOrName('Alice');
-   * 
-   * // Search by address prefix
-   * const byAddress = await rpc.sdk.searchProfileByAddressOrName('0xde374');
-   * 
-   * // Search with filters
-   * const filtered = await rpc.sdk.searchProfileByAddressOrName(
-   *   'developer',
-   *   10,
-   *   0,
-   *   ['CrcV2_RegisterHuman']
-   * );
+   *
+   * // Paginate through results
+   * const page1 = await rpc.sdk.searchProfileByAddressOrName('developer', 10);
+   * const page2 = await rpc.sdk.searchProfileByAddressOrName('developer', 10, page1.nextCursor);
    * ```
    */
   async searchProfileByAddressOrName(
     query: string,
     limit: number = 20,
-    offset: number = 0,
+    cursor?: string | null,
     types?: string[]
   ): Promise<ProfileSearchResponse> {
-    return this.client.call<[string, number, number, string[]?], ProfileSearchResponse>(
+    return this.client.call<[string, number, string | null, string[]?], ProfileSearchResponse>(
       'circles_searchProfileByAddressOrName',
-      types ? [query, limit, offset, types] : [query, limit, offset]
+      types ? [query, limit, cursor ?? null, types] : [query, limit, cursor ?? null]
     );
   }
 }
