@@ -79,6 +79,23 @@ export interface EnrichedTransaction {
 }
 
 /**
+ * Invitation origin — how an address was invited to Circles
+ */
+export type InvitationType = 'v1_signup' | 'v2_standard' | 'v2_escrow' | 'v2_at_scale';
+
+export interface InvitationOriginResponse {
+  address: Address;
+  invitationType: InvitationType;
+  inviter?: Address | null;
+  proxyInviter?: Address | null;
+  escrowAmount?: string | null;
+  blockNumber: number;
+  timestamp: number;
+  transactionHash: string;
+  version: number;
+}
+
+/**
  * Invitation source types - indicates how the invitation was created
  */
 export type InvitationSource = 'trust' | 'escrow' | 'atScale';

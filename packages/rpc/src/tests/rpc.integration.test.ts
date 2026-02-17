@@ -441,6 +441,50 @@ integration('Invitation methods', () => {
       expect(addr).toMatch(/^0x[0-9a-fA-F]{40}$/);
     }
   }, TEST_TIMEOUT);
+
+  test('getInvitationOrigin returns origin details', async () => {
+    const origin = await rpc.invitation.getInvitationOrigin(TEST_AVATAR);
+    // Should have origin since TEST_AVATAR is a registered human
+    expect(origin).not.toBeNull();
+    if (origin) {
+      expect(origin.address.toLowerCase()).toBe(TEST_AVATAR.toLowerCase());
+      expect(['v1_signup', 'v2_standard', 'v2_escrow', 'v2_at_scale']).toContain(origin.invitationType);
+      expect(typeof origin.blockNumber).toBe('number');
+      expect(typeof origin.timestamp).toBe('number');
+      expect(typeof origin.transactionHash).toBe('string');
+      expect(typeof origin.version).toBe('number');
+    }
+  }, TEST_TIMEOUT);
+
+  test('getTrustInvitations returns TrustInvitation array', async () => {
+    const result = await rpc.invitation.getTrustInvitations(TEST_AVATAR);
+    expect(Array.isArray(result)).toBe(true);
+    if (result.length > 0) {
+      expect(result[0].source).toBe('trust');
+      expect(result[0]).toHaveProperty('balance');
+      expect(result[0]).toHaveProperty('address');
+    }
+  }, TEST_TIMEOUT);
+
+  test('getEscrowInvitations returns EscrowInvitation array', async () => {
+    const result = await rpc.invitation.getEscrowInvitations(TEST_AVATAR);
+    expect(Array.isArray(result)).toBe(true);
+    if (result.length > 0) {
+      expect(result[0].source).toBe('escrow');
+      expect(result[0]).toHaveProperty('escrowedAmount');
+      expect(result[0]).toHaveProperty('escrowDays');
+    }
+  }, TEST_TIMEOUT);
+
+  test('getAtScaleInvitations returns AtScaleInvitation array', async () => {
+    const result = await rpc.invitation.getAtScaleInvitations(TEST_AVATAR);
+    expect(Array.isArray(result)).toBe(true);
+    if (result.length > 0) {
+      expect(result[0].source).toBe('atScale');
+      expect(result[0]).toHaveProperty('blockNumber');
+      expect(result[0]).toHaveProperty('timestamp');
+    }
+  }, TEST_TIMEOUT);
 });
 
 // ---------------------------------------------------------------------------

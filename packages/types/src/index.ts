@@ -28,6 +28,8 @@ export type {
   ParticipantInfo,
   EnrichedTransaction,
   ProfileSearchResponse,
+  InvitationType,
+  InvitationOriginResponse,
   InvitationSource,
   InvitationInfo,
   TrustInvitation,
