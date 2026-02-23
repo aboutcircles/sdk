@@ -1,4 +1,4 @@
-import { Distributions } from "@aboutcircles/sdk-referrals";
+import { Distributions, DispenseError } from "@aboutcircles/sdk-referrals";
 
 /**
  * Distribution Sessions Example
@@ -75,8 +75,45 @@ async function example4_GetSession(id: string) {
   console.log();
 }
 
-async function example5_DeleteSession(id: string) {
-  console.log("=== 5. Delete Session ===\n");
+async function example5_DispenseKey(slug: string) {
+  console.log("=== 5. Dispense a Key via Session Slug ===\n");
+
+  try {
+    const result = await distributions.dispense(slug);
+
+    console.log("Key dispensed:");
+    console.log("  Private key:", result.privateKey.slice(0, 10) + "...");
+    console.log("  Inviter:", result.inviter);
+    console.log("  Claim URL:", result.claimUrl ?? "(DISTRIBUTION_BASE_URL not set)");
+    console.log("  Session slug:", result.sessionSlug);
+  } catch (error) {
+    if (error instanceof DispenseError) {
+      // Typed error handling — show appropriate UI per error code
+      switch (error.code) {
+        case "SESSION_PAUSED":
+          console.log("Session is paused — try again later.");
+          break;
+        case "SESSION_EXPIRED":
+          console.log("Session expired or quota exhausted.");
+          break;
+        case "POOL_EMPTY":
+          console.log("No more keys available in the inviter's pool.");
+          break;
+        case "SESSION_NOT_FOUND":
+          console.log("Session not found — check the slug.");
+          break;
+        default:
+          console.log(`Dispense failed: ${error.message} (${error.code})`);
+      }
+    } else {
+      throw error;
+    }
+  }
+  console.log();
+}
+
+async function example6_DeleteSession(id: string) {
+  console.log("=== 6. Delete Session ===\n");
 
   await distributions.deleteSession(id);
   console.log("Session deleted (only works if dispensedCount === 0).\n");
@@ -86,9 +123,11 @@ async function runExamples() {
   try {
     const session = await example1_CreateSession();
     await example2_ListSessions();
+    await example5_DispenseKey(session.slug);
     await example3_UpdateSession(session.id);
     await example4_GetSession(session.id);
-    await example5_DeleteSession(session.id);
+    // Note: delete will fail if a key was dispensed (audit trail)
+    // await example6_DeleteSession(session.id);
 
     console.log("=== All examples complete ===");
   } catch (error) {
@@ -104,5 +143,6 @@ export {
   example2_ListSessions,
   example3_UpdateSession,
   example4_GetSession,
-  example5_DeleteSession,
+  example5_DispenseKey,
+  example6_DeleteSession,
 };
