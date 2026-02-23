@@ -51,3 +51,59 @@ export interface ReferralList {
 export interface ApiError {
   error: string;
 }
+
+// ── Distribution Sessions ──────────────────────────────────────────
+
+/**
+ * A distribution session gates access to an inviter's key pool
+ * via quota, expiry, and pause controls.
+ */
+export interface DistributionSession {
+  id: string;
+  slug: string;
+  inviterAddress: string;
+  label: string | null;
+  quota: number;
+  dispensedCount: number;
+  expiresAt: string | null;
+  paused: boolean;
+  createdAt: string;
+  updatedAt: string;
+  /** Full URL for QR codes (only when DISTRIBUTION_BASE_URL is configured) */
+  distributionUrl: string | null;
+}
+
+/**
+ * Paginated list of distribution sessions
+ */
+export interface DistributionSessionList {
+  sessions: DistributionSession[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/**
+ * Parameters for creating a distribution session
+ */
+export interface CreateSessionParams {
+  /** Inviter's Ethereum address whose key pool this session draws from */
+  inviterAddress: string;
+  /** Maximum number of keys this session can dispense */
+  quota: number;
+  /** Human-readable label (e.g. "ETHDenver 2026 booth") */
+  label?: string;
+  /** ISO 8601 expiry timestamp */
+  expiresAt?: string;
+}
+
+/**
+ * Parameters for updating a distribution session
+ */
+export interface UpdateSessionParams {
+  label?: string;
+  quota?: number;
+  /** New expiry (ISO 8601), or null to remove expiry */
+  expiresAt?: string | null;
+  paused?: boolean;
+}
