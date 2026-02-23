@@ -107,3 +107,44 @@ export interface UpdateSessionParams {
   expiresAt?: string | null;
   paused?: boolean;
 }
+
+/**
+ * Result from dispensing a key via a distribution session slug.
+ * Returned by `GET /d/{slug}`.
+ */
+export interface DispenseResult {
+  /** Full private key for the invitation link */
+  privateKey: string;
+  /** Inviter address that owns the key pool */
+  inviter: string;
+  /** Pre-built claim URL (only when DISTRIBUTION_BASE_URL configured) */
+  claimUrl?: string;
+  /** The session slug this key was dispensed through */
+  sessionSlug: string;
+}
+
+/**
+ * Error codes returned when dispense fails.
+ * Allows callers to show appropriate UI for each failure mode.
+ */
+export type DispenseErrorCode =
+  | "SESSION_NOT_FOUND"   // 404 - slug doesn't exist
+  | "POOL_EMPTY"          // 404 - no keys left in inviter's pool
+  | "SESSION_EXPIRED"     // 410 - session expired or quota exhausted
+  | "SESSION_PAUSED"      // 423 - session is paused
+  | "RATE_LIMITED"        // 429 - too many requests
+  | "UNKNOWN";            // other errors
+
+/**
+ * Typed error thrown by dispense() with a code for programmatic handling.
+ */
+export class DispenseError extends Error {
+  constructor(
+    message: string,
+    public readonly code: DispenseErrorCode,
+    public readonly httpStatus: number,
+  ) {
+    super(message);
+    this.name = "DispenseError";
+  }
+}

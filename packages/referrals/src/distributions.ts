@@ -1,9 +1,12 @@
-import type {
-  DistributionSession,
-  DistributionSessionList,
-  CreateSessionParams,
-  UpdateSessionParams,
-  ApiError,
+import {
+  DispenseError,
+  type DistributionSession,
+  type DistributionSessionList,
+  type CreateSessionParams,
+  type UpdateSessionParams,
+  type DispenseResult,
+  type DispenseErrorCode,
+  type ApiError,
 } from "./types.js";
 
 /**
@@ -151,5 +154,63 @@ export class Distributions {
         error.error || `Failed to delete session: ${response.statusText}`
       );
     }
+  }
+
+  /**
+   * Dispense a key via a distribution session slug.
+   *
+   * The slug is the capability token — knowing it grants access
+   * to dispense keys through that session (subject to quota/expiry/pause).
+   *
+   * @param slug - Distribution session slug (from QR code / link)
+   * @returns The dispensed key, inviter address, and optional claim URL
+   * @throws {DispenseError} with typed code for programmatic handling:
+   *   - `SESSION_NOT_FOUND` (404) — slug doesn't exist
+   *   - `POOL_EMPTY` (404) — no keys left in inviter's pool
+   *   - `SESSION_EXPIRED` (410) — session expired or quota exhausted
+   *   - `SESSION_PAUSED` (423) — session is paused
+   *   - `RATE_LIMITED` (429) — too many requests
+   */
+  async dispense(slug: string): Promise<DispenseResult> {
+    const response = await fetch(
+      `${this.getBaseUrl()}/d/${encodeURIComponent(slug)}`,
+      {
+        headers: { Accept: "application/json" },
+      }
+    );
+
+    if (!response.ok) {
+      let message: string;
+      let code: DispenseErrorCode;
+
+      try {
+        const error = (await response.json()) as ApiError;
+        message = error.error;
+      } catch {
+        message = response.statusText;
+      }
+
+      switch (response.status) {
+        case 404:
+          // Distinguish pool empty from not found by message content
+          code = message.includes("keys available") ? "POOL_EMPTY" : "SESSION_NOT_FOUND";
+          break;
+        case 410:
+          code = "SESSION_EXPIRED";
+          break;
+        case 423:
+          code = "SESSION_PAUSED";
+          break;
+        case 429:
+          code = "RATE_LIMITED";
+          break;
+        default:
+          code = "UNKNOWN";
+      }
+
+      throw new DispenseError(message, code, response.status);
+    }
+
+    return response.json() as Promise<DispenseResult>;
   }
 }
