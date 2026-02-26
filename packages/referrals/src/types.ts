@@ -130,7 +130,8 @@ export interface DispenseResult {
 export type DispenseErrorCode =
   | "SESSION_NOT_FOUND"   // 404 - slug doesn't exist
   | "POOL_EMPTY"          // 404 - no keys left in inviter's pool
-  | "SESSION_EXPIRED"     // 410 - session expired or quota exhausted
+  | "SESSION_EXPIRED"     // 410 - session has expired
+  | "QUOTA_EXHAUSTED"     // 410 - session quota exhausted
   | "SESSION_PAUSED"      // 423 - session is paused
   | "RATE_LIMITED"        // 429 - too many requests
   | "UNKNOWN";            // other errors
@@ -146,5 +147,32 @@ export class DispenseError extends Error {
   ) {
     super(message);
     this.name = "DispenseError";
+  }
+}
+
+// ── Session CRUD Errors ─────────────────────────────────────────────
+
+/**
+ * Error codes for distribution session CRUD operations.
+ * Allows callers to programmatically distinguish failure modes.
+ */
+export type SessionErrorCode =
+  | "VALIDATION_ERROR"    // 400
+  | "NOT_FOUND"           // 404
+  | "CONFLICT"            // 409
+  | "SERVER_ERROR";       // 5xx
+
+/**
+ * Typed error thrown by session CRUD methods with HTTP status and code
+ * for programmatic handling.
+ */
+export class SessionError extends Error {
+  constructor(
+    message: string,
+    public readonly code: SessionErrorCode,
+    public readonly httpStatus: number,
+  ) {
+    super(message);
+    this.name = "SessionError";
   }
 }

@@ -2,6 +2,7 @@ export { Referrals } from "./referrals.js";
 export { Distributions } from "./distributions.js";
 export {
   DispenseError,
+  SessionError,
   type ReferralStatus,
   type ReferralInfo,
   type Referral,
@@ -13,4 +14,5 @@ export {
   type UpdateSessionParams,
   type DispenseResult,
   type DispenseErrorCode,
+  type SessionErrorCode,
 } from "./types.js";

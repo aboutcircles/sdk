@@ -50,7 +50,7 @@ export class Referrals {
    * @throws Error if validation fails or key already exists
    */
   async store(privateKey: string, inviter: string): Promise<void> {
-    const response = await fetch(`${this.getBaseUrl()}/referral/store`, {
+    const response = await fetch(`${this.getBaseUrl()}/store`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ privateKey, inviter }),
@@ -74,7 +74,7 @@ export class Referrals {
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
     const response = await fetch(
-      `${this.getBaseUrl()}/referral/retrieve?key=${encodeURIComponent(privateKey)}`
+      `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`
     );
 
     if (!response.ok) {
@@ -99,7 +99,7 @@ export class Referrals {
     }
 
     const headers = await this.getAuthHeaders();
-    const response = await fetch(`${this.getBaseUrl()}/referral/my-referrals`, {
+    const response = await fetch(`${this.getBaseUrl()}/my-referrals`, {
       headers,
     });
 
