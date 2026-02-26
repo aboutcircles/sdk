@@ -16,6 +16,22 @@ export interface SignResult {
   verified: boolean;
 }
 
+/**
+ * Controls how the host hashes the message before signing:
+ *
+ * - `'erc1271'` (default) — The host applies EIP-191 prefix-hashing to the message
+ *   (`keccak256("\x19Ethereum Signed Message:\n" + len + message)`) and uses that
+ *   hash as the `SafeMessage.message` content before signing with EIP-712.
+ *   Verifiers must call `isValidSignature(eip191Hash, sig)`.
+ *
+ * - `'raw'` — The host encodes the message as raw UTF-8 bytes and uses those bytes
+ *   directly as the `SafeMessage.message` content before signing with EIP-712.
+ *   Verifiers must call `isValidSignature(rawBytes, sig)`.
+ *
+ * The two types produce different signatures that are not interchangeable.
+ */
+export type SignatureType = 'erc1271' | 'raw';
+
 type WalletListener = (address: string | null) => void;
 type DataListener = (data: string) => void;
 
@@ -82,6 +98,13 @@ if (typeof window !== 'undefined') {
 }
 
 /**
+ * Returns true when running inside the miniapps iframe host.
+ */
+export function isMiniappMode(): boolean {
+  return typeof window !== 'undefined' && window.parent !== window;
+}
+
+/**
  * Register a callback that fires when the host sends app-specific data via ?data= param.
  */
 export function onAppData(fn: DataListener): void {
@@ -91,10 +114,15 @@ export function onAppData(fn: DataListener): void {
 /**
  * Register a callback that fires whenever wallet connection changes.
  * Called immediately with current state, then again on every change.
+ * Returns an unsubscribe function.
  */
-export function onWalletChange(fn: WalletListener): void {
+export function onWalletChange(fn: WalletListener): () => void {
   _listeners.push(fn);
   fn(_address);
+  return () => {
+    const idx = _listeners.indexOf(fn);
+    if (idx !== -1) _listeners.splice(idx, 1);
+  };
 }
 
 /**
@@ -110,12 +138,17 @@ export function sendTransactions(transactions: Transaction[]): Promise<string[]>
 }
 
 /**
- * Request the host to sign an arbitrary message.
+ * Request the host to sign a message.
+ *
+ * @param message - The message string to sign.
+ * @param signatureType - How the host hashes the message before signing. See {@link SignatureType}.
+ *   Defaults to `'erc1271'`.
+ * @returns `{ signature, verified }` on success.
  */
-export function signMessage(message: string): Promise<SignResult> {
+export function signMessage(message: string, signatureType: SignatureType = 'erc1271'): Promise<SignResult> {
   return new Promise((resolve, reject) => {
     const requestId = 'req_' + ++_requestCounter;
     _pending[requestId] = { resolve: resolve as (value: unknown) => void, reject };
-    window.parent.postMessage({ type: 'sign_message', requestId, message }, '*');
+    window.parent.postMessage({ type: 'sign_message', requestId, message, signatureType }, '*');
   });
 }
