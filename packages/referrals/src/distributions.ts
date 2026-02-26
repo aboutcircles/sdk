@@ -1,13 +1,23 @@
 import {
   DispenseError,
+  SessionError,
   type DistributionSession,
   type DistributionSessionList,
   type CreateSessionParams,
   type UpdateSessionParams,
   type DispenseResult,
   type DispenseErrorCode,
+  type SessionErrorCode,
   type ApiError,
 } from "./types.js";
+
+/** Map HTTP status to a typed session error code. */
+function sessionErrorCode(status: number): SessionErrorCode {
+  if (status === 400) return "VALIDATION_ERROR";
+  if (status === 404) return "NOT_FOUND";
+  if (status === 409) return "CONFLICT";
+  return "SERVER_ERROR";
+}
 
 /**
  * HTTP client for distribution session management.
@@ -48,8 +58,10 @@ export class Distributions {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(
-        error.error || `Failed to create session: ${response.statusText}`
+      throw new SessionError(
+        error.error || `Failed to create session: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
       );
     }
 
@@ -76,8 +88,10 @@ export class Distributions {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(
-        error.error || `Failed to list sessions: ${response.statusText}`
+      throw new SessionError(
+        error.error || `Failed to list sessions: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
       );
     }
 
@@ -96,8 +110,10 @@ export class Distributions {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(
-        error.error || `Failed to get session: ${response.statusText}`
+      throw new SessionError(
+        error.error || `Failed to get session: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
       );
     }
 
@@ -127,8 +143,10 @@ export class Distributions {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(
-        error.error || `Failed to update session: ${response.statusText}`
+      throw new SessionError(
+        error.error || `Failed to update session: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
       );
     }
 
@@ -150,8 +168,10 @@ export class Distributions {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(
-        error.error || `Failed to delete session: ${response.statusText}`
+      throw new SessionError(
+        error.error || `Failed to delete session: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
       );
     }
   }
@@ -167,7 +187,8 @@ export class Distributions {
    * @throws {DispenseError} with typed code for programmatic handling:
    *   - `SESSION_NOT_FOUND` (404) — slug doesn't exist
    *   - `POOL_EMPTY` (404) — no keys left in inviter's pool
-   *   - `SESSION_EXPIRED` (410) — session expired or quota exhausted
+   *   - `SESSION_EXPIRED` (410) — session has expired
+   *   - `QUOTA_EXHAUSTED` (410) — session quota exhausted
    *   - `SESSION_PAUSED` (423) — session is paused
    *   - `RATE_LIMITED` (429) — too many requests
    */
@@ -196,7 +217,7 @@ export class Distributions {
           code = message.includes("keys available") ? "POOL_EMPTY" : "SESSION_NOT_FOUND";
           break;
         case 410:
-          code = "SESSION_EXPIRED";
+          code = message.includes("quota") ? "QUOTA_EXHAUSTED" : "SESSION_EXPIRED";
           break;
         case 423:
           code = "SESSION_PAUSED";
