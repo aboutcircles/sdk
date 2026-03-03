@@ -1,10 +1,14 @@
 # @aboutcircles/sdk-runner
 
-Safe multisig wallet integration for executing blockchain operations with the Circles SDK.
+Contract runner implementations for executing blockchain operations with the Circles SDK.
 
 ## Overview
 
-This package provides the `SafeContractRunner` implementation for executing transactions through Safe multisig wallets. It handles transaction batching, signing, and confirmation, making it easy to interact with Circles protocol using Safe wallets.
+This package provides multiple `ContractRunner` implementations:
+
+- `SafeContractRunner` - server-side Safe execution with a signer private key
+- `SafeBrowserRunner` - browser Safe execution with an injected EIP-1193 wallet
+- `MiniAppPostMessageRunner` - iframe miniapp execution through the Circles host postMessage protocol
 
 ## Installation
 
@@ -13,6 +17,46 @@ npm install @aboutcircles/sdk-runner
 ```
 
 ## Usage
+
+### MiniAppPostMessageRunner (postMessage / injected host signer)
+
+Use this runner inside a miniapp iframe embedded in the Circles miniapp host. It sends
+transaction and signature requests to the host via `window.parent.postMessage` and waits for
+host responses.
+
+```typescript
+import { Sdk } from '@aboutcircles/sdk';
+import { circlesConfig } from '@aboutcircles/sdk-core';
+import { MiniAppPostMessageRunner } from '@aboutcircles/sdk-runner';
+import { gnosis } from 'viem/chains';
+
+// 1) Create/init runner (requests wallet address from host)
+const runner = await MiniAppPostMessageRunner.create(
+  'https://rpc.aboutcircles.com/',
+  gnosis,
+  {
+    // Recommend setting this in production for security
+    targetOrigin: 'https://circles.gnosis.io',
+    expectedOrigin: 'https://circles.gnosis.io',
+  }
+);
+
+// 2) Pass runner into SDK
+const sdk = new Sdk(circlesConfig[100], runner);
+
+// 3) Use SDK write methods as usual
+const avatar = await sdk.getAvatar(runner.address!);
+await avatar.trust.add('0x1234567890123456789012345678901234567890');
+
+// Optional: request message signatures via host
+const signed = await runner.signMessage('Hello from miniapp', 'erc1271');
+console.log(signed.signature, signed.verified);
+```
+
+Expected host protocol messages:
+
+- miniapp -> host: `request_address`, `send_transactions`, `sign_message`
+- host -> miniapp: `wallet_connected`, `wallet_disconnected`, `tx_success`, `tx_rejected`, `sign_success`, `sign_rejected`
 
 ### SafeContractRunner
 
@@ -98,6 +142,39 @@ class SafeContractRunner implements ContractRunner {
   init(safeAddress?: Address): Promise<void>;
   sendTransaction(txs: TransactionRequest[]): Promise<TransactionResponse>;
   sendBatchTransaction(): SafeBatchRun;
+}
+```
+
+### MiniAppPostMessageRunner
+
+```typescript
+class MiniAppPostMessageRunner implements ContractRunner {
+  constructor(
+    publicClient: PublicClient,
+    options?: {
+      targetOrigin?: string;
+      expectedOrigin?: string;
+      requestTimeoutMs?: number;
+      address?: Address;
+    }
+  );
+
+  static create(
+    rpcUrl: string,
+    chain: Chain,
+    options?: {
+      targetOrigin?: string;
+      expectedOrigin?: string;
+      requestTimeoutMs?: number;
+      address?: Address;
+    }
+  ): Promise<MiniAppPostMessageRunner>;
+
+  init(): Promise<void>;
+  sendTransaction(txs: TransactionRequest[]): Promise<TransactionResponse>;
+  sendBatchTransaction(): MiniAppBatchRun;
+  signMessage(message: string, signatureType?: 'erc1271' | 'raw'): Promise<{ signature: Hex; verified: boolean }>;
+  destroy(): void;
 }
 ```
 
