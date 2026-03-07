@@ -44,4 +44,6 @@ coverage/
 CLAUDE.md
 
 # Examples
-examples/
+examples/*
+!examples/miniapp-browser/
+!examples/miniapp-browser/**

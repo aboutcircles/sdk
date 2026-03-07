@@ -144,9 +144,7 @@ export class SafeBrowserRunner implements ContractRunner {
    */
   estimateGas = async (tx: TransactionRequest): Promise<bigint> => {
     const estimate = await this.publicClient.estimateGas({
-      // @ts-expect-error - Address type is compatible with viem's 0x${string}
       account: this.address,
-      // @ts-expect-error - Address type is compatible with viem's 0x${string}
       to: tx.to!,
       data: tx.data,
       value: tx.value,
@@ -160,9 +158,7 @@ export class SafeBrowserRunner implements ContractRunner {
    */
   call = async (tx: TransactionRequest): Promise<string> => {
     const result = await this.publicClient.call({
-      // @ts-expect-error - Address type is compatible with viem's 0x${string}
       account: tx.from || this.address,
-      // @ts-expect-error - Address type is compatible with viem's 0x${string}
       to: tx.to,
       data: tx.data,
       value: tx.value,

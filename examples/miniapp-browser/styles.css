@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px 14px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #faf5f1;
+  color: #060a40;
+}
+
+.card {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 22px;
+  border: 1px solid #ede1d8;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.subtitle {
+  margin: 6px 0 18px;
+  color: #6a6c8c;
+  font-size: 13px;
+}
+
+section {
+  margin-top: 16px;
+}
+
+label {
+  display: block;
+  margin: 0 0 6px;
+  color: #6a6c8c;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+input,
+textarea,
+select,
+button {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #ede1d8;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+input,
+textarea,
+select {
+  background: #faf5f1;
+  color: #060a40;
+  margin-bottom: 10px;
+}
+
+textarea {
+  min-height: 74px;
+  resize: vertical;
+}
+
+button {
+  border: none;
+  color: #ffffff;
+  background: #060a40;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.pill {
+  display: inline-block;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid #ede1d8;
+  background: #faf5f1;
+}
+
+.pill.ok {
+  background: #f0fdf3;
+  border-color: #bbf7ca;
+  color: #158030;
+}
+
+.pill.warn {
+  background: #fff8eb;
+  border-color: #feebc7;
+  color: #b54708;
+}
+
+.status {
+  margin: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.status.disconnected {
+  background: #fff8eb;
+  border-color: #feebc7;
+  color: #b54708;
+}
+
+.status.connected {
+  background: #f0fdf3;
+  border-color: #bbf7ca;
+  color: #158030;
+}
+
+.result {
+  margin: 0;
+  min-height: 44px;
+  border: 1px solid #ede1d8;
+  border-radius: 10px;
+  background: #faf5f1;
+  color: #060a40;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
