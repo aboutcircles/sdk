@@ -3,55 +3,118 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Circles Mini App Browser Example</title>
+    <title>Circles Mini App Starter</title>
   </head>
   <body>
-    <main class="card">
-      <h1>Circles Mini App Demo</h1>
-      <p class="subtitle">TypeScript + Vite using <code>@aboutcircles/sdk</code> + miniapp host signer</p>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Circles Mini App Example</p>
+        <h1>Clean starter for your first useful Circles mini app</h1>
+        <p class="subtitle">
+          Learn the essentials in order: <strong>connect</strong>, <strong>see balances</strong>,
+          <strong>receive</strong>, <strong>send</strong>, then try advanced actions.
+        </p>
+      </header>
 
-      <section>
-        <h2>Environment</h2>
+      <section class="panel status-strip">
         <p id="mode" class="pill">Checking host mode…</p>
+        <p id="readiness" class="pill">Read status: checking…</p>
+        <p id="writeReady" class="pill">Write status: checking…</p>
       </section>
 
-      <section>
-        <h2>SDK / Runner Status</h2>
-        <div class="status disconnected" id="walletStatus">Initializing…</div>
-        <label for="queryAddress">Address to query (optional in miniapp mode)</label>
-        <input id="queryAddress" type="text" placeholder="0x..." />
-        <button id="refreshBtn">Refresh Circles Data</button>
+      <section class="panel step" id="stepEnvironment">
+        <h2>Step 0 · Environment</h2>
+        <p class="help">Make sure the app knows your wallet context.</p>
+        <div class="meta-row single">
+          <div class="status disconnected" id="walletStatus">Initializing…</div>
+        </div>
       </section>
 
-      <section>
-        <h2>SDK Read Demo</h2>
-        <pre id="readResult" class="result">No query yet.</pre>
+      <section class="panel step" id="stepRead">
+        <h2>Step 1 · Load account + balances</h2>
+        <p class="help">Get avatar status, trust count, and your Circles balances.</p>
+
+        <div class="actions">
+          <button id="loadMineBtn">Load my address</button>
+        </div>
+
+        <label for="queryAddress">Or load any address</label>
+        <div class="input-row">
+          <input id="queryAddress" type="text" placeholder="0x..." />
+          <button id="loadAddressBtn">Load</button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <p class="stat-label">Avatar</p>
+            <p id="avatarSummary" class="stat-value">–</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Trust relations</p>
+            <p id="trustSummary" class="stat-value">–</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Total balance</p>
+            <p id="balanceSummary" class="stat-value">–</p>
+          </article>
+        </div>
+
+        <pre id="readResult" class="result">Run a read action to see data.</pre>
       </section>
 
-      <section>
-        <h2>SDK Write Demo (Trust)</h2>
-        <label for="trustTarget">Avatar to trust</label>
-        <input id="trustTarget" type="text" placeholder="0x..." />
-        <button id="trustBtn" disabled>Call avatar.trust.add(...)</button>
+      <section class="panel step" id="stepReceive">
+        <h2>Step 2 · Receive Circles</h2>
+        <p class="help">Share your address so someone can send you Circles.</p>
+
+        <div class="receive-box">
+          <code id="receiveAddress">No wallet address yet.</code>
+          <button id="copyAddressBtn" disabled>Copy address</button>
+        </div>
       </section>
 
-      <section>
-        <h2>Miniapp Signer Demo</h2>
-        <label for="messageInput">Message</label>
-        <textarea id="messageInput">Hello from mini app browser example</textarea>
+      <section class="panel step" id="stepSend">
+        <h2>Step 3 · Send Circles</h2>
+        <p class="help">Send a small amount to test your first transfer.</p>
 
-        <label for="signatureType">Signature Type</label>
-        <select id="signatureType">
-          <option value="erc1271" selected>erc1271</option>
-          <option value="raw">raw</option>
-        </select>
+        <label for="sendTo">Recipient address</label>
+        <input id="sendTo" type="text" placeholder="0x..." />
 
-        <button id="signBtn" disabled>Request Signature</button>
+        <label for="sendAmount">Amount (CRC)</label>
+        <input id="sendAmount" type="text" placeholder="e.g. 1.5" />
+
+        <button id="sendBtn" disabled>Send Circles</button>
       </section>
 
-      <section>
-        <h2>Result</h2>
-        <pre id="result" class="result">No action yet.</pre>
+      <section class="panel two-col step" id="stepAdvanced">
+        <div>
+          <h2>Step 4 · Sign message</h2>
+          <p class="help">Use host wallet signing via miniapp postMessage runner.</p>
+
+          <label for="messageInput">Message</label>
+          <textarea id="messageInput">Hello from my first Circles mini app 👋</textarea>
+
+          <label for="signatureType">Signature type</label>
+          <select id="signatureType">
+            <option value="erc1271" selected>erc1271</option>
+            <option value="raw">raw</option>
+          </select>
+
+          <button id="signBtn" disabled>Sign message</button>
+        </div>
+
+        <div>
+          <h2>Step 5 · Trust action</h2>
+          <p class="help">Example write call: <code>avatar.trust.add(target)</code>.</p>
+
+          <label for="trustTarget">Address to trust</label>
+          <input id="trustTarget" type="text" placeholder="0x..." />
+          <button id="trustBtn" disabled>Add trust</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Action output</h2>
+        <pre id="result" class="result">Action results will appear here.</pre>
       </section>
     </main>
 

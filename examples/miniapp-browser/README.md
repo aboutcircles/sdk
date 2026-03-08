@@ -1,27 +1,35 @@
 # Circles Mini App Browser Example (TypeScript + Vite)
 
-This example is a **TypeScript** mini app using a small Vite pipeline and the real SDK packages:
+This is a polished **starter mini app** for new Circles developers.
+
+It keeps things simple, but showcases the most important basics in one page:
+
+1. **Read Circles data** for an address (avatar, trust, balances)
+2. **Sign a message** via miniapp host wallet
+3. **Send one write transaction** (`avatar.trust.add`)
+
+Under the hood it uses:
 
 - `@aboutcircles/sdk`
 - `@aboutcircles/sdk-core`
-- `@aboutcircles/sdk-runner` (`MiniAppPostMessageRunner`)
+- `MiniAppPostMessageRunner` from the local runner source (see note below)
 
-It demonstrates the same SDK compatibility as regular apps, but with the miniapp host signer
-instead of requiring MetaMask.
+The example is built to feel like a practical template you can fork for your own mini app.
 
-It demonstrates:
+## What this example demonstrates
 
-- SDK initialization with miniapp runner signer
-- SDK read methods (`sdk.data.getAvatar`, `sdk.data.getTrustRelations`, `sdk.data.getBalances`)
-- SDK write method (`sdk.getAvatar(runner.address).trust.add(...)`)
-- Direct signer call via runner (`runner.signMessage(message, 'erc1271' | 'raw')`)
+- miniapp host detection + wallet connection state
+- read flows with `sdk.data` methods
+- signer flows with `runner.signMessage(message, 'erc1271' | 'raw')`
+- write flow with `sdk.getAvatar(address).trust.add(target)`
+- safe output rendering for `bigint` values
 
 ## Files
 
-- `index.html` – UI
-- `styles.css` – styling
-- `src/miniapp-sdk.ts` – minimal host wallet connection listener
-- `src/main.ts` – SDK + runner integration and app logic
+- `index.html` – structured, guided starter UI
+- `styles.css` – clean responsive styling
+- `src/miniapp-sdk.ts` – host wallet event bridge
+- `src/main.ts` – SDK/runner logic and action handlers
 - `package.json` / `tsconfig.json` – build setup
 
 ## Install & run locally
@@ -52,3 +60,4 @@ Then open:
 - In standalone mode, SDK read queries still work, but signer/write features are disabled.
 - Inside the Circles mini app host iframe, the app initializes `MiniAppPostMessageRunner` and uses the host wallet as signer.
 - This gives you miniapp-native signing while remaining SDK-compatible for Circles data, profiles, trust, transfers, etc.
+- The runner is imported from `packages/runner/src/miniapp-postmessage-runner` because the currently published `@aboutcircles/sdk-runner` package does not export `MiniAppPostMessageRunner` yet.
