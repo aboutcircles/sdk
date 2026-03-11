@@ -26,11 +26,15 @@ function sessionErrorCode(status: number): SessionErrorCode {
  * quota, expiry, and pause controls. Each session gets a unique slug
  * for QR codes / links.
  *
- * No authentication required — sessions are rate-limited and the
- * slug itself is the capability token.
+ * Session management endpoints (create, list, get, update, delete) require
+ * authentication. Pass a `getToken` callback to supply the Bearer JWT.
+ * The `dispense` endpoint is public and requires no token.
  */
 export class Distributions {
-  constructor(private readonly baseUrl: string) {}
+  constructor(
+    private readonly baseUrl: string,
+    private readonly getToken?: () => Promise<string>,
+  ) {}
 
   private getBaseUrl(): string {
     return this.baseUrl.endsWith("/")
@@ -38,10 +42,17 @@ export class Distributions {
       : this.baseUrl;
   }
 
+  private async getAuthHeaders(): Promise<Record<string, string>> {
+    const base: Record<string, string> = { "Content-Type": "application/json" };
+    if (!this.getToken) return base;
+    const token = await this.getToken();
+    return { ...base, Authorization: `Bearer ${token}` };
+  }
+
   /**
    * Create a distribution session.
    *
-   * @param params - Session parameters (inviterAddress, quota, optional label/expiresAt)
+   * @param params - Session parameters (inviterAddress, optional label/expiresAt)
    * @returns The created session including its unique slug
    */
   async createSession(
@@ -51,7 +62,7 @@ export class Distributions {
       `${this.getBaseUrl()}/distributions/sessions`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: await this.getAuthHeaders(),
         body: JSON.stringify(params),
       }
     );
@@ -83,7 +94,8 @@ export class Distributions {
     if (opts?.offset !== undefined) params.set("offset", String(opts.offset));
 
     const response = await fetch(
-      `${this.getBaseUrl()}/distributions/sessions?${params}`
+      `${this.getBaseUrl()}/distributions/sessions?${params}`,
+      { headers: await this.getAuthHeaders() }
     );
 
     if (!response.ok) {
@@ -105,7 +117,8 @@ export class Distributions {
    */
   async getSession(id: string): Promise<DistributionSession> {
     const response = await fetch(
-      `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`
+      `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`,
+      { headers: await this.getAuthHeaders() }
     );
 
     if (!response.ok) {
@@ -123,10 +136,8 @@ export class Distributions {
   /**
    * Update a distribution session.
    *
-   * Cannot set quota below current dispensedCount.
-   *
    * @param id - Session UUID
-   * @param params - Fields to update (label, quota, expiresAt, paused)
+   * @param params - Fields to update (label, expiresAt, paused)
    */
   async updateSession(
     id: string,
@@ -136,7 +147,7 @@ export class Distributions {
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`,
       {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: await this.getAuthHeaders(),
         body: JSON.stringify(params),
       }
     );
@@ -163,7 +174,10 @@ export class Distributions {
   async deleteSession(id: string): Promise<void> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`,
-      { method: "DELETE" }
+      {
+        method: "DELETE",
+        headers: await this.getAuthHeaders(),
+      }
     );
 
     if (!response.ok) {
