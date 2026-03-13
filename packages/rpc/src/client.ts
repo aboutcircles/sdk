@@ -98,7 +98,7 @@ export class RpcClient {
    * @private
    */
   private connect(): Promise<void> {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
       let wsUrl = this.rpcUrl.replace('http', 'ws');
       if (wsUrl.endsWith('/')) {
         wsUrl += 'ws';
@@ -134,13 +134,20 @@ export class RpcClient {
 
       this.websocket.onclose = () => {
         console.warn('WebSocket closed');
+        const wasConnected = this.websocketConnected;
         this.websocketConnected = false;
+        // Reconnect after a previously-established connection drops
+        if (wasConnected) {
+          this.scheduleReconnect();
+        }
       };
 
       this.websocket.onerror = (error) => {
         console.error('WebSocket error:', error);
         this.websocketConnected = false;
-        // Schedule a reconnect
+        // Reject the initial connection promise so callers don't hang forever.
+        // Reconnect attempts happen in the background via scheduleReconnect().
+        reject(RpcError.connectionFailed(this.rpcUrl, error instanceof Error ? error : new Error('WebSocket connection failed')));
         this.scheduleReconnect();
       };
     });
