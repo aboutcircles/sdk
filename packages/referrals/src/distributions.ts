@@ -5,6 +5,8 @@ import {
   type DistributionSessionList,
   type CreateSessionParams,
   type UpdateSessionParams,
+  type SessionKeyList,
+  type AddKeysResult,
   type DispenseResult,
   type DispenseErrorCode,
   type SessionErrorCode,
@@ -184,6 +186,94 @@ export class Distributions {
       const error = (await response.json()) as ApiError;
       throw new SessionError(
         error.error || `Failed to delete session: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
+      );
+    }
+  }
+
+  /**
+   * Add keys to a distribution session (max 100 per call).
+   *
+   * @param id - Session UUID
+   * @param keys - Array of raw private keys (0x-prefixed, 64 hex chars)
+   * @returns Counts of added/skipped/claimed entries and per-key errors
+   */
+  async addKeys(id: string, keys: string[]): Promise<AddKeysResult> {
+    const response = await fetch(
+      `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}/keys`,
+      {
+        method: "POST",
+        headers: await this.getAuthHeaders(),
+        body: JSON.stringify({ keys }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new SessionError(
+        error.error || `Failed to add keys: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
+      );
+    }
+
+    return response.json() as Promise<AddKeysResult>;
+  }
+
+  /**
+   * List keys in a distribution session.
+   *
+   * @param id - Session UUID
+   * @param opts - Pagination options
+   */
+  async listKeys(
+    id: string,
+    opts?: { limit?: number; offset?: number }
+  ): Promise<SessionKeyList> {
+    const params = new URLSearchParams();
+    if (opts?.limit !== undefined) params.set("limit", String(opts.limit));
+    if (opts?.offset !== undefined) params.set("offset", String(opts.offset));
+
+    const query = params.toString() ? `?${params}` : "";
+    const response = await fetch(
+      `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}/keys${query}`,
+      { headers: await this.getAuthHeaders() }
+    );
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new SessionError(
+        error.error || `Failed to list keys: ${response.statusText}`,
+        sessionErrorCode(response.status),
+        response.status,
+      );
+    }
+
+    return response.json() as Promise<SessionKeyList>;
+  }
+
+  /**
+   * Remove a key from a distribution session.
+   *
+   * Only allowed for keys in `queued` state — dispatched or claimed keys cannot be removed.
+   *
+   * @param id - Session UUID
+   * @param keyId - Key UUID (from listKeys)
+   */
+  async removeKey(id: string, keyId: string): Promise<void> {
+    const response = await fetch(
+      `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}/keys/${encodeURIComponent(keyId)}`,
+      {
+        method: "DELETE",
+        headers: await this.getAuthHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new SessionError(
+        error.error || `Failed to remove key: ${response.statusText}`,
         sessionErrorCode(response.status),
         response.status,
       );

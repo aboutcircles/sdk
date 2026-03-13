@@ -1,4 +1,4 @@
-import type { ReferralInfo, ReferralList, ApiError } from "./types.js";
+import type { ReferralInfo, ReferralList, ReferralPreviewList, StoreBatchResult, ApiError } from "./types.js";
 
 /**
  * Referrals service client for storing and retrieving referral links
@@ -63,6 +63,31 @@ export class Referrals {
   }
 
   /**
+   * Store multiple referral private keys in a single request (max 200)
+   *
+   * Processing is independent — one failure doesn't block others.
+   *
+   * @param invitations - Array of { privateKey, inviter } pairs
+   * @returns Counts of stored/failed entries and per-item error details
+   */
+  async storeBatch(
+    invitations: Array<{ privateKey: string; inviter: string }>
+  ): Promise<StoreBatchResult> {
+    const response = await fetch(`${this.getBaseUrl()}/store-batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ invitations }),
+    });
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to store batch: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<StoreBatchResult>;
+  }
+
+  /**
    * Retrieve referral info by private key
    *
    * This is a public endpoint - no authentication required.
@@ -93,15 +118,25 @@ export class Referrals {
    * @returns List of referrals with their status and metadata
    * @throws Error if not authenticated or request fails
    */
-  async listMine(): Promise<ReferralList> {
+  async listMine(opts?: {
+    limit?: number;
+    offset?: number;
+    inSession?: boolean;
+    status?: string;
+  }): Promise<ReferralList> {
     if (!this.getToken) {
       throw new Error("Authentication required to list referrals");
     }
 
+    const params = new URLSearchParams();
+    if (opts?.limit !== undefined) params.set("limit", String(opts.limit));
+    if (opts?.offset !== undefined) params.set("offset", String(opts.offset));
+    if (opts?.inSession !== undefined) params.set("inSession", String(opts.inSession));
+    if (opts?.status !== undefined) params.set("status", opts.status);
+
+    const query = params.toString() ? `?${params}` : "";
     const headers = await this.getAuthHeaders();
-    const response = await fetch(`${this.getBaseUrl()}/my-referrals`, {
-      headers,
-    });
+    const response = await fetch(`${this.getBaseUrl()}/my-referrals${query}`, { headers });
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
@@ -109,5 +144,36 @@ export class Referrals {
     }
 
     return response.json() as Promise<ReferralList>;
+  }
+
+  /**
+   * List referrals for a given address (public, no auth required)
+   *
+   * Returns masked key previews — full keys are never exposed here.
+   *
+   * @param address - Inviter Ethereum address
+   * @param opts - Pagination options
+   * @returns Paginated list of referral previews with on-chain status
+   */
+  async listPublic(
+    address: string,
+    opts?: { limit?: number; offset?: number; inSession?: boolean }
+  ): Promise<ReferralPreviewList> {
+    const params = new URLSearchParams();
+    if (opts?.limit !== undefined) params.set("limit", String(opts.limit));
+    if (opts?.offset !== undefined) params.set("offset", String(opts.offset));
+    if (opts?.inSession !== undefined) params.set("inSession", String(opts.inSession));
+
+    const query = params.toString() ? `?${params}` : "";
+    const response = await fetch(
+      `${this.getBaseUrl()}/list/${encodeURIComponent(address)}${query}`
+    );
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to list referrals: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<ReferralPreviewList>;
   }
 }
