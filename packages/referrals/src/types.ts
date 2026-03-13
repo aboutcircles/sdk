@@ -18,31 +18,32 @@ export interface ReferralInfo {
 /**
  * Full referral record returned from my-referrals endpoint
  */
-export interface Referral {
-  /** Unique identifier */
+export interface ReferralSession {
   id: string;
-  /** The referral private key */
-  privateKey: string;
-  /** Current status */
-  status: ReferralStatus;
-  /** The Safe account address */
-  accountAddress?: string;
-  /** When the referral was created */
-  createdAt: string;
-  /** When the account was confirmed on-chain */
-  confirmedAt: string | null;
-  /** When the account was claimed */
-  claimedAt: string | null;
+  slug: string;
+  label: string | null;
 }
 
-/**
- * Response from my-referrals endpoint
- */
+export interface Referral {
+  id: string;
+  privateKey: string;
+  status: ReferralStatus;
+  accountAddress?: string;
+  createdAt: string;
+  pendingAt: string;
+  staleAt: string | null;
+  confirmedAt: string | null;
+  claimedAt: string | null;
+  /** Distribution sessions this key belongs to. Empty array if not assigned. */
+  sessions: ReferralSession[];
+}
+
 export interface ReferralList {
-  /** List of referrals */
   referrals: Referral[];
-  /** Total count */
   count: number;
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 /**
@@ -52,7 +53,52 @@ export interface ApiError {
   error: string;
 }
 
-// ── Distribution Sessions ──────────────────────────────────────────
+/**
+ * Result from store-batch endpoint
+ */
+export interface StoreBatchResult {
+  success: boolean;
+  stored: number;
+  failed: number;
+  errors?: Array<{
+    index: number;
+    keyPreview: string;
+    reason: string;
+  }>;
+}
+
+/**
+ * Referral preview returned from the public list/{address} endpoint (key is masked)
+ */
+export interface ReferralPreview {
+  id: string;
+  /** Masked private key preview (e.g. "0x1234...7890") */
+  keyPreview: string;
+  status: ReferralStatus;
+  accountAddress: string | null;
+  createdAt: string;
+  pendingAt: string | null;
+  staleAt: string | null;
+  confirmedAt: string | null;
+  claimedAt: string | null;
+  /** Whether this key is also present in at least one distribution session */
+  inSession: boolean;
+}
+
+/**
+ * Paginated response from the public list/{address} endpoint
+ */
+export interface ReferralPreviewList {
+  referrals: ReferralPreview[];
+  count: number;
+  total: number;
+  limit: number;
+  offset: number;
+  /** 'synced' = fresh RPC check, 'cached' = DB-cached status (30s TTL) */
+  syncStatus: "synced" | "cached";
+}
+
+// ── Distribution Sessions ─────────────────────────────────────────────────────
 
 /**
  * A distribution session gates access to an inviter's key pool
@@ -106,6 +152,43 @@ export interface UpdateSessionParams {
   /** New expiry (ISO 8601), or null to remove expiry */
   expiresAt?: string | null;
   paused?: boolean;
+}
+
+/**
+ * A single key entry within a distribution session
+ */
+export interface SessionKey {
+  id: string;
+  privateKey: string;
+  signerAddress: string | null;
+  accountAddress: string | null;
+  status: "queued" | "dispatched" | "claimed";
+  dispatchedAt: string | null;
+  claimedAt: string | null;
+  addedAt: string;
+}
+
+/**
+ * Paginated list of keys in a distribution session
+ */
+export interface SessionKeyList {
+  keys: SessionKey[];
+  total: number;
+  queuedCount: number;
+  dispatchedCount: number;
+  claimedCount: number;
+  limit: number;
+  offset: number;
+}
+
+/**
+ * Result from adding keys to a distribution session
+ */
+export interface AddKeysResult {
+  added: number;
+  skipped: number;
+  claimed: number;
+  errors: Array<{ key: string; error: string }>;
 }
 
 /**
