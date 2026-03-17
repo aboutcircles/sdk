@@ -1,5 +1,5 @@
 import { Contract } from './contract';
-import { invitationFarmAbi } from '@aboutcircles/sdk-abis';
+import { invitationFarmAbi } from '@aboutcircles/sdk-abis/invitationFarm';
 import type { Address, TransactionRequest } from '@aboutcircles/sdk-types';
 
 /**

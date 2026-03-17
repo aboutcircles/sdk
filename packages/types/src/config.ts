@@ -14,8 +14,8 @@ export interface CirclesConfig {
   pathfinderUrl: string;
   /** Profile service URL for user profiles and metadata */
   profileServiceUrl: string;
-  /** Referrals service URL for referral/invitation links (optional) */
-  referralsServiceUrl?: string;
+  /** Referrals service URL for storing referral data */
+  referralsServiceUrl: string;
   /** Circles V1 Hub contract address */
   v1HubAddress: Address;
   /** Circles V2 Hub contract address */
@@ -32,10 +32,10 @@ export interface CirclesConfig {
   baseGroupFactoryAddress: Address;
   /** Lift ERC20 contract address */
   liftERC20Address: Address;
-  /** Invitation Escrow contract address */
-  invitationEscrowAddress: Address;
   /** Invitation Farm contract address */
   invitationFarmAddress: Address;
   /** Referrals Module contract address */
   referralsModuleAddress: Address;
+  /** Invitation Module contract address */
+  invitationModuleAddress: Address;
 }

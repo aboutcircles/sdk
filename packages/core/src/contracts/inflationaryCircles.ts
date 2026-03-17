@@ -1,5 +1,5 @@
 import { BaseWrappedCirclesContract } from './baseWrappedCircles';
-import { inflationaryCirclesAbi } from '@aboutcircles/sdk-abis';
+import { inflationaryCirclesAbi } from '@aboutcircles/sdk-abis/inflationaryCircles';
 import type { Address } from '@aboutcircles/sdk-types';
 
 /**

@@ -11,9 +11,8 @@ import {
   type DispenseErrorCode,
   type SessionErrorCode,
   type ApiError,
-} from "./types.js";
+} from "./types";
 
-/** Map HTTP status to a typed session error code. */
 function sessionErrorCode(status: number): SessionErrorCode {
   if (status === 400) return "VALIDATION_ERROR";
   if (status === 404) return "NOT_FOUND";
@@ -28,9 +27,8 @@ function sessionErrorCode(status: number): SessionErrorCode {
  * quota, expiry, and pause controls. Each session gets a unique slug
  * for QR codes / links.
  *
- * Session management endpoints (create, list, get, update, delete) require
- * authentication. Pass a `getToken` callback to supply the Bearer JWT.
- * The `dispense` endpoint is public and requires no token.
+ * Session management endpoints require authentication. Pass a `getToken`
+ * callback to supply the Bearer JWT. The `dispense` endpoint is public.
  */
 export class Distributions {
   constructor(
@@ -51,15 +49,7 @@ export class Distributions {
     return { ...base, Authorization: `Bearer ${token}` };
   }
 
-  /**
-   * Create a distribution session.
-   *
-   * @param params - Session parameters (inviterAddress, optional label/expiresAt)
-   * @returns The created session including its unique slug
-   */
-  async createSession(
-    params: CreateSessionParams
-  ): Promise<DistributionSession> {
+  async createSession(params: CreateSessionParams): Promise<DistributionSession> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions`,
       {
@@ -81,12 +71,6 @@ export class Distributions {
     return response.json() as Promise<DistributionSession>;
   }
 
-  /**
-   * List distribution sessions for an inviter address.
-   *
-   * @param inviter - Ethereum address to filter by
-   * @param opts - Pagination options (limit 1-100, offset)
-   */
   async listSessions(
     inviter: string,
     opts?: { limit?: number; offset?: number }
@@ -112,11 +96,6 @@ export class Distributions {
     return response.json() as Promise<DistributionSessionList>;
   }
 
-  /**
-   * Get a single distribution session by ID.
-   *
-   * @param id - Session UUID
-   */
   async getSession(id: string): Promise<DistributionSession> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`,
@@ -135,16 +114,7 @@ export class Distributions {
     return response.json() as Promise<DistributionSession>;
   }
 
-  /**
-   * Update a distribution session.
-   *
-   * @param id - Session UUID
-   * @param params - Fields to update (label, expiresAt, paused)
-   */
-  async updateSession(
-    id: string,
-    params: UpdateSessionParams
-  ): Promise<DistributionSession> {
+  async updateSession(id: string, params: UpdateSessionParams): Promise<DistributionSession> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`,
       {
@@ -166,13 +136,6 @@ export class Distributions {
     return response.json() as Promise<DistributionSession>;
   }
 
-  /**
-   * Delete a distribution session.
-   *
-   * Rejected if any keys have been dispensed (audit trail preservation).
-   *
-   * @param id - Session UUID
-   */
   async deleteSession(id: string): Promise<void> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}`,
@@ -192,13 +155,6 @@ export class Distributions {
     }
   }
 
-  /**
-   * Add keys to a distribution session (max 100 per call).
-   *
-   * @param id - Session UUID
-   * @param keys - Array of raw private keys (0x-prefixed, 64 hex chars)
-   * @returns Counts of added/skipped/claimed entries and per-key errors
-   */
   async addKeys(id: string, keys: string[]): Promise<AddKeysResult> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}/keys`,
@@ -221,12 +177,6 @@ export class Distributions {
     return response.json() as Promise<AddKeysResult>;
   }
 
-  /**
-   * List keys in a distribution session.
-   *
-   * @param id - Session UUID
-   * @param opts - Pagination options
-   */
   async listKeys(
     id: string,
     opts?: { limit?: number; offset?: number }
@@ -253,14 +203,6 @@ export class Distributions {
     return response.json() as Promise<SessionKeyList>;
   }
 
-  /**
-   * Remove a key from a distribution session.
-   *
-   * Only allowed for keys in `queued` state — dispatched or claimed keys cannot be removed.
-   *
-   * @param id - Session UUID
-   * @param keyId - Key UUID (from listKeys)
-   */
   async removeKey(id: string, keyId: string): Promise<void> {
     const response = await fetch(
       `${this.getBaseUrl()}/distributions/sessions/${encodeURIComponent(id)}/keys/${encodeURIComponent(keyId)}`,
@@ -281,27 +223,16 @@ export class Distributions {
   }
 
   /**
-   * Dispense a key via a distribution session slug.
+   * Dispense a key via a distribution session slug (public, no auth required).
    *
-   * The slug is the capability token — knowing it grants access
-   * to dispense keys through that session (subject to quota/expiry/pause).
-   *
-   * @param slug - Distribution session slug (from QR code / link)
-   * @returns The dispensed key, inviter address, and optional claim URL
-   * @throws {DispenseError} with typed code for programmatic handling:
-   *   - `SESSION_NOT_FOUND` (404) — slug doesn't exist
-   *   - `POOL_EMPTY` (404) — no keys left in inviter's pool
-   *   - `SESSION_EXPIRED` (410) — session has expired
-   *   - `QUOTA_EXHAUSTED` (410) — session quota exhausted
-   *   - `SESSION_PAUSED` (423) — session is paused
-   *   - `RATE_LIMITED` (429) — too many requests
+   * @throws {DispenseError} with typed code:
+   *   - `SESSION_NOT_FOUND` (404), `POOL_EMPTY` (404), `SESSION_EXPIRED` (410),
+   *     `QUOTA_EXHAUSTED` (410), `SESSION_PAUSED` (423), `RATE_LIMITED` (429)
    */
   async dispense(slug: string): Promise<DispenseResult> {
     const response = await fetch(
       `${this.getBaseUrl()}/d/${encodeURIComponent(slug)}`,
-      {
-        headers: { Accept: "application/json" },
-      }
+      { headers: { Accept: "application/json" } }
     );
 
     if (!response.ok) {
@@ -317,7 +248,6 @@ export class Distributions {
 
       switch (response.status) {
         case 404:
-          // Distinguish pool empty from not found by message content
           code = message.includes("keys available") ? "POOL_EMPTY" : "SESSION_NOT_FOUND";
           break;
         case 410:

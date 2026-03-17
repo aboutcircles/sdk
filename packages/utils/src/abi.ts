@@ -616,3 +616,79 @@ export function decodeErrorResult(config: {
 
   return null; // No matching error found
 }
+
+// ============================================================================
+// SIMPLE ABI PARAMETER ENCODING (LIMITED USE CASE)
+// ============================================================================
+
+/**
+ * IMPORTANT: This is a lightweight encoding utility for SIMPLE cases only.
+ * It supports basic types: address, bytes, uint*, int*, bool, string
+ *
+ * For complex use cases with tuples, nested arrays, or advanced types,
+ * use viem's encodeAbiParameters instead.
+ *
+ * This function is provided to avoid bundling the entire viem library
+ * for simple encoding scenarios like encoding (address, bytes) tuples.
+ *
+ * @param types - Array of parameter types (e.g., ['address', 'bytes'])
+ * @param values - Array of values to encode
+ * @returns Hex-encoded parameters with 0x prefix
+ *
+ * @example
+ * ```typescript
+ * // Encode (address, bytes) tuple
+ * const encoded = encodeAbiParameters(
+ *   ['address', 'bytes'],
+ *   ['0x1234...', '0xabcd...']
+ * );
+ * ```
+ */
+export function encodeAbiParameters(types: string[], values: unknown[]): Hex {
+  if (types.length !== values.length) {
+    throw new Error(`Type/value length mismatch: ${types.length} types, ${values.length} values`);
+  }
+
+  const encodings: string[] = [];
+  const dynamicData: string[] = [];
+  const isDynamic: boolean[] = [];
+
+  // First pass: encode all parameters
+  for (let i = 0; i < types.length; i++) {
+    const type = types[i] as AbiType;
+    const dynamic = isDynamicType(type);
+
+    isDynamic.push(dynamic);
+
+    if (dynamic) {
+      encodings.push('');
+      dynamicData.push(encodeParam(type, values[i]));
+    } else {
+      encodings.push(encodeParam(type, values[i]));
+    }
+  }
+
+  // Second pass: calculate offsets and build result
+  if (dynamicData.length === 0) {
+    return ('0x' + encodings.join('')) as Hex;
+  }
+
+  let offset = encodings.reduce((sum, enc, i) =>
+    sum + (isDynamic[i] ? BYTES_PER_WORD : enc.length / 2), 0
+  );
+
+  let result = '';
+  let dynamicIndex = 0;
+
+  for (let i = 0; i < types.length; i++) {
+    if (isDynamic[i]) {
+      result += toHex64(offset);
+      offset += dynamicData[dynamicIndex].length / 2;
+      dynamicIndex++;
+    } else {
+      result += encodings[i];
+    }
+  }
+
+  return ('0x' + result + dynamicData.join('')) as Hex;
+}

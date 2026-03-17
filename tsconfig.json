@@ -21,10 +21,11 @@
     { "path": "./packages/core" },
     { "path": "./packages/rpc" },
     { "path": "./packages/profiles" },
-    { "path": "./packages/referrals" },
-    { "path": "./packages/pathfinder" },
+{ "path": "./packages/pathfinder" },
     { "path": "./packages/transfers" },
+    { "path": "./packages/invitations" },
     { "path": "./packages/sdk" },
-    { "path": "./packages/runner" }
+    { "path": "./packages/runner" },
+    { "path": "./packages/miniapp-sdk" }
   ]
 }

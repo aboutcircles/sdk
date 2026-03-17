@@ -11,7 +11,9 @@ import type { TransactionReceipt } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import type { CirclesEvent, Observable } from '@aboutcircles/sdk-rpc';
 import { Observable as ObservableClass, CirclesRpc } from '@aboutcircles/sdk-rpc';
-import { cidV0ToHex, bytesToHex, ValidationError } from '@aboutcircles/sdk-utils';
+import { cidV0ToHex } from '@aboutcircles/sdk-utils/cid';
+import { bytesToHex } from '@aboutcircles/sdk-utils/bytes';
+import { ValidationError } from '@aboutcircles/sdk-utils/errors';
 import { Profiles } from '@aboutcircles/sdk-profiles';
 import { SdkError } from '../errors';
 import {
@@ -86,7 +88,7 @@ export abstract class CommonAvatar {
     this.rpc = new CirclesRpc(core.config.circlesRpcUrl);
 
     // Initialize transfer builder
-    this.transferBuilder = new TransferBuilder(core);
+    this.transferBuilder = new TransferBuilder(core.config);
 
     // Event subscription is optional - initialize with stub observable
     // Actual subscription is handled by Sdk.getAvatar() when autoSubscribeEvents is enabled
@@ -464,6 +466,7 @@ export abstract class CommonAvatar {
      * const receipt = await avatar.transfer.direct('0x123...', BigInt(100e18), '0xWrappedTokenAddress...');
      * ```
      */
+    // @todo allow batch
     direct: async (
       to: Address,
       amount: bigint,

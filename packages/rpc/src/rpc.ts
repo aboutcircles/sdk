@@ -15,6 +15,9 @@ import {
 /**
  * Main RPC class for Circles protocol RPC interactions
  *
+ * Uses lazy initialization - method modules are only created when first accessed.
+ * This reduces initial memory footprint and instantiation overhead.
+ *
  * @example
  * ```typescript
  * // Use default RPC endpoint
@@ -45,16 +48,17 @@ import {
  */
 export class CirclesRpc {
   public readonly client: RpcClient;
-  public readonly pathfinder: PathfinderMethods;
-  public readonly query: QueryMethods;
-  public readonly trust: TrustMethods;
-  public readonly balance: BalanceMethods;
-  public readonly avatar: AvatarMethods;
-  public readonly profile: ProfileMethods;
-  public readonly token: TokenMethods;
-  public readonly invitation: InvitationMethods;
-  public readonly transaction: TransactionMethods;
-  public readonly group: GroupMethods;
+
+  private _pathfinder?: PathfinderMethods;
+  private _query?: QueryMethods;
+  private _trust?: TrustMethods;
+  private _balance?: BalanceMethods;
+  private _avatar?: AvatarMethods;
+  private _profile?: ProfileMethods;
+  private _token?: TokenMethods;
+  private _invitation?: InvitationMethods;
+  private _transaction?: TransactionMethods;
+  private _group?: GroupMethods;
 
   /**
    * Create a new CirclesRpc instance
@@ -63,17 +67,76 @@ export class CirclesRpc {
    */
   constructor(rpcUrl: string = 'https://rpc.circlesubi.network/') {
     this.client = new RpcClient(rpcUrl);
+  }
 
-    this.pathfinder = new PathfinderMethods(this.client);
-    this.query = new QueryMethods(this.client);
-    this.trust = new TrustMethods(this.client);
-    this.balance = new BalanceMethods(this.client);
-    this.avatar = new AvatarMethods(this.client);
-    this.profile = new ProfileMethods(this.client);
-    this.token = new TokenMethods(this.client);
-    this.invitation = new InvitationMethods(this.client);
-    this.transaction = new TransactionMethods(this.client);
-    this.group = new GroupMethods(this.client);
+  get pathfinder(): PathfinderMethods {
+    if (!this._pathfinder) {
+      this._pathfinder = new PathfinderMethods(this.client);
+    }
+    return this._pathfinder;
+  }
+
+  get query(): QueryMethods {
+    if (!this._query) {
+      this._query = new QueryMethods(this.client);
+    }
+    return this._query;
+  }
+
+  get trust(): TrustMethods {
+    if (!this._trust) {
+      this._trust = new TrustMethods(this.client);
+    }
+    return this._trust;
+  }
+
+  get balance(): BalanceMethods {
+    if (!this._balance) {
+      this._balance = new BalanceMethods(this.client);
+    }
+    return this._balance;
+  }
+
+  get avatar(): AvatarMethods {
+    if (!this._avatar) {
+      this._avatar = new AvatarMethods(this.client);
+    }
+    return this._avatar;
+  }
+
+  get profile(): ProfileMethods {
+    if (!this._profile) {
+      this._profile = new ProfileMethods(this.client);
+    }
+    return this._profile;
+  }
+
+  get token(): TokenMethods {
+    if (!this._token) {
+      this._token = new TokenMethods(this.client);
+    }
+    return this._token;
+  }
+
+  get invitation(): InvitationMethods {
+    if (!this._invitation) {
+      this._invitation = new InvitationMethods(this.client);
+    }
+    return this._invitation;
+  }
+
+  get transaction(): TransactionMethods {
+    if (!this._transaction) {
+      this._transaction = new TransactionMethods(this.client);
+    }
+    return this._transaction;
+  }
+
+  get group(): GroupMethods {
+    if (!this._group) {
+      this._group = new GroupMethods(this.client);
+    }
+    return this._group;
   }
 
   /**

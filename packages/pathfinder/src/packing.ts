@@ -1,4 +1,4 @@
-import { bytesToHex } from '@aboutcircles/sdk-utils';
+import { bytesToHex } from '@aboutcircles/sdk-utils/bytes';
 import type { TransferStep } from '@aboutcircles/sdk-types';
 
 /**

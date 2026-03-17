@@ -1,3 +1,0 @@
-# MIGRATION GUIDE
-
-TBD

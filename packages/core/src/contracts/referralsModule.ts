@@ -1,5 +1,5 @@
 import { Contract } from './contract';
-import { referralsModuleAbi } from '@aboutcircles/sdk-abis';
+import { referralsModuleAbi } from '@aboutcircles/sdk-abis/referralsModule';
 import type { Address, TransactionRequest, Hex } from '@aboutcircles/sdk-types';
 
 /**

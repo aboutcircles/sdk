@@ -1,7 +1,7 @@
 {
-  "name": "@aboutcircles/sdk-referrals",
-  "version": "0.1.0",
-  "description": "Referrals service client for Circles SDK - store and retrieve referral links",
+  "name": "@aboutcircles/miniapp-sdk",
+  "version": "0.1.24",
+  "description": "Tiny SDK for mini apps running inside the Circles miniapps iframe host",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm && tsc --emitDeclarationOnly",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
@@ -21,16 +21,13 @@
   ],
   "keywords": [
     "circles",
-    "referrals",
-    "invitations",
+    "miniapp",
+    "iframe",
     "sdk"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/aboutcircles/sdk"
   },
-  "license": "MIT",
-  "devDependencies": {
-    "typescript": "^5.0.4"
-  }
+  "license": "MIT"
 }

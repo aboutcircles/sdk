@@ -47,27 +47,6 @@ export interface ReferralList {
 }
 
 /**
- * Error response from API
- */
-export interface ApiError {
-  error: string;
-}
-
-/**
- * Result from store-batch endpoint
- */
-export interface StoreBatchResult {
-  success: boolean;
-  stored: number;
-  failed: number;
-  errors?: Array<{
-    index: number;
-    keyPreview: string;
-    reason: string;
-  }>;
-}
-
-/**
  * Referral preview returned from the public list/{address} endpoint (key is masked)
  */
 export interface ReferralPreview {
@@ -96,6 +75,27 @@ export interface ReferralPreviewList {
   offset: number;
   /** 'synced' = fresh RPC check, 'cached' = DB-cached status (30s TTL) */
   syncStatus: "synced" | "cached";
+}
+
+/**
+ * Error response from API
+ */
+export interface ApiError {
+  error: string;
+}
+
+/**
+ * Result from store-batch endpoint
+ */
+export interface StoreBatchResult {
+  success: boolean;
+  stored: number;
+  failed: number;
+  errors?: Array<{
+    index: number;
+    keyPreview: string;
+    reason: string;
+  }>;
 }
 
 // ── Distribution Sessions ─────────────────────────────────────────────────────
@@ -193,7 +193,6 @@ export interface AddKeysResult {
 
 /**
  * Result from dispensing a key via a distribution session slug.
- * Returned by `GET /d/{slug}`.
  */
 export interface DispenseResult {
   /** Full private key for the invitation link */
@@ -208,7 +207,6 @@ export interface DispenseResult {
 
 /**
  * Error codes returned when dispense fails.
- * Allows callers to show appropriate UI for each failure mode.
  */
 export type DispenseErrorCode =
   | "SESSION_NOT_FOUND"   // 404 - slug doesn't exist
@@ -217,7 +215,7 @@ export type DispenseErrorCode =
   | "QUOTA_EXHAUSTED"     // 410 - session quota exhausted
   | "SESSION_PAUSED"      // 423 - session is paused
   | "RATE_LIMITED"        // 429 - too many requests
-  | "UNKNOWN";            // other errors
+  | "UNKNOWN";
 
 /**
  * Typed error thrown by dispense() with a code for programmatic handling.
@@ -233,11 +231,8 @@ export class DispenseError extends Error {
   }
 }
 
-// ── Session CRUD Errors ─────────────────────────────────────────────
-
 /**
  * Error codes for distribution session CRUD operations.
- * Allows callers to programmatically distinguish failure modes.
  */
 export type SessionErrorCode =
   | "VALIDATION_ERROR"    // 400
@@ -246,8 +241,7 @@ export type SessionErrorCode =
   | "SERVER_ERROR";       // 5xx
 
 /**
- * Typed error thrown by session CRUD methods with HTTP status and code
- * for programmatic handling.
+ * Typed error thrown by session CRUD methods.
  */
 export class SessionError extends Error {
   constructor(

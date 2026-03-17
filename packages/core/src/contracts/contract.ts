@@ -1,5 +1,5 @@
 import type { Abi } from 'abitype';
-import { encodeFunctionData, decodeFunctionResult } from '@aboutcircles/sdk-utils';
+import { encodeFunctionData, decodeFunctionResult } from '@aboutcircles/sdk-utils/abi';
 import type { Address, Hex } from '@aboutcircles/sdk-types';
 
 /**

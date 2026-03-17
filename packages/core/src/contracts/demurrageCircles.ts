@@ -1,5 +1,5 @@
 import { BaseWrappedCirclesContract } from './baseWrappedCircles';
-import { demurrageCirclesAbi } from '@aboutcircles/sdk-abis';
+import { demurrageCirclesAbi } from '@aboutcircles/sdk-abis/demurrageCircles';
 import type { Address } from '@aboutcircles/sdk-types';
 
 /**

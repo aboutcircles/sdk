@@ -15,8 +15,10 @@ const packages = [
   "profiles",
   "pathfinder",
   "transfers",
+  "invitations",
   "runner",
   "sdk",
+  "miniapp-sdk",
 ];
 
 // Get current version from main SDK
