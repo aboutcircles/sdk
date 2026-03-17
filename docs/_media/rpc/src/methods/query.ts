@@ -1,6 +1,24 @@
 import type { RpcClient } from '../client';
-import type { QueryParams, TableInfo, EventType } from '@aboutcircles/sdk-types';
+import type { QueryParams, TableInfo, EventType, PagedResult } from '@aboutcircles/sdk-types';
 import { checksumAddresses } from '../utils';
+
+/**
+ * Filter predicate for advanced event queries
+ */
+export interface FilterPredicate {
+  column: string;
+  filterType: string;
+  value: string;
+}
+
+/**
+ * Paginated events response
+ */
+export interface PagedEventsResponse<T = unknown> {
+  events: T[];
+  hasMore: boolean;
+  nextCursor: string | null;
+}
 
 /**
  * Query and table RPC methods
@@ -63,37 +81,58 @@ export class QueryMethods {
   }
 
   /**
-   * Query events of specific types within a block range
+   * Query events of specific types within a block range with pagination support.
    *
+   * @param address - Optional address filter (null for all addresses)
    * @param fromBlock - Starting block number (null for genesis)
    * @param toBlock - Ending block number (null for latest)
    * @param eventTypes - Array of event types to filter (null for all)
-   * @param address - Optional address filter
-   * @param includeTransactionData - Whether to include transaction data
-   * @returns Array of events
+   * @param filterPredicates - Advanced filter predicates (null for none)
+   * @param sortAscending - Sort order (default: false = descending)
+   * @param limit - Maximum events to return (default: 100, max: 1000)
+   * @param cursor - Pagination cursor from previous response (null for first page)
+   * @returns Paginated events response with events array, hasMore flag, and nextCursor
    *
    * @example
    * ```typescript
-   * const events = await rpc.query.events(
+   * // Basic usage - get first page of events for an address
+   * const result = await rpc.query.events(
+   *   '0xde374ece6fa50e781e81aac78e811b33d16912c7',
    *   38000000,
    *   null,
-   *   ['CrcV1_Trust'],
-   *   null,
-   *   false
+   *   ['CrcV1_Trust']
    * );
+   * console.log(result.events);
+   * console.log(result.hasMore, result.nextCursor);
+   *
+   * // Paginate through results
+   * let cursor: string | null = null;
+   * do {
+   *   const page = await rpc.query.events(address, fromBlock, null, null, null, false, 100, cursor);
+   *   console.log(page.events);
+   *   cursor = page.nextCursor;
+   * } while (cursor);
    * ```
    */
   async events<T = unknown>(
-    fromBlock: number | null,
-    toBlock: number | null,
-    eventTypes: EventType[] | null = null,
     address: string | null = null,
-    includeTransactionData: boolean = false
-  ): Promise<T[]> {
+    fromBlock: number | null = null,
+    toBlock: number | null = null,
+    eventTypes: EventType[] | null = null,
+    filterPredicates: FilterPredicate[] | null = null,
+    sortAscending: boolean = false,
+    limit: number = 100,
+    cursor: string | null = null
+  ): Promise<PagedEventsResponse<T>> {
     const result = await this.client.call<
-      [number | null, number | null, EventType[] | null, string | null, boolean],
-      T[]
-    >('circles_events', [fromBlock, toBlock, eventTypes, address, includeTransactionData]);
-    return checksumAddresses(result);
+      [string | null, number | null, number | null, EventType[] | null, FilterPredicate[] | null, boolean, number, string | null],
+      PagedEventsResponse<T>
+    >('circles_events', [address, fromBlock, toBlock, eventTypes, filterPredicates, sortAscending, limit, cursor]);
+
+    return {
+      events: checksumAddresses(result.events),
+      hasMore: result.hasMore,
+      nextCursor: result.nextCursor
+    };
   }
 }

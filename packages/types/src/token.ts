@@ -50,3 +50,13 @@ export interface TokenHolder {
   tokenAddress: Address;
   demurragedTotalBalance: string;
 }
+
+/**
+ * Token holder row emitted by circles_getTokenHolders RPC
+ */
+export interface TokenHolderRow {
+  account: Address;
+  balance: string;
+  tokenAddress: Address;
+  version: number;
+}
