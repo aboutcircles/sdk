@@ -6,7 +6,7 @@
 
 # Class: InvitationMethods
 
-Defined in: [packages/rpc/src/methods/invitation.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L12)
+Defined in: [packages/rpc/src/methods/invitation.ts:12](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L12)
 
 Invitation RPC methods
 
@@ -18,7 +18,7 @@ Invitation RPC methods
 new InvitationMethods(client): InvitationMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:13](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L13)
+Defined in: [packages/rpc/src/methods/invitation.ts:13](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L13)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/invitation.ts:13](https://github.com/about
 getInvitedBy(address): Promise<`0x${string}` | undefined>;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:38](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L38)
+Defined in: [packages/rpc/src/methods/invitation.ts:38](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L38)
 
 Get the avatar that invited a specific avatar
 
@@ -71,7 +71,7 @@ console.log(inviter); // '0x...'
 getInvitations(address): Promise<AvatarInfo[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:83](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L83)
+Defined in: [packages/rpc/src/methods/invitation.ts:83](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L83)
 
 Get the list of avatars who have invited this avatar
 Checks v2 trust relations and validates that inviters have enough balance
@@ -105,7 +105,7 @@ console.log(invitations); // Array of AvatarInfo
 getInvitationsFrom(address, accepted): Promise<`0x${string}`[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:190](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L190)
+Defined in: [packages/rpc/src/methods/invitation.ts:190](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L190)
 
 Get the list of accounts that were invited by a specific avatar
 

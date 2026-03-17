@@ -57,7 +57,7 @@
     "packages/runner",
     "packages/pathfinder",
     "packages/profiles",
-    "packages/transfers",
+"packages/transfers",
     "packages/invitations",
     "packages/sdk",
     "packages/miniapp-sdk"

@@ -1,22 +1,14 @@
-import type { ReferralInfo, ReferralList, ApiError } from "./types";
-import { InvitationError } from "./errors";
+import type { ReferralInfo, ReferralList, ReferralPreviewList, StoreBatchResult, ApiError } from "./types";
 
 /**
- * Referrals service client for retrieving referral information
+ * Referrals service client for storing and retrieving referral links
  *
- * The referrals backend enables Circles SDK users to query referral data:
+ * The referrals backend enables Circles SDK users to invite others via referral links.
+ * - Store: Save a referral private key with on-chain validation
  * - Retrieve: Get referral info by private key (public)
  * - List: Get all referrals created by authenticated user
- *
- * Note: Storing referrals is handled by Invitations.generateReferral()
  */
 export class Referrals {
-  /**
-   * Create a new Referrals client
-   *
-   * @param baseUrl - The referrals service base URL (e.g., "https://referrals.circles.example")
-   * @param getToken - Optional function to get auth token for authenticated endpoints
-   */
   constructor(
     private readonly baseUrl: string,
     private readonly getToken?: () => Promise<string>
@@ -29,109 +21,127 @@ export class Referrals {
   }
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
-    if (!this.getToken) {
-      return { "Content-Type": "application/json" };
-    }
-
+    const base: Record<string, string> = { "Content-Type": "application/json" };
+    if (!this.getToken) return base;
     const token = await this.getToken();
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
+    return { ...base, Authorization: `Bearer ${token}` };
   }
 
   /**
-   * Retrieve referral info by private key
+   * Store a referral private key
    *
-   * This is a public endpoint - no authentication required.
-   * Used by invitees to look up who invited them.
+   * The private key is validated on-chain via ReferralsModule.accounts() to ensure
+   * the account exists and has not been claimed. The inviter address is self-declared
+   * for dashboard visibility only - the on-chain indexer captures the true inviter.
+   */
+  async store(privateKey: string, inviter: string): Promise<void> {
+    const response = await fetch(`${this.getBaseUrl()}/store`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ privateKey, inviter }),
+    });
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to store referral: ${response.statusText}`);
+    }
+  }
+
+  /**
+   * Store multiple referral private keys in a single request (max 200)
    *
-   * @param privateKey - The referral private key
-   * @returns Referral info including inviter and status
-   * @throws InvitationError if referral not found or expired
+   * Processing is independent — one failure doesn't block others.
+   */
+  async storeBatch(
+    invitations: Array<{ privateKey: string; inviter: string }>
+  ): Promise<StoreBatchResult> {
+    const response = await fetch(`${this.getBaseUrl()}/store-batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ invitations }),
+    });
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to store batch: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<StoreBatchResult>;
+  }
+
+  /**
+   * Retrieve referral info by private key (public endpoint, no auth required)
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
-    try {
-      const url = `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`;
-      const response = await fetch(url);
+    const response = await fetch(
+      `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`
+    );
 
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const error = (await response.json()) as ApiError;
-          errorMessage = error.error || errorMessage;
-        } catch {
-          errorMessage = response.statusText || errorMessage;
-        }
-
-        throw new InvitationError(errorMessage, {
-          code: 'INVITATION_RETRIEVE_FAILED',
-          source: 'INVITATIONS',
-          context: { status: response.status, url, privateKey }
-        });
-      }
-
-      return response.json() as Promise<ReferralInfo>;
-    } catch (error) {
-      if (error instanceof InvitationError) {
-        throw error;
-      }
-      throw new InvitationError(`Failed to retrieve referral: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        code: 'INVITATION_RETRIEVE_ERROR',
-        source: 'INVITATIONS',
-        cause: error,
-        context: { privateKey }
-      });
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to retrieve referral: ${response.statusText}`);
     }
+
+    return response.json() as Promise<ReferralInfo>;
   }
 
   /**
    * List all referrals created by the authenticated user
    *
    * Requires authentication - the user's address is extracted from the JWT token.
-   *
-   * @returns List of referrals with their status and metadata
-   * @throws InvitationError if not authenticated or request fails
    */
-  async listMine(): Promise<ReferralList> {
+  async listMine(opts?: {
+    limit?: number;
+    offset?: number;
+    inSession?: boolean;
+    status?: string;
+  }): Promise<ReferralList> {
     if (!this.getToken) {
-      throw new InvitationError("Authentication required to list referrals", {
-        code: 'INVITATION_AUTH_REQUIRED',
-        source: 'INVITATIONS'
-      });
+      throw new Error("Authentication required to list referrals");
     }
 
-    try {
-      const url = `${this.getBaseUrl()}/my-referrals`;
-      const headers = await this.getAuthHeaders();
-      const response = await fetch(url, { headers });
+    const params = new URLSearchParams();
+    if (opts?.limit !== undefined) params.set("limit", String(opts.limit));
+    if (opts?.offset !== undefined) params.set("offset", String(opts.offset));
+    if (opts?.inSession !== undefined) params.set("inSession", String(opts.inSession));
+    if (opts?.status !== undefined) params.set("status", opts.status);
 
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const error = (await response.json()) as ApiError;
-          errorMessage = error.error || errorMessage;
-        } catch {
-          errorMessage = response.statusText || errorMessage;
-        }
+    const query = params.toString() ? `?${params}` : "";
+    const headers = await this.getAuthHeaders();
+    const response = await fetch(`${this.getBaseUrl()}/my-referrals${query}`, { headers });
 
-        throw new InvitationError(errorMessage, {
-          code: 'INVITATION_LIST_FAILED',
-          source: 'INVITATIONS',
-          context: { status: response.status, url }
-        });
-      }
-
-      return response.json() as Promise<ReferralList>;
-    } catch (error) {
-      if (error instanceof InvitationError) {
-        throw error;
-      }
-      throw new InvitationError(`Failed to list referrals: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        code: 'INVITATION_LIST_ERROR',
-        source: 'INVITATIONS',
-        cause: error
-      });
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to list referrals: ${response.statusText}`);
     }
+
+    return response.json() as Promise<ReferralList>;
+  }
+
+  /**
+   * List referrals for a given address (public, no auth required)
+   *
+   * Returns masked key previews — full keys are never exposed here.
+   */
+  async listPublic(
+    address: string,
+    opts?: { limit?: number; offset?: number; inSession?: boolean }
+  ): Promise<ReferralPreviewList> {
+    const params = new URLSearchParams();
+    if (opts?.limit !== undefined) params.set("limit", String(opts.limit));
+    if (opts?.offset !== undefined) params.set("offset", String(opts.offset));
+    if (opts?.inSession !== undefined) params.set("inSession", String(opts.inSession));
+
+    const query = params.toString() ? `?${params}` : "";
+    const response = await fetch(
+      `${this.getBaseUrl()}/list/${encodeURIComponent(address)}${query}`
+    );
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to list referrals: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<ReferralPreviewList>;
   }
 }

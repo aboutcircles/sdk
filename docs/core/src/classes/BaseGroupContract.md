@@ -6,7 +6,7 @@
 
 # Class: BaseGroupContract
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:20](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L20)
+Defined in: [packages/core/src/contracts/baseGroup.ts:20](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L20)
 
 BaseGroup Contract Wrapper
 Provides type-safe methods for interacting with Circles BaseGroup contracts
@@ -35,7 +35,7 @@ const baseGroup = new BaseGroupContract({
 new BaseGroupContract(config): BaseGroupContract;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L21)
+Defined in: [packages/core/src/contracts/baseGroup.ts:21](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L21)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ Defined in: [packages/core/src/contracts/baseGroup.ts:21](https://github.com/abo
 readonly address: `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L9)
+Defined in: [packages/core/src/contracts/contract.ts:9](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/contract.ts#L9)
 
 #### Inherited from
 
@@ -82,7 +82,7 @@ readonly abi: [{
 }];
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L10)
+Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/contract.ts#L10)
 
 #### Inherited from
 
@@ -96,7 +96,7 @@ Defined in: [packages/core/src/contracts/contract.ts:10](https://github.com/abou
 protected rpcUrl: string;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L11)
+Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/contract.ts#L11)
 
 #### Inherited from
 
@@ -110,7 +110,7 @@ Defined in: [packages/core/src/contracts/contract.ts:11](https://github.com/abou
 BASE_MINT_HANDLER(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L32)
+Defined in: [packages/core/src/contracts/baseGroup.ts:32](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L32)
 
 Get the BaseMintHandler contract address
 
@@ -126,7 +126,7 @@ Get the BaseMintHandler contract address
 BASE_MINT_POLICY(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:39](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L39)
+Defined in: [packages/core/src/contracts/baseGroup.ts:39](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L39)
 
 Get the base mint policy address (constant)
 
@@ -142,7 +142,7 @@ Get the base mint policy address (constant)
 BASE_TREASURY(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:46](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L46)
+Defined in: [packages/core/src/contracts/baseGroup.ts:46](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L46)
 
 Get the BaseTreasury contract address
 
@@ -158,7 +158,7 @@ Get the BaseTreasury contract address
 MAX_CONDITIONS(): Promise<bigint>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L53)
+Defined in: [packages/core/src/contracts/baseGroup.ts:53](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L53)
 
 Get the maximum number of membership conditions allowed (constant)
 
@@ -174,7 +174,7 @@ Get the maximum number of membership conditions allowed (constant)
 owner(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:60](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L60)
+Defined in: [packages/core/src/contracts/baseGroup.ts:60](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L60)
 
 Get the current owner address
 
@@ -190,7 +190,7 @@ Get the current owner address
 service(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:67](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L67)
+Defined in: [packages/core/src/contracts/baseGroup.ts:67](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L67)
 
 Get the current service address
 
@@ -206,7 +206,7 @@ Get the current service address
 feeCollection(): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:74](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L74)
+Defined in: [packages/core/src/contracts/baseGroup.ts:74](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L74)
 
 Get the current fee collection address
 
@@ -222,7 +222,7 @@ Get the current fee collection address
 getMembershipConditions(): Promise<readonly `0x${string}`[]>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L81)
+Defined in: [packages/core/src/contracts/baseGroup.ts:81](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L81)
 
 Get all membership condition addresses
 
@@ -238,7 +238,7 @@ Get all membership condition addresses
 membershipConditions(index): Promise<`0x${string}`>;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:88](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L88)
+Defined in: [packages/core/src/contracts/baseGroup.ts:88](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L88)
 
 Get a membership condition address by index
 
@@ -260,7 +260,7 @@ Get a membership condition address by index
 setOwner(newOwner): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:95](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L95)
+Defined in: [packages/core/src/contracts/baseGroup.ts:95](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L95)
 
 Create a transaction to set a new owner
 
@@ -282,7 +282,7 @@ Create a transaction to set a new owner
 setService(newService): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:106](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L106)
+Defined in: [packages/core/src/contracts/baseGroup.ts:106](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L106)
 
 Create a transaction to set a new service address
 
@@ -304,7 +304,7 @@ Create a transaction to set a new service address
 setFeeCollection(newFeeCollection): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:117](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L117)
+Defined in: [packages/core/src/contracts/baseGroup.ts:117](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L117)
 
 Create a transaction to set a new fee collection address
 
@@ -326,7 +326,7 @@ Create a transaction to set a new fee collection address
 setMembershipCondition(condition, enabled): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:128](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L128)
+Defined in: [packages/core/src/contracts/baseGroup.ts:128](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L128)
 
 Create a transaction to enable or disable a membership condition
 
@@ -352,7 +352,7 @@ Create a transaction to enable or disable a membership condition
 trust(trustReceiver, expiry): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:142](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L142)
+Defined in: [packages/core/src/contracts/baseGroup.ts:142](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L142)
 
 Create a transaction to trust a member (without membership checks)
 
@@ -378,7 +378,7 @@ Create a transaction to trust a member (without membership checks)
 trustBatchWithConditions(members, expiry): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:153](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L153)
+Defined in: [packages/core/src/contracts/baseGroup.ts:153](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L153)
 
 Create a transaction to trust or untrust a batch of members with membership condition checks
 
@@ -404,7 +404,7 @@ readonly `` `0x${string}` ``[]
 updateMetadataDigest(metadataDigest): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:167](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L167)
+Defined in: [packages/core/src/contracts/baseGroup.ts:167](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L167)
 
 Create a transaction to update the metadata digest
 
@@ -426,7 +426,7 @@ Create a transaction to update the metadata digest
 registerShortNameWithNonce(nonce): TransactionRequest;
 ```
 
-Defined in: [packages/core/src/contracts/baseGroup.ts:178](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/baseGroup.ts#L178)
+Defined in: [packages/core/src/contracts/baseGroup.ts:178](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/baseGroup.ts#L178)
 
 Create a transaction to register a short name with a specific nonce
 
@@ -451,7 +451,7 @@ read(
 options?): Promise<unknown>;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L29)
+Defined in: [packages/core/src/contracts/contract.ts:29](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/contract.ts#L29)
 
 Read from contract (view/pure functions) using direct JSON-RPC call
 
@@ -493,7 +493,7 @@ Optional call options
 encodeWrite(functionName, args?): `0x${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/contracts/contract.ts#L81)
+Defined in: [packages/core/src/contracts/contract.ts:81](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/contracts/contract.ts#L81)
 
 Encode transaction data for write functions
 

@@ -6,7 +6,7 @@
 
 # Class: Sdk
 
-Defined in: [packages/sdk/src/Sdk.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L50)
+Defined in: [packages/sdk/src/Sdk.ts:51](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L51)
 
 Simplified Circles SDK
 Provides a user-friendly API for non-crypto users with low entrance barrier
@@ -40,7 +40,7 @@ await avatar.personalToken.mint();
 new Sdk(config, contractRunner?): Sdk;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:77](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L77)
+Defined in: [packages/sdk/src/Sdk.ts:79](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L79)
 
 Create a new Sdk instance
 
@@ -74,7 +74,7 @@ Error if contractRunner is provided but doesn't support sendTransaction or has n
 readonly circlesConfig: CirclesConfig;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L51)
+Defined in: [packages/sdk/src/Sdk.ts:52](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L52)
 
 ***
 
@@ -84,7 +84,7 @@ Defined in: [packages/sdk/src/Sdk.ts:51](https://github.com/aboutcircles/sdk-v2/
 readonly optional contractRunner: ContractRunner;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L52)
+Defined in: [packages/sdk/src/Sdk.ts:53](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L53)
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: [packages/sdk/src/Sdk.ts:52](https://github.com/aboutcircles/sdk-v2/
 readonly optional senderAddress: `0x${string}`;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L53)
+Defined in: [packages/sdk/src/Sdk.ts:54](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L54)
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: [packages/sdk/src/Sdk.ts:53](https://github.com/aboutcircles/sdk-v2/
 readonly core: Core;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:54](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L54)
+Defined in: [packages/sdk/src/Sdk.ts:55](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L55)
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: [packages/sdk/src/Sdk.ts:54](https://github.com/aboutcircles/sdk-v2/
 readonly rpc: CirclesRpc;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:55](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L55)
+Defined in: [packages/sdk/src/Sdk.ts:56](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L56)
 
 ***
 
@@ -124,7 +124,7 @@ Defined in: [packages/sdk/src/Sdk.ts:55](https://github.com/aboutcircles/sdk-v2/
 readonly data: CirclesData;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:58](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L58)
+Defined in: [packages/sdk/src/Sdk.ts:60](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L60)
 
 ***
 
@@ -134,7 +134,7 @@ Defined in: [packages/sdk/src/Sdk.ts:58](https://github.com/aboutcircles/sdk-v2/
 readonly register: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:129](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L129)
+Defined in: [packages/sdk/src/Sdk.ts:149](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L149)
 
 Registration methods for creating new Circles identities
 
@@ -304,7 +304,7 @@ const groupAvatar = await sdk.register.asGroup(
 readonly profiles: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:426](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L426)
+Defined in: [packages/sdk/src/Sdk.ts:446](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L446)
 
 Profile management methods
 
@@ -354,13 +354,111 @@ Profile data or undefined if not found
 
 ***
 
+### referrals
+
+```ts
+readonly referrals: object;
+```
+
+Defined in: [packages/sdk/src/Sdk.ts:472](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L472)
+
+Referral/invitation management methods
+
+The referrals backend enables users to invite others via referral links.
+Requires referralsServiceUrl to be configured in CirclesConfig.
+
+#### store()
+
+```ts
+store: (privateKey, inviter) => Promise<void>;
+```
+
+Store a referral private key
+
+The private key is validated on-chain via ReferralsModule.accounts() to ensure
+the account exists and has not been claimed. The inviter address is self-declared
+for dashboard visibility only.
+
+##### Parameters
+
+###### privateKey
+
+`string`
+
+The referral private key (0x-prefixed, 64 hex chars)
+
+###### inviter
+
+`` `0x${string}` ``
+
+Self-declared inviter address for dashboard visibility
+
+##### Returns
+
+`Promise`\<`void`\>
+
+##### Throws
+
+Error if referrals service not configured or validation fails
+
+#### retrieve()
+
+```ts
+retrieve: (privateKey) => Promise<ReferralInfo>;
+```
+
+Retrieve referral info by private key
+
+This is a public endpoint - no authentication required.
+Used by invitees to look up who invited them.
+
+##### Parameters
+
+###### privateKey
+
+`string`
+
+The referral private key
+
+##### Returns
+
+`Promise`\<`ReferralInfo`\>
+
+Referral info including inviter and status
+
+##### Throws
+
+Error if referrals service not configured or referral not found
+
+#### listMine()
+
+```ts
+listMine: () => Promise<ReferralList>;
+```
+
+List all referrals created by the authenticated user
+
+Requires authentication - must configure a token provider.
+
+##### Returns
+
+`Promise`\<`ReferralList`\>
+
+List of referrals with their status and metadata
+
+##### Throws
+
+Error if referrals service not configured or not authenticated
+
+***
+
 ### tokens
 
 ```ts
 readonly tokens: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:449](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L449)
+Defined in: [packages/sdk/src/Sdk.ts:527](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L527)
 
 Token utilities
 
@@ -464,7 +562,7 @@ while (await holdersQuery.queryNextPage()) {
 readonly groups: object;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:500](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L500)
+Defined in: [packages/sdk/src/Sdk.ts:578](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L578)
 
 Group utilities
 
@@ -639,13 +737,13 @@ while (await query.queryNextPage()) {
 ### getAvatar()
 
 ```ts
-getAvatar(avatarAddress): Promise<
+getAvatar(avatarAddress, autoSubscribeEvents): Promise<
   | HumanAvatar
   | OrganisationAvatar
 | BaseGroupAvatar>;
 ```
 
-Defined in: [packages/sdk/src/Sdk.ts:104](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/sdk/src/Sdk.ts#L104)
+Defined in: [packages/sdk/src/Sdk.ts:115](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/sdk/src/Sdk.ts#L115)
 
 Get an avatar by address
 Automatically detects the avatar type and returns the appropriate avatar instance
@@ -655,6 +753,15 @@ Automatically detects the avatar type and returns the appropriate avatar instanc
 ##### avatarAddress
 
 `` `0x${string}` ``
+
+The address of the avatar to fetch
+
+##### autoSubscribeEvents
+
+`boolean` = `false`
+
+Whether to automatically subscribe to events for this avatar (default: false)
+                           If true, waits for event subscription to complete before returning
 
 #### Returns
 

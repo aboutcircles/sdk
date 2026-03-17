@@ -1,4 +1,4 @@
-import type { Address, FindPathParams, SimulatedBalance } from '@aboutcircles/sdk-types';
+import type { Address, FindPathParams, SimulatedBalance, SimulatedTrust } from '@aboutcircles/sdk-types';
 import { checksumAddress as toChecksumAddress } from '@aboutcircles/sdk-utils';
 
 /**
@@ -85,6 +85,10 @@ export function normalizeFindPathParams(params: FindPathParams): Record<string, 
       Amount: balance.amount.toString(),
       IsWrapped: balance.isWrapped,
       IsStatic: balance.isStatic,
+    })),
+    SimulatedTrusts: params.simulatedTrusts?.map((trust: SimulatedTrust) => ({
+      Truster: normalizeAddress(trust.truster),
+      Trustee: normalizeAddress(trust.trustee),
     })),
     MaxTransfers: params.maxTransfers,
   };

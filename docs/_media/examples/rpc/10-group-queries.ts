@@ -4,7 +4,7 @@
  * Demonstrates how to query groups and group memberships
  */
 
-import { CirclesRpc } from '@aboutcircles/sdk-rpc';
+import { CirclesRpc } from '@circles-sdk/rpc';
 
 const TEST_ADDRESS = '0xc7d3dF890952a327Af94D5Ba6fdC1Bf145188a1b';
 
@@ -60,10 +60,10 @@ async function main() {
   }
   console.log();
 
-  // 4. Find groups by owner (supports multiple owners with OR query)
+  // 4. Find groups by owner
   console.log('4. Finding groups owned by test address...');
   const ownedGroups = await rpc.group.findGroups(10, {
-    ownerIn: [TEST_ADDRESS],
+    ownerEquals: TEST_ADDRESS,
   });
   console.log(`Found ${ownedGroups.length} groups owned by test address`);
   if (ownedGroups.length > 0) {
@@ -78,16 +78,11 @@ async function main() {
 
   // 5. Get group memberships for test address
   console.log('5. Getting group memberships for test address...');
-  const membershipsQuery = rpc.group.getGroupMemberships(TEST_ADDRESS, 50);
-
-  // Fetch first page
-  await membershipsQuery.queryNextPage();
-  const memberships = membershipsQuery.currentPage?.results || [];
-
+  const memberships = await rpc.group.getGroupMemberships(TEST_ADDRESS, 20);
   console.log(`Found ${memberships.length} group memberships`);
 
   if (memberships.length > 0) {
-    console.log('Group memberships (showing first 5):');
+    console.log('Group memberships:');
     for (const membership of memberships.slice(0, 5)) {
       const joinedDate = new Date(membership.timestamp * 1000);
       console.log(`  - Group: ${membership.group}`);
@@ -98,10 +93,6 @@ async function main() {
         console.log(`    Expires: ${expiryDate.toLocaleString()}`);
       }
       console.log();
-    }
-
-    if (membershipsQuery.currentPage?.hasMore) {
-      console.log('(More memberships available - use pagination to fetch additional pages)');
     }
   } else {
     console.log('Test address is not a member of any groups');
@@ -120,7 +111,21 @@ async function main() {
   }
   console.log();
 
+  // 7. Complex query - find groups with multiple filters
+  console.log('7. Complex query - groups with member count > 0...');
+  const allGroupsLarge = await rpc.group.findGroups(50);
+  const groupsWithMembers = allGroupsLarge.filter(g => (g.memberCount || 0) > 0);
+  console.log(`Found ${groupsWithMembers.length} groups with members`);
 
+  if (groupsWithMembers.length > 0) {
+    // Sort by member count
+    const sortedGroups = groupsWithMembers.sort((a, b) => (b.memberCount || 0) - (a.memberCount || 0));
+    console.log('Top 5 groups by member count:');
+    sortedGroups.slice(0, 5).forEach((group, index) => {
+      console.log(`  ${index + 1}. ${group.name || 'Unnamed'} - ${group.memberCount} members`);
+      console.log(`     ${group.group}`);
+    });
+  }
 }
 
 main().catch(console.error);
