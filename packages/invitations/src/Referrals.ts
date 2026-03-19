@@ -1,5 +1,5 @@
-import type { ReferralInfo, ReferralList, ApiError } from "./types";
-import { InvitationError } from "./errors";
+import type { ReferralInfo, ReferralList, ApiError } from "./types.js";
+import { InvitationError } from "./errors.js";
 
 /**
  * Referrals service client for retrieving referral information

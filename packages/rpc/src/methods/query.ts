@@ -1,6 +1,6 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { QueryParams, TableInfo, EventType, PagedResult } from '@aboutcircles/sdk-types';
-import { checksumAddresses } from '../utils';
+import { checksumAddresses } from '../utils.js';
 
 /**
  * Filter predicate for advanced event queries

@@ -1,4 +1,4 @@
-import { Contract } from './contract';
+import { Contract } from './contract.js';
 import { hubV2Abi } from '@aboutcircles/sdk-abis/hubV2';
 import type { Address, TransactionRequest, Hex } from '@aboutcircles/sdk-types';
 

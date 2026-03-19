@@ -1,4 +1,4 @@
-import { RpcClient } from './client';
+import { RpcClient } from './client.js';
 import {
   PathfinderMethods,
   QueryMethods,
@@ -11,7 +11,7 @@ import {
   TransactionMethods,
   GroupMethods,
   SdkMethods,
-} from './methods';
+} from './methods/index.js';
 
 /**
  * Main RPC class for Circles protocol RPC interactions

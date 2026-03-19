@@ -1,4 +1,4 @@
-import type { Hex } from './base';
+import type { Hex } from './base.js';
 
 /**
  * Supported CRC V2 transfer data annotation types.

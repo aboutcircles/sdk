@@ -4,9 +4,9 @@ import {
   ReferralsModuleContractMinimal,
   HubV2ContractMinimal
 } from '@aboutcircles/sdk-core/minimal';
-import { InvitationError } from './errors';
-import type { ReferralPreviewList } from './types';
-import { Invitations } from './Invitations';
+import { InvitationError } from './errors.js';
+import type { ReferralPreviewList } from './types.js';
+import { Invitations } from './Invitations.js';
 import { encodeAbiParameters, INVITATION_FEE } from '@aboutcircles/sdk-utils';
 
 export interface GeneratedReferral {

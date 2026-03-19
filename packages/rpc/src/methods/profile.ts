@@ -1,7 +1,7 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { Address, Profile, ProfileView, ProfileSearchResponse } from '@aboutcircles/sdk-types';
-import type { SearchResultProfile } from '../types';
-import { normalizeAddress } from '../utils';
+import type { SearchResultProfile } from '../types.js';
+import { normalizeAddress } from '../utils.js';
 
 /**
  * Profile RPC methods

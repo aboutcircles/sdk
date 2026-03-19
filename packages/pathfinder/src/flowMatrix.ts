@@ -1,5 +1,5 @@
 import type { FlowMatrix, TransferStep, Address, FlowEdgeStruct, StreamStruct, Hex } from '@aboutcircles/sdk-types';
-import { packCoordinates, transformToFlowVertices } from './packing';
+import { packCoordinates, transformToFlowVertices } from './packing.js';
 import { bytesToHex } from '@aboutcircles/sdk-utils/bytes';
 
 /**

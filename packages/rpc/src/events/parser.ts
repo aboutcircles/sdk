@@ -1,4 +1,4 @@
-import type { CirclesEvent, RpcSubscriptionEvent } from './types';
+import type { CirclesEvent, RpcSubscriptionEvent } from './types.js';
 
 /**
  * Helper to convert hex string to bigint

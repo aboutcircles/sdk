@@ -1,4 +1,4 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type {
   Address,
   AvatarInfo,
@@ -10,7 +10,7 @@ import type {
   Invitation,
   AllInvitationsResponse
 } from '@aboutcircles/sdk-types';
-import { normalizeAddress, checksumAddresses } from '../utils';
+import { normalizeAddress, checksumAddresses } from '../utils.js';
 
 interface InviterRow {
   inviter: Address;

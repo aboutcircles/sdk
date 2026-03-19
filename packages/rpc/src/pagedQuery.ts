@@ -1,4 +1,4 @@
-import type { RpcClient } from './client';
+import type { RpcClient } from './client.js';
 import type {
   PagedQueryParams,
   Filter,
@@ -6,7 +6,7 @@ import type {
   QueryParams,
   CirclesQueryResponse,
 } from '@aboutcircles/sdk-types';
-import type { CursorColumn, FlexiblePagedResult } from './types';
+import type { CursorColumn, FlexiblePagedResult } from './types.js';
 
 /**
  * Cursor configuration for different table types

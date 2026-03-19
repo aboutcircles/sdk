@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test';
-import { encodeCrcV2TransferData, decodeCrcV2TransferData } from '../transferData';
-import type { DecodedMetadataPayload, DecodedAbiPayload } from '../transferData';
+import { encodeCrcV2TransferData, decodeCrcV2TransferData } from '../transferData.js';
+import type { DecodedMetadataPayload, DecodedAbiPayload } from '../transferData.js';
 
 // ============================================================================
 // Type 0x0001 — UTF-8 Text

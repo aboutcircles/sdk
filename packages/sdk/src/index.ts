@@ -1,18 +1,18 @@
 // Main SDK class
-export { Sdk } from './Sdk';
+export { Sdk } from './Sdk.js';
 
 // Avatar classes
-export { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars';
-export type { PathfindingOptions } from './avatars';
+export { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars/index.js';
+export type { PathfindingOptions } from './avatars/index.js';
 export type { TransactionReceipt } from 'viem';
 
 // Avatar union type for convenience
-import type { HumanAvatar, BaseGroupAvatar, OrganisationAvatar } from './avatars';
+import type { HumanAvatar, BaseGroupAvatar, OrganisationAvatar } from './avatars/index.js';
 export type Avatar = HumanAvatar | BaseGroupAvatar | OrganisationAvatar;
 
 // Error handling
-export { SdkError } from './errors';
-export type { SdkErrorSource } from './errors';
+export { SdkError } from './errors.js';
+export type { SdkErrorSource } from './errors.js';
 
 // Re-export types from other packages for convenience
 export type {
@@ -28,4 +28,4 @@ export type {
 export type { AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery, GroupType, ContractRunner } from '@aboutcircles/sdk-types';
 
 // SDK-specific types
-export type { CirclesData } from './types';
+export type { CirclesData } from './types.js';

@@ -7,8 +7,8 @@ import {
   SafeContractMinimal,
   InvitationModuleContractMinimal
 } from '@aboutcircles/sdk-core/minimal';
-import { InvitationError } from './errors';
-import type { ReferralPreviewList } from './types';
+import { InvitationError } from './errors.js';
+import type { ReferralPreviewList } from './types.js';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import {
   hexToBytes,

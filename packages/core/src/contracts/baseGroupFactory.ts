@@ -1,4 +1,4 @@
-import { Contract } from './contract';
+import { Contract } from './contract.js';
 import { baseGroupFactoryAbi } from '@aboutcircles/sdk-abis/baseGroupFactory';
 import type { Address, TransactionRequest, Hex } from '@aboutcircles/sdk-types';
 

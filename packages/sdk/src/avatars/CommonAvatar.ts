@@ -15,7 +15,7 @@ import { cidV0ToHex } from '@aboutcircles/sdk-utils/cid';
 import { bytesToHex } from '@aboutcircles/sdk-utils/bytes';
 import { ValidationError } from '@aboutcircles/sdk-utils/errors';
 import { Profiles } from '@aboutcircles/sdk-profiles';
-import { SdkError } from '../errors';
+import { SdkError } from '../errors.js';
 import {
   CirclesType,
   DemurrageCirclesContract,

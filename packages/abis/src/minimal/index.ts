@@ -1,10 +1,10 @@
 /**
  * Export all minimal ABIs
  */
-export { hubV2MinimalAbi } from './hubV2';
-export { liftERC20MinimalAbi } from './liftERC20';
-export { wrappedCirclesMinimalAbi } from './wrappedCircles';
-export { referralsModuleMinimalAbi } from './referralsModule';
-export { invitationFarmMinimalAbi } from './invitationFarm';
-export { safeMinimalAbi } from './safe';
-export { invitationModuleMinimalAbi } from './invitationModule';
+export { hubV2MinimalAbi } from './hubV2.js';
+export { liftERC20MinimalAbi } from './liftERC20.js';
+export { wrappedCirclesMinimalAbi } from './wrappedCircles.js';
+export { referralsModuleMinimalAbi } from './referralsModule.js';
+export { invitationFarmMinimalAbi } from './invitationFarm.js';
+export { safeMinimalAbi } from './safe.js';
+export { invitationModuleMinimalAbi } from './invitationModule.js';

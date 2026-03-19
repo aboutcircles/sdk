@@ -1,4 +1,4 @@
-import type { Address, Hex } from './base';
+import type { Address, Hex } from './base.js';
 
 /**
  * Trust relation types

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { checksumAddresses, normalizeAddress, checksumAddress } from '../utils';
+import { checksumAddresses, normalizeAddress, checksumAddress } from '../utils.js';
 import type { Address } from '@aboutcircles/sdk-types';
 
 describe('normalizeAddress', () => {

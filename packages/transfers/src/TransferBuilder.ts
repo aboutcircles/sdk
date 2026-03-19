@@ -16,7 +16,7 @@ import {
   InflationaryCirclesContractMinimal,
 } from '@aboutcircles/sdk-core/minimal';
 import { CirclesType } from '@aboutcircles/sdk-types';
-import { TransferError } from './errors';
+import { TransferError } from './errors.js';
 
 /**
  * TransferBuilder constructs transfer transactions without executing them

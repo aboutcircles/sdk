@@ -11,9 +11,9 @@ import type {
 import type { TransactionReceipt, Hex } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import { ValidationError } from '@aboutcircles/sdk-utils';
-import { SdkError } from '../errors';
+import { SdkError } from '../errors.js';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
-import { CommonAvatar, type PathfindingOptions } from './CommonAvatar';
+import { CommonAvatar, type PathfindingOptions } from './CommonAvatar.js';
 import { Invitations, InviteFarm, type ProxyInviter, type GeneratedReferral, type ReferralPreviewList } from '@aboutcircles/sdk-invitations';
 
 /**

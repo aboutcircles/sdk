@@ -1,4 +1,4 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type {
   Address,
   GroupRow,
@@ -7,9 +7,9 @@ import type {
   Filter,
   PagedResponse
 } from '@aboutcircles/sdk-types';
-import type { GroupTokenHolderRow } from '../types';
-import { normalizeAddress, checksumAddresses } from '../utils';
-import { PagedQuery } from '../pagedQuery';
+import type { GroupTokenHolderRow } from '../types.js';
+import { normalizeAddress, checksumAddresses } from '../utils.js';
+import { PagedQuery } from '../pagedQuery.js';
 
 /**
  * Group query RPC methods
