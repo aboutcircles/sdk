@@ -36,9 +36,7 @@ export type {
   Invitation,
   AllInvitationsResponse
 } from './rpc-responses.js';
-export type {
-  TransactionHistoryRow
-} from './rows.js';
+export type { TransactionHistoryRow } from './rows.js';
 
 // Query and filter types
 export type {
