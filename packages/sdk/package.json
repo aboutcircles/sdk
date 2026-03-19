@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "description": "Simplified Circles SDK for non-crypto users with low entrance barrier",
   "type": "module",
   "main": "./dist/index.js",
@@ -36,7 +36,7 @@
     "@aboutcircles/sdk-core": "*",
     "@aboutcircles/sdk-rpc": "*",
     "@aboutcircles/sdk-profiles": "*",
-"@aboutcircles/sdk-utils": "*",
+    "@aboutcircles/sdk-utils": "*",
     "@aboutcircles/sdk-runner": "*",
     "@aboutcircles/sdk-pathfinder": "*",
     "@aboutcircles/sdk-transfers": "*",
