@@ -6,7 +6,7 @@
 
 # Interface: StreamStruct
 
-Defined in: [packages/types/src/pathfinding.ts:65](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L65)
+Defined in: [packages/types/src/pathfinding.ts:74](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L74)
 
 Stream structure for operateFlowMatrix
 Corresponds to TypeDefinitions.Stream in the Hub V2 contract
@@ -19,7 +19,7 @@ Corresponds to TypeDefinitions.Stream in the Hub V2 contract
 sourceCoordinate: number;
 ```
 
-Defined in: [packages/types/src/pathfinding.ts:66](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L66)
+Defined in: [packages/types/src/pathfinding.ts:75](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L75)
 
 ***
 
@@ -29,7 +29,7 @@ Defined in: [packages/types/src/pathfinding.ts:66](https://github.com/aboutcircl
 flowEdgeIds: number[];
 ```
 
-Defined in: [packages/types/src/pathfinding.ts:67](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L67)
+Defined in: [packages/types/src/pathfinding.ts:76](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L76)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [packages/types/src/pathfinding.ts:67](https://github.com/aboutcircl
 data: `0x${string}` | Uint8Array<ArrayBufferLike>;
 ```
 
-Defined in: [packages/types/src/pathfinding.ts:68](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/pathfinding.ts#L68)
+Defined in: [packages/types/src/pathfinding.ts:77](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/pathfinding.ts#L77)

@@ -6,7 +6,7 @@
 
 # Class: CirclesConverter
 
-Defined in: [packages/utils/src/circlesConverter.ts:7](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L7)
+Defined in: [packages/utils/src/circlesConverter.ts:7](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L7)
 
 Conversions between demurrage and inflationary units in V2 – bit‑identical with the
 Solidity reference implementation (ABDK Math 64.64).
@@ -33,7 +33,7 @@ new CirclesConverter(): CirclesConverter;
 readonly static ONE_64: bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L11)
+Defined in: [packages/utils/src/circlesConverter.ts:11](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L11)
 
 1.0 in 64.64 representation
 
@@ -45,7 +45,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:11](https://github.com/about
 readonly static GAMMA_64: bigint = 18_443_079_296_116_538_654n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:14](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L14)
+Defined in: [packages/utils/src/circlesConverter.ts:14](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L14)
 
 GAMMA = (0.93)^(1/365.25) * 2^64
 
@@ -57,7 +57,7 @@ GAMMA = (0.93)^(1/365.25) * 2^64
 readonly static BETA_64: bigint = 18_450_409_579_521_241_655n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:16](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L16)
+Defined in: [packages/utils/src/circlesConverter.ts:16](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L16)
 
 BETA = 1 / GAMMA * 2^64
 
@@ -69,7 +69,7 @@ BETA = 1 / GAMMA * 2^64
 readonly static SECONDS_PER_DAY: bigint = 86_400n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:18](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L18)
+Defined in: [packages/utils/src/circlesConverter.ts:18](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L18)
 
 ***
 
@@ -79,7 +79,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:18](https://github.com/about
 readonly static INFLATION_DAY_ZERO_UNIX: bigint = 1_602_720_000n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:19](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L19)
+Defined in: [packages/utils/src/circlesConverter.ts:19](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L19)
 
 ***
 
@@ -89,7 +89,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:19](https://github.com/about
 readonly static ATTO_FACTOR: bigint = 1_000_000_000_000_000_000n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:21](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L21)
+Defined in: [packages/utils/src/circlesConverter.ts:21](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L21)
 
 ***
 
@@ -99,7 +99,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:21](https://github.com/about
 readonly static FACTOR_1E12: bigint = 1_000_000_000_000n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:22](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L22)
+Defined in: [packages/utils/src/circlesConverter.ts:22](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L22)
 
 ***
 
@@ -109,7 +109,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:22](https://github.com/about
 readonly static V1_ACCURACY: bigint = 100_000_000n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:24](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L24)
+Defined in: [packages/utils/src/circlesConverter.ts:24](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L24)
 
 ***
 
@@ -119,7 +119,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:24](https://github.com/about
 readonly static V1_INFLATION_PCT_NUM: bigint = 107n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:25](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L25)
+Defined in: [packages/utils/src/circlesConverter.ts:25](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L25)
 
 ***
 
@@ -129,7 +129,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:25](https://github.com/about
 readonly static V1_INFLATION_PCT_DEN: bigint = 100n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L26)
+Defined in: [packages/utils/src/circlesConverter.ts:26](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L26)
 
 ***
 
@@ -139,7 +139,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:26](https://github.com/about
 readonly static PERIOD_SEC: bigint = 31_556_952n;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L27)
+Defined in: [packages/utils/src/circlesConverter.ts:27](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L27)
 
 ## Methods
 
@@ -149,7 +149,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:27](https://github.com/about
 static attoCirclesToCircles(atto): number;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:105](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L105)
+Defined in: [packages/utils/src/circlesConverter.ts:105](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L105)
 
 Atto‑circles (1e18) → UI circles as JS number (lossless until 2^53‑1).
 
@@ -171,7 +171,7 @@ Atto‑circles (1e18) → UI circles as JS number (lossless until 2^53‑1).
 static circlesToAttoCircles(circles): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:121](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L121)
+Defined in: [packages/utils/src/circlesConverter.ts:121](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L121)
 
 UI circles → atto‑circles (truncates to match Solidity’s rounding).
 
@@ -193,7 +193,7 @@ UI circles → atto‑circles (truncates to match Solidity’s rounding).
 static inflationaryToDemurrage(inflationary, day): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:128](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L128)
+Defined in: [packages/utils/src/circlesConverter.ts:128](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L128)
 
 Inflationary → demurraged for explicit day index.
 
@@ -219,7 +219,7 @@ Inflationary → demurraged for explicit day index.
 static demurrageToInflationary(demurraged, day): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:133](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L133)
+Defined in: [packages/utils/src/circlesConverter.ts:133](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L133)
 
 Demurraged → inflationary for explicit day index.
 
@@ -245,7 +245,7 @@ Demurraged → inflationary for explicit day index.
 static dayFromTimestamp(unixSeconds): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:138](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L138)
+Defined in: [packages/utils/src/circlesConverter.ts:138](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L138)
 
 UNIX timestamp (seconds) → Circles day index.
 
@@ -267,7 +267,7 @@ UNIX timestamp (seconds) → Circles day index.
 static attoCirclesToAttoStaticCircles(demurraged, nowUnixSeconds): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:143](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L143)
+Defined in: [packages/utils/src/circlesConverter.ts:143](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L143)
 
 Demurraged → static circles for “today”.
 
@@ -293,7 +293,7 @@ Demurraged → static circles for “today”.
 static attoStaticCirclesToAttoCircles(staticCircles, nowUnixSeconds): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:151](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L151)
+Defined in: [packages/utils/src/circlesConverter.ts:151](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L151)
 
 Static circles → demurraged circles for “today”.
 
@@ -319,7 +319,7 @@ Static circles → demurraged circles for “today”.
 static inflationaryToDemurrageExact(inflationary, day): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:159](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L159)
+Defined in: [packages/utils/src/circlesConverter.ts:159](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L159)
 
 Inflationary → demurraged (exact, reversible).
 
@@ -345,7 +345,7 @@ Inflationary → demurraged (exact, reversible).
 static demurrageToInflationaryExact(demurraged, day): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:165](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L165)
+Defined in: [packages/utils/src/circlesConverter.ts:165](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L165)
 
 Demurraged → inflationary (inverse of the above, exact).
 
@@ -371,7 +371,7 @@ Demurraged → inflationary (inverse of the above, exact).
 static attoCirclesToAttoStaticCirclesExact(demurraged, nowUnixSeconds): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:171](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L171)
+Defined in: [packages/utils/src/circlesConverter.ts:171](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L171)
 
 Demurraged atto-circles → static atto-circles “today” (loss-less).
 
@@ -397,7 +397,7 @@ Demurraged atto-circles → static atto-circles “today” (loss-less).
 static attoStaticCirclesToAttoCirclesExact(staticCircles, nowUnixSeconds): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:180](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L180)
+Defined in: [packages/utils/src/circlesConverter.ts:180](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L180)
 
 Static atto-circles → demurraged atto-circles “today” (loss-less).
 
@@ -423,7 +423,7 @@ Static atto-circles → demurraged atto-circles “today” (loss-less).
 static truncateToInt64(wei): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:190](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L190)
+Defined in: [packages/utils/src/circlesConverter.ts:190](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L190)
 
 #### Parameters
 
@@ -443,7 +443,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:190](https://github.com/abou
 static blowUpToBigInt(sixDecimals): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:196](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L196)
+Defined in: [packages/utils/src/circlesConverter.ts:196](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L196)
 
 #### Parameters
 
@@ -463,7 +463,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:196](https://github.com/abou
 static truncateToSixDecimals(wei): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:200](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L200)
+Defined in: [packages/utils/src/circlesConverter.ts:200](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L200)
 
 #### Parameters
 
@@ -483,7 +483,7 @@ Defined in: [packages/utils/src/circlesConverter.ts:200](https://github.com/abou
 static attoCrcToAttoCircles(v1Amount, blockTimestampUtc): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:212](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L212)
+Defined in: [packages/utils/src/circlesConverter.ts:212](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L212)
 
 CRC → demurraged Circles for a given timestamp.
 
@@ -509,7 +509,7 @@ CRC → demurraged Circles for a given timestamp.
 static attoCirclesToAttoCrc(demurraged, blockTimestampUtc): bigint;
 ```
 
-Defined in: [packages/utils/src/circlesConverter.ts:222](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/circlesConverter.ts#L222)
+Defined in: [packages/utils/src/circlesConverter.ts:222](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/circlesConverter.ts#L222)
 
 Demurraged Circles → CRC (inverse of the above).
 

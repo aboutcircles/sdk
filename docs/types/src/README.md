@@ -27,6 +27,7 @@
 - [GroupQueryParams](interfaces/GroupQueryParams.md)
 - [NetworkSnapshot](interfaces/NetworkSnapshot.md)
 - [SimulatedBalance](interfaces/SimulatedBalance.md)
+- [SimulatedTrust](interfaces/SimulatedTrust.md)
 - [FindPathParams](interfaces/FindPathParams.md)
 - [TransferStep](interfaces/TransferStep.md)
 - [PathfindingResult](interfaces/PathfindingResult.md)

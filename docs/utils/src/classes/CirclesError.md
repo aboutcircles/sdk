@@ -6,7 +6,7 @@
 
 # Class: CirclesError\<TSource\>
 
-Defined in: [packages/utils/src/errors.ts:31](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L31)
+Defined in: [packages/utils/src/errors.ts:31](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L31)
 
 Base Circles SDK Error
 All SDK errors extend from this class
@@ -38,7 +38,7 @@ new CirclesError<TSource>(
 options?): CirclesError<TSource>;
 ```
 
-Defined in: [packages/utils/src/errors.ts:38](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L38)
+Defined in: [packages/utils/src/errors.ts:38](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L38)
 
 #### Parameters
 
@@ -86,7 +86,7 @@ Error.constructor
 readonly name: string;
 ```
 
-Defined in: [packages/utils/src/errors.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L32)
+Defined in: [packages/utils/src/errors.ts:32](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L32)
 
 #### Overrides
 
@@ -102,7 +102,7 @@ Error.name
 readonly optional code: string | number;
 ```
 
-Defined in: [packages/utils/src/errors.ts:33](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L33)
+Defined in: [packages/utils/src/errors.ts:33](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L33)
 
 ***
 
@@ -112,7 +112,7 @@ Defined in: [packages/utils/src/errors.ts:33](https://github.com/aboutcircles/sd
 readonly source: TSource;
 ```
 
-Defined in: [packages/utils/src/errors.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L34)
+Defined in: [packages/utils/src/errors.ts:34](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L34)
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: [packages/utils/src/errors.ts:34](https://github.com/aboutcircles/sd
 readonly optional cause: unknown;
 ```
 
-Defined in: [packages/utils/src/errors.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L35)
+Defined in: [packages/utils/src/errors.ts:35](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L35)
 
 The cause of the error.
 
@@ -140,7 +140,7 @@ Error.cause
 readonly optional context: Record<string, any>;
 ```
 
-Defined in: [packages/utils/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L36)
+Defined in: [packages/utils/src/errors.ts:36](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L36)
 
 ## Methods
 
@@ -150,7 +150,7 @@ Defined in: [packages/utils/src/errors.ts:36](https://github.com/aboutcircles/sd
 toJSON(): object;
 ```
 
-Defined in: [packages/utils/src/errors.ts:64](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L64)
+Defined in: [packages/utils/src/errors.ts:64](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L64)
 
 Convert error to JSON for logging/debugging
 
@@ -208,7 +208,7 @@ stack: string | undefined;
 toString(): string;
 ```
 
-Defined in: [packages/utils/src/errors.ts:82](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/utils/src/errors.ts#L82)
+Defined in: [packages/utils/src/errors.ts:82](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/utils/src/errors.ts#L82)
 
 Get formatted error message with context
 

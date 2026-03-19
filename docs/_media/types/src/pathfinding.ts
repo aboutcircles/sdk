@@ -16,6 +16,14 @@ export interface SimulatedBalance {
 }
 
 /**
+ * Simulated trust connection for path finding
+ */
+export interface SimulatedTrust {
+  truster: Address;
+  trustee: Address;
+}
+
+/**
  * Path finding parameters for circlesV2_findPath
  */
 export interface FindPathParams {
@@ -28,6 +36,7 @@ export interface FindPathParams {
   excludeFromTokens?: Address[];
   excludeToTokens?: Address[];
   simulatedBalances?: SimulatedBalance[];
+  simulatedTrusts?: SimulatedTrust[];
   maxTransfers?: number;
 }
 
