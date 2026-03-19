@@ -1,4 +1,4 @@
-import { Contract } from './contract';
+import { Contract } from './contract.js';
 import { liftERC20Abi } from '@aboutcircles/sdk-abis/liftERC20';
 import type { Address, TransactionRequest, Hex } from '@aboutcircles/sdk-types';
 import { CirclesType } from '@aboutcircles/sdk-types';

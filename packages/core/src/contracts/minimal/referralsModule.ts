@@ -1,4 +1,4 @@
-import { Contract } from '../contract';
+import { Contract } from '../contract.js';
 import { referralsModuleMinimalAbi } from '@aboutcircles/sdk-abis/minimal';
 import type { Address, TransactionRequest } from '@aboutcircles/sdk-types';
 

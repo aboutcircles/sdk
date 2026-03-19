@@ -1,7 +1,7 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { Address, TrustRelation, Filter, CirclesQueryResponse, TrustRelationType, AggregatedTrustRelation } from '@aboutcircles/sdk-types';
-import { normalizeAddress, checksumAddresses } from '../utils';
-import { PagedQuery } from '../pagedQuery';
+import { normalizeAddress, checksumAddresses } from '../utils.js';
+import { PagedQuery } from '../pagedQuery.js';
 
 /**
  * Trust relation RPC methods

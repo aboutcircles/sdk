@@ -1,9 +1,9 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { Address, Filter } from '@aboutcircles/sdk-types';
-import type { TransactionHistoryRow } from '../types';
-import { normalizeAddress, checksumAddresses } from '../utils';
+import type { TransactionHistoryRow } from '../types.js';
+import { normalizeAddress, checksumAddresses } from '../utils.js';
 import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
-import { PagedQuery } from '../pagedQuery';
+import { PagedQuery } from '../pagedQuery.js';
 
 /**
  * Calculate circle amounts for v2 transactions

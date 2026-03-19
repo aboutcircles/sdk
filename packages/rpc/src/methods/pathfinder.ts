@@ -1,6 +1,6 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { FindPathParams, PathfindingResult } from '@aboutcircles/sdk-types';
-import { normalizeFindPathParams, parseStringsToBigInt, checksumAddresses } from '../utils';
+import { normalizeFindPathParams, parseStringsToBigInt, checksumAddresses } from '../utils.js';
 import { MAX_FLOW } from '@aboutcircles/sdk-utils/constants';
 
 /**

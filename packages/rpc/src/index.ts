@@ -1,8 +1,8 @@
 // Main RPC class
-export { CirclesRpc } from './rpc';
+export { CirclesRpc } from './rpc.js';
 
 // Client
-export { RpcClient } from './client';
+export { RpcClient } from './client.js';
 
 // Method classes
 export {
@@ -16,7 +16,7 @@ export {
   InvitationMethods,
   TransactionMethods,
   GroupMethods,
-} from './methods';
+} from './methods/index.js';
 
 // RPC-specific types
 export type {
@@ -25,20 +25,20 @@ export type {
   GroupTokenHolderRow,
   CursorColumn,
   FlexiblePagedResult,
-} from './types';
+} from './types.js';
 
 // Re-export shared types from @aboutcircles/sdk-types for convenience
 export type { TrustRelationType, AggregatedTrustRelation } from '@aboutcircles/sdk-types';
 
 // Error handling
-export { RpcError } from './errors';
-export type { RpcErrorSource } from './errors';
+export { RpcError } from './errors.js';
+export type { RpcErrorSource } from './errors.js';
 
 // Utils
-export { normalizeAddress, normalizeAddresses, parseStringsToBigInt } from './utils';
+export { normalizeAddress, normalizeAddresses, parseStringsToBigInt } from './utils.js';
 
 // Pagination
-export { PagedQuery } from './pagedQuery';
+export { PagedQuery } from './pagedQuery.js';
 
 // Events (subscription and observation)
 export {
@@ -46,7 +46,7 @@ export {
   parseRpcEvent,
   parseRpcSubscriptionMessage,
   isCirclesEvent,
-} from './events';
+} from './events/index.js';
 
 export type {
   CirclesEvent,
@@ -54,4 +54,4 @@ export type {
   CirclesBaseEvent,
   CirclesEventOfType,
   RpcSubscriptionEvent,
-} from './events';
+} from './events/index.js';

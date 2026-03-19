@@ -1,3 +1,3 @@
-export { TransferBuilder } from './TransferBuilder';
-export { TransferError } from './errors';
-export type { TransfersErrorSource } from './errors';
+export { TransferBuilder } from './TransferBuilder.js';
+export { TransferError } from './errors.js';
+export type { TransfersErrorSource } from './errors.js';

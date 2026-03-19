@@ -3,10 +3,10 @@ import { base16 } from 'multiformats/bases/base16';
 import { base58btc } from 'multiformats/bases/base58';
 import { keccak_256 } from '@noble/hashes/sha3.js';
 import type { Hex, DecodedTransferData, TransferDataType } from '@aboutcircles/sdk-types';
-import { encodeFunctionData } from './abi';
-import { decodeAbiParameters } from './abi';
-import { hexToBytes, bytesToHex } from './bytes';
-import { EncodingError } from './errors';
+import { encodeFunctionData } from './abi.js';
+import { decodeAbiParameters } from './abi.js';
+import { hexToBytes, bytesToHex } from './bytes.js';
+import { EncodingError } from './errors.js';
 
 export type { TransferDataType, DecodedTransferData, DecodedAbiPayload, DecodedMetadataPayload } from '@aboutcircles/sdk-types';
 

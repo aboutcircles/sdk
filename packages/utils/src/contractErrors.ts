@@ -5,8 +5,8 @@
 
 import type { Abi } from 'abitype';
 import type { DecodedContractError } from '@aboutcircles/sdk-types';
-import { decodeErrorResult } from './abi';
-import { CirclesError } from './errors';
+import { decodeErrorResult } from './abi.js';
+import { CirclesError } from './errors.js';
 
 /**
  * Contract error codes mapping

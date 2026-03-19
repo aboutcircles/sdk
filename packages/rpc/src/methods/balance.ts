@@ -1,6 +1,6 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { Address, TokenBalance } from '@aboutcircles/sdk-types';
-import { normalizeAddress, parseStringsToBigInt, checksumAddresses } from '../utils';
+import { normalizeAddress, parseStringsToBigInt, checksumAddresses } from '../utils.js';
 import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
 
 /**

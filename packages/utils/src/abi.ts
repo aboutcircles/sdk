@@ -1,7 +1,7 @@
 import { keccak_256 } from '@noble/hashes/sha3.js';
 import type { Abi, AbiFunction } from 'abitype';
 import type { Hex } from '@aboutcircles/sdk-types';
-import { bytesToHex } from './bytes';
+import { bytesToHex } from './bytes.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

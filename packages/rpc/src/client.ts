@@ -1,7 +1,7 @@
 import type { JsonRpcRequest, JsonRpcResponse, Address } from '@aboutcircles/sdk-types';
-import { Observable, parseRpcSubscriptionMessage } from './events';
-import type { CirclesEvent } from './events';
-import { RpcError } from './errors';
+import { Observable, parseRpcSubscriptionMessage } from './events/index.js';
+import type { CirclesEvent } from './events/index.js';
+import { RpcError } from './errors.js';
 
 /**
  * Base RPC client for making JSON-RPC calls to Circles RPC endpoints
