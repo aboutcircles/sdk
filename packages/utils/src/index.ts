@@ -7,6 +7,8 @@ export { ZERO_ADDRESS, INVITATION_FEE, MAX_FLOW, SAFE_PROXY_FACTORY, ACCOUNT_INI
 export { circlesConfig } from './config';
 export { parseContractError, ContractError } from './contractErrors';
 export { generatePrivateKey, privateKeyToAddress, keccak256 } from './crypto';
+export { encodeCrcV2TransferData, decodeCrcV2TransferData } from './transferData';
+export type { TransferDataType, DecodedTransferData, DecodedAbiPayload, DecodedMetadataPayload } from './transferData';
 
 // Error handling
 export {
