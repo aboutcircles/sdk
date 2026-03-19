@@ -12,11 +12,14 @@ import type { Hex } from './base';
 export type TransferDataType = 0x0001 | 0x1001 | 0x0002 | 0x0003 | 0x0004;
 
 /**
- * Decoded ABI calldata payload (type 0x0004).
+ * Decoded ABI calldata payload with resolved signature (type 0x0004).
+ * Returned when the selector is found in the local lookup table.
+ * When not found, payload is raw Hex string.
  */
 export interface DecodedAbiPayload {
   selector: Hex;
-  data: Hex;
+  signature: string;
+  params: unknown[];
 }
 
 /**
