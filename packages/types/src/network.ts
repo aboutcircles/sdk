@@ -1,5 +1,5 @@
-import type { TrustRelation } from './trust';
-import type { TokenBalance } from './token';
+import type { TrustRelation } from './trust.js';
+import type { TokenBalance } from './token.js';
 
 /**
  * Network and event types

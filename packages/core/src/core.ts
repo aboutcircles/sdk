@@ -1,6 +1,6 @@
-import { HubV2Contract, BaseGroupFactoryContract, NameRegistryContract, LiftERC20Contract, InvitationFarmContract, ReferralsModuleContract } from './contracts';
+import { HubV2Contract, BaseGroupFactoryContract, NameRegistryContract, LiftERC20Contract, InvitationFarmContract, ReferralsModuleContract } from './contracts/index.js';
 import type { CirclesConfig } from '@aboutcircles/sdk-types';
-import { circlesConfig } from './config';
+import { circlesConfig } from './config.js';
 
 /**
  * Core SDK class for managing Circles protocol contract interactions

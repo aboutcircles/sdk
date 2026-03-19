@@ -1,4 +1,4 @@
-import { Contract } from '../contract';
+import { Contract } from '../contract.js';
 import { wrappedCirclesMinimalAbi } from '@aboutcircles/sdk-abis/minimal/wrappedCircles';
 import type { Address, TransactionRequest } from '@aboutcircles/sdk-types';
 

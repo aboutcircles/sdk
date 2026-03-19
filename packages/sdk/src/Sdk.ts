@@ -14,12 +14,12 @@ import { Profiles } from '@aboutcircles/sdk-profiles';
 import { Referrals } from '@aboutcircles/sdk-invitations';
 import { CirclesRpc, PagedQuery } from '@aboutcircles/sdk-rpc';
 import { cidV0ToHex } from '@aboutcircles/sdk-utils';
-import { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars';
-import { SdkError } from './errors';
+import { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars/index.js';
+import { SdkError } from './errors.js';
 import { decodeEventLog } from 'viem';
 import { baseGroupFactoryAbi } from '@aboutcircles/sdk-abis';
 import type { GroupType } from '@aboutcircles/sdk-types';
-import type { CirclesData } from './types';
+import type { CirclesData } from './types.js';
 
 
 /**

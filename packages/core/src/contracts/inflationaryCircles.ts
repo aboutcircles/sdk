@@ -1,4 +1,4 @@
-import { BaseWrappedCirclesContract } from './baseWrappedCircles';
+import { BaseWrappedCirclesContract } from './baseWrappedCircles.js';
 import { inflationaryCirclesAbi } from '@aboutcircles/sdk-abis/inflationaryCircles';
 import type { Address } from '@aboutcircles/sdk-types';
 

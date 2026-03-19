@@ -1,10 +1,10 @@
 import type { Address, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
-import type { ContractRunner, BatchRun } from './runner';
+import type { ContractRunner, BatchRun } from './runner.js';
 import type { PublicClient, TransactionReceipt, Chain } from 'viem';
 import type { SafeTransaction } from '@safe-global/types-kit';
 import { createPublicClient, http } from 'viem';
 import { type MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types';
-import { RunnerError } from './errors';
+import { RunnerError } from './errors.js';
 
 // Use require for Safe to ensure compatibility with bun's CJS/ESM interop
 // Safe Protocol Kit v5 uses CommonJS exports, so we use require() for proper interop

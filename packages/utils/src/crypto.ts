@@ -1,7 +1,7 @@
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
 import type { Address, Hex } from '@aboutcircles/sdk-types';
-import { checksumAddress } from './abi';
+import { checksumAddress } from './abi.js';
 
 /**
  * Generate a random private key (32 bytes / 64 hex chars)

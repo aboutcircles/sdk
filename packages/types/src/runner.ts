@@ -1,4 +1,4 @@
-import type { Address, TransactionRequest } from './base';
+import type { Address, TransactionRequest } from './base.js';
 
 /**
  * Runner types

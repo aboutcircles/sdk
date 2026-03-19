@@ -1,4 +1,4 @@
-import type { Address } from './base';
+import type { Address } from './base.js';
 
 /**
  * SDK-related types

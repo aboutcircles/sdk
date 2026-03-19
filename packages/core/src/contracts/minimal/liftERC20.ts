@@ -1,4 +1,4 @@
-import { Contract } from '../contract';
+import { Contract } from '../contract.js';
 import { liftERC20MinimalAbi } from '@aboutcircles/sdk-abis/minimal/liftERC20';
 import type { Address } from '@aboutcircles/sdk-types';
 import { CirclesType } from '@aboutcircles/sdk-types';

@@ -11,7 +11,7 @@ import {
   type DispenseErrorCode,
   type SessionErrorCode,
   type ApiError,
-} from "./types";
+} from "./types.js";
 
 function sessionErrorCode(status: number): SessionErrorCode {
   if (status === 400) return "VALIDATION_ERROR";

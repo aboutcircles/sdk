@@ -12,10 +12,10 @@ export type {
   ContractConfig,
   TransactionRequest,
   CallResult,
-} from './base';
+} from './base.js';
 
 // JSON-RPC types
-export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, QueryResponse } from './rpc';
+export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, QueryResponse } from './rpc.js';
 
 // Query and filter types
 export type {
@@ -32,19 +32,19 @@ export type {
   Cursor,
   PagedResult,
   PagedQueryParams,
-} from './query';
+} from './query.js';
 
 // Avatar and profile types
-export type { AvatarInfo, Profile, GroupProfile } from './avatar';
+export type { AvatarInfo, Profile, GroupProfile } from './avatar.js';
 
 // Token types
-export type { TokenBalance, TokenInfo, TokenHolder } from './token';
+export type { TokenBalance, TokenInfo, TokenHolder } from './token.js';
 
 // Trust relation types
-export type { TrustRelation, TrustRelationType, AggregatedTrustRelation } from './trust';
+export type { TrustRelation, TrustRelationType, AggregatedTrustRelation } from './trust.js';
 
 // Group types
-export type { GroupRow, GroupMembershipRow, GroupQueryParams } from './group';
+export type { GroupRow, GroupMembershipRow, GroupQueryParams } from './group.js';
 
 // Pathfinding types
 export type {
@@ -57,31 +57,34 @@ export type {
   StreamStruct,
   FlowMatrix,
   AdvancedTransferOptions,
-} from './pathfinding';
+} from './pathfinding.js';
 
 // Network types
-export type { EventType, NetworkSnapshot } from './network';
+export type { EventType, NetworkSnapshot } from './network.js';
 
 // Configuration types
-export type { CirclesConfig } from './config';
+export type { CirclesConfig } from './config.js';
 
 // Wrapper types
-export { CirclesType } from './wrapper';
-export type { WrappedTokenInfo, WrappedTokensRecord } from './wrapper';
+export { CirclesType } from './wrapper.js';
+export type { WrappedTokenInfo, WrappedTokensRecord } from './wrapper.js';
 
 // SDK types
-export { GroupType } from './sdk';
-export type { AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery } from './sdk';
+export { GroupType } from './sdk.js';
+export type { AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery } from './sdk.js';
 
 // Event types
-export type { CirclesBaseEvent, CirclesEventType, CirclesEvent, CirclesEventOfType, RpcSubscriptionEvent } from './events';
+export type { CirclesBaseEvent, CirclesEventType, CirclesEvent, CirclesEventOfType, RpcSubscriptionEvent } from './events.js';
 
 
 // Runner types
-export type { BatchRun, ContractRunner } from './runner';
+export type { BatchRun, ContractRunner } from './runner.js';
 
 // Contract types
-export type { EscrowedAmountAndDays } from './contracts';
+export type { EscrowedAmountAndDays } from './contracts.js';
 
 // Error types
-export type { DecodedContractError } from './errors';
+export type { DecodedContractError } from './errors.js';
+
+// Transfer data annotation types
+export type { TransferDataType, DecodedTransferData, DecodedAbiPayload, DecodedMetadataPayload } from './transferData.js';

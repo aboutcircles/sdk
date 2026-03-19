@@ -9,12 +9,12 @@ export type {
   CirclesBaseEvent,
   CirclesEventOfType,
   RpcSubscriptionEvent,
-} from './types';
+} from './types.js';
 
-export { isCirclesEvent } from './types';
+export { isCirclesEvent } from './types.js';
 
 // Parser
-export { parseRpcEvent, parseRpcSubscriptionMessage } from './parser';
+export { parseRpcEvent, parseRpcSubscriptionMessage } from './parser.js';
 
 // Observable
-export { Observable } from './observable';
+export { Observable } from './observable.js';

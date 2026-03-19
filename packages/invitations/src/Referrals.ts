@@ -1,4 +1,4 @@
-import type { ReferralInfo, ReferralList, ReferralPreviewList, StoreBatchResult, ApiError } from "./types";
+import type { ReferralInfo, ReferralList, ReferralPreviewList, StoreBatchResult, ApiError } from "./types.js";
 
 /**
  * Referrals service client for storing and retrieving referral links
