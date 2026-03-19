@@ -1,0 +1,45 @@
+{
+  "name": "@aboutcircles/sdk-auth",
+  "version": "0.1.24",
+  "description": "Token exchange cache and auth utilities for Circles SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aboutcircles/sdk.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "vitest": "^2.1.9"
+  },
+  "keywords": [
+    "circles",
+    "auth",
+    "token-exchange",
+    "cache"
+  ],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/aboutcircles/sdk/issues"
+  },
+  "homepage": "https://github.com/aboutcircles/sdk#readme"
+}

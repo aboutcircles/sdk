@@ -25,6 +25,7 @@
     { "path": "./packages/transfers" },
     { "path": "./packages/sdk" },
     { "path": "./packages/runner" },
-    { "path": "./packages/miniapp-sdk" }
+    { "path": "./packages/miniapp-sdk" },
+    { "path": "./packages/auth" }
   ]
 }
