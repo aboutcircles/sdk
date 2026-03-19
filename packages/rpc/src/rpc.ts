@@ -10,6 +10,7 @@ import {
   InvitationMethods,
   TransactionMethods,
   GroupMethods,
+  SdkMethods,
 } from './methods';
 
 /**
@@ -44,6 +45,9 @@ import {
  *
  * // Get profile
  * const profile = await rpc.profile.getProfileByAddress('0xc3a1428c04c426cdf513c6fc8e09f55ddaf50cd7');
+ * 
+ * // Get consolidated profile view (Phase 3 SDK enablement)
+ * const profileView = await rpc.sdk.getProfileView('0xde374ece6fa50e781e81aac78e811b33d16912c7');
  * ```
  */
 export class CirclesRpc {
@@ -59,6 +63,7 @@ export class CirclesRpc {
   private _invitation?: InvitationMethods;
   private _transaction?: TransactionMethods;
   private _group?: GroupMethods;
+  private _sdk?: SdkMethods;
 
   /**
    * Create a new CirclesRpc instance
@@ -137,6 +142,13 @@ export class CirclesRpc {
       this._group = new GroupMethods(this.client);
     }
     return this._group;
+  }
+
+  get sdk(): SdkMethods {
+    if (!this._sdk) {
+      this._sdk = new SdkMethods(this.client);
+    }
+    return this._sdk;
   }
 
   /**
