@@ -108,3 +108,6 @@ export type { EscrowedAmountAndDays } from './contracts';
 
 // Error types
 export type { DecodedContractError } from './errors';
+
+// Transfer data annotation types
+export type { TransferDataType, DecodedTransferData, DecodedAbiPayload, DecodedMetadataPayload } from './transferData';
