@@ -692,3 +692,23 @@ export function encodeAbiParameters(types: string[], values: unknown[]): Hex {
 
   return ('0x' + result + dynamicData.join('')) as Hex;
 }
+
+/**
+ * Decode ABI-encoded parameters given their type strings.
+ * @param types - Array of Solidity type strings (e.g. ['address', 'uint256'])
+ * @param data  - Hex-encoded data (with or without 0x prefix), without selector
+ * @returns Array of decoded values
+ */
+export function decodeAbiParameters(types: string[], data: string): unknown[] {
+  const cleanData = data.startsWith('0x') ? data.slice(2) : data;
+  const results: unknown[] = [];
+  let offset = 0;
+
+  for (const type of types) {
+    const result = decodeParam(type as AbiType, cleanData, offset);
+    results.push(result.value);
+    offset += result.consumed;
+  }
+
+  return results;
+}

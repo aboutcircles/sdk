@@ -1,8 +1,10 @@
 import { CID } from 'multiformats/cid';
 import { base16 } from 'multiformats/bases/base16';
 import { base58btc } from 'multiformats/bases/base58';
+import { keccak_256 } from '@noble/hashes/sha3.js';
 import type { Hex, DecodedTransferData, TransferDataType } from '@aboutcircles/sdk-types';
 import { encodeFunctionData } from './abi';
+import { decodeAbiParameters } from './abi';
 import { hexToBytes, bytesToHex } from './bytes';
 import { EncodingError } from './errors';
 
@@ -57,6 +59,75 @@ function hexToCid(hex: string): string {
     return cid.toV0().toString();
   }
   return cid.toString();
+}
+// @todo construct lookup table based on the contracts in the core pkg
+// ============================================================================
+// LOCAL SELECTOR LOOKUP TABLE
+// ============================================================================
+
+/** Known function signatures for local selector resolution. */
+const KNOWN_SIGNATURES: string[] = [
+  // ERC20
+  'transfer(address,uint256)',
+  'transferFrom(address,address,uint256)',
+  'approve(address,uint256)',
+  'increaseAllowance(address,uint256)',
+  'decreaseAllowance(address,uint256)',
+  'balanceOf(address)',
+  'allowance(address,address)',
+  'totalSupply()',
+  'decimals()',
+  'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+  // ERC1155
+  'safeTransferFrom(address,address,uint256,uint256,bytes)',
+  'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)',
+  'setApprovalForAll(address,bool)',
+  'isApprovedForAll(address,address)',
+  // Circles Hub V2
+  'trust(address,uint96)',
+  'isTrusted(address,address)',
+  'isHuman(address)',
+  'wrap(address,uint256,uint8)',
+  'toTokenId(address)',
+  'operateFlowMatrix(address[],tuple[],tuple[],bytes)',
+  // Wrapped Circles
+  'unwrap(uint256)',
+  'convertDemurrageToInflationaryValue(uint256,uint64)',
+  'convertInflationaryToDemurrageValue(uint256,uint64)',
+  // Safe
+  'enableModule(address)',
+  'isModuleEnabled(address)',
+  // Invitation
+  'trustInviter(address)',
+  'claimInvite()',
+  'claimInvites(uint256)',
+  'createAccount(address)',
+  'createAccounts(address[])',
+  // LiftERC20
+  'erc20Circles(uint8,address)',
+];
+
+/** Compute 4-byte selector from a function signature string. */
+function computeSelector(sig: string): string {
+  const hash = keccak_256(new TextEncoder().encode(sig));
+  return bytesToHex(hash.slice(0, 4)).slice(2); // strip 0x, 8 hex chars
+}
+
+/** Map from 8-char hex selector → full signature string. Built once at module load. */
+const SELECTOR_TABLE: Map<string, string> = new Map(
+  KNOWN_SIGNATURES.map(sig => [computeSelector(sig), sig])
+);
+
+/**
+ * Parse a function signature string into param type strings.
+ * e.g. "transfer(address,uint256)" → ["address", "uint256"]
+ */
+function parseSignatureTypes(signature: string): string[] {
+  const parenIdx = signature.indexOf('(');
+  if (parenIdx === -1) return [];
+  const inner = signature.slice(parenIdx + 1, -1);
+  if (!inner) return [];
+  return inner.split(',').map(t => t.trim()).filter(Boolean);
 }
 
 // ============================================================================
@@ -261,12 +332,22 @@ export function decodeCrcV2TransferData(
     }
 
     case 0x0004: {
-      // ABI-encoded calldata - return selector + raw data
-      const selector = `0x${payloadHex.slice(0, 8)}` as Hex;
-      payload = {
-        selector,
-        data: `0x${payloadHex}` as Hex,
-      };
+      // ABI-encoded calldata — try local selector lookup, fallback to raw data
+      const selectorHex = payloadHex.slice(0, 8);
+      const selector = `0x${selectorHex}` as Hex;
+      const signature = SELECTOR_TABLE.get(selectorHex);
+
+      if (signature) {
+        const paramTypes = parseSignatureTypes(signature);
+        const paramsHex = payloadHex.slice(8);
+        const params = paramTypes.length > 0
+          ? decodeAbiParameters(paramTypes, paramsHex)
+          : [];
+        payload = { selector, signature, params };
+      } else {
+        // Unknown selector — return raw calldata hex
+        payload = `0x${payloadHex}` as Hex;
+      }
       break;
     }
 

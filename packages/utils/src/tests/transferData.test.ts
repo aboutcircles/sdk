@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test';
 import { encodeCrcV2TransferData, decodeCrcV2TransferData } from '../transferData';
-import type { DecodedMetadataPayload } from '../transferData';
+import type { DecodedMetadataPayload, DecodedAbiPayload } from '../transferData';
 
 // ============================================================================
 // Type 0x0001 — UTF-8 Text
@@ -200,22 +200,41 @@ describe('Type 0x0004 — ABI-encoded calldata', () => {
     expect(hex.slice(10, 18)).toBe(expectedSelector);
   });
 
-  test('round-trips from function signature + params', () => {
+  test('decodes known selector with resolved signature and params', () => {
     const encoded = encodeCrcV2TransferData([signature, address, amount], 0x0004);
     const decoded = decodeCrcV2TransferData(encoded);
     expect(decoded.type).toBe(0x0004);
     expect(decoded.length).toBe(68); // 4 selector + 32 + 32
-    const { selector, data } = decoded.payload as { selector: string; data: string };
-    expect(selector).toBe(`0x${expectedSelector}`);
-    expect(data.slice(2, 10)).toBe(expectedSelector);
+    const p = decoded.payload as DecodedAbiPayload;
+    expect(p.selector).toBe(`0x${expectedSelector}`);
+    expect(p.signature).toBe(signature);
+    expect(p.params.length).toBe(2);
+    // address param (lowercased with checksum)
+    expect((p.params[0] as string).toLowerCase()).toBe(address.toLowerCase());
+    // uint256 param
+    expect(p.params[1]).toBe(amount);
   });
 
-  test('round-trips from raw calldata', () => {
+  test('decodes raw calldata with known selector', () => {
     const rawCalldata = `0x${expectedSelector}${expectedEncodedAddress}${expectedEncodedAmount}`;
     const encoded = encodeCrcV2TransferData([rawCalldata], 0x0004);
     const decoded = decodeCrcV2TransferData(encoded);
-    const { data } = decoded.payload as { selector: string; data: string };
-    expect(data.toLowerCase()).toBe(rawCalldata.toLowerCase());
+    const p = decoded.payload as DecodedAbiPayload;
+    expect(p.selector).toBe(`0x${expectedSelector}`);
+    expect(p.signature).toBe(signature);
+    expect(p.params.length).toBe(2);
+  });
+
+  test('returns raw data for unknown selector', () => {
+    // Craft calldata with a selector not in the lookup table
+    // Use 8 zeros padded — extremely unlikely to be a real function
+    const unknownSelector = 'ffffffff';
+    const fakePayload = unknownSelector + expectedEncodedAddress;
+    const encoded = encodeCrcV2TransferData([`0x${fakePayload}`], 0x0004);
+    const decoded = decodeCrcV2TransferData(encoded);
+    // Unknown selector — payload is raw hex string
+    expect(typeof decoded.payload).toBe('string');
+    expect(decoded.payload).toBe(`0x${fakePayload}`);
   });
 
   test('throws for invalid signature', () => {
