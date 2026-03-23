@@ -9,7 +9,7 @@ import type { Address } from './base';
  */
 export interface TokenBalance {
   tokenAddress: Address;
-  tokenId: bigint;
+  tokenId: Address;
   tokenOwner: Address;
   tokenType: string;
   version: number;
