@@ -82,10 +82,8 @@ export class Referrals {
   /**
    * Retrieve referral info by private key (public endpoint, no auth required)
    *
-   * Performs an on-chain check via ReferralsModule.accounts(signer):
-   * - If account is 0x0 → key not found on-chain (404)
-   * - If claimed on-chain → 410
-   * - Otherwise returns the active ReferralInfo (200)
+   * Returns ReferralInfo for both active (200) and already-claimed (410) referrals.
+   * Performs an on-chain check via ReferralsModule.accounts(signer).
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
     const signer = privateKeyToAddress(privateKey);
