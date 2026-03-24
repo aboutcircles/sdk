@@ -71,18 +71,26 @@ export class Referrals {
 
   /**
    * Retrieve referral info by private key (public endpoint, no auth required)
+   *
+   * Returns ReferralInfo for both active (200) and already-claimed (410) referrals.
+   * The caller can check `result.status === 'claimed'` to branch accordingly.
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
     const response = await fetch(
       `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`
     );
 
-    if (!response.ok) {
-      const error = (await response.json()) as ApiError;
-      throw new Error(error.error || `Failed to retrieve referral: ${response.statusText}`);
+    // 410 = already claimed — body still contains valid ReferralInfo
+    if (response.status === 410 || response.ok) {
+      return response.json() as Promise<ReferralInfo>;
     }
 
-    return response.json() as Promise<ReferralInfo>;
+    const body = await response.json().catch(() => null);
+    const message = (body as ApiError)?.error || `Failed to retrieve referral: ${response.statusText}`;
+    const err = new Error(message) as Error & { status: number; body: unknown };
+    err.status = response.status;
+    err.body = body;
+    throw err;
   }
 
   /**
