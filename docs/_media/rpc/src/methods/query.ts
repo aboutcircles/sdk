@@ -127,7 +127,7 @@ export class QueryMethods {
     const result = await this.client.call<
       [string | null, number | null, number | null, EventType[] | null, FilterPredicate[] | null, boolean, number, string | null],
       PagedEventsResponse<T>
-    >('circles_events', [address, fromBlock, toBlock, eventTypes, filterPredicates, sortAscending, limit, cursor]);
+    >('circles_events_paginated', [address, fromBlock, toBlock, eventTypes, filterPredicates, sortAscending, limit, cursor]);
 
     return {
       events: checksumAddresses(result.events),
