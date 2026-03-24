@@ -1,14 +1,13 @@
-import type { ReferralInfo, ReferralList, ApiError } from "./types.js";
+import type { ReferralInfo, ReferralList, StoreBatchResult, ApiError } from "./types.js";
 import { InvitationError } from "./errors.js";
 
 /**
  * Referrals service client for retrieving referral information
  *
  * The referrals backend enables Circles SDK users to query referral data:
+ * - Store: Save a referral private key with on-chain validation
  * - Retrieve: Get referral info by private key (public)
  * - List: Get all referrals created by authenticated user
- *
- * Note: Storing referrals is handled by Invitations.generateReferral()
  */
 export class Referrals {
   /**
@@ -29,60 +28,72 @@ export class Referrals {
   }
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
-    if (!this.getToken) {
-      return { "Content-Type": "application/json" };
-    }
-
+    const base: Record<string, string> = { "Content-Type": "application/json" };
+    if (!this.getToken) return base;
     const token = await this.getToken();
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
+    return { ...base, Authorization: `Bearer ${token}` };
   }
 
   /**
-   * Retrieve referral info by private key
+   * Store a referral private key
+   */
+  async store(privateKey: string, inviter: string): Promise<void> {
+    const response = await fetch(`${this.getBaseUrl()}/store`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ privateKey, inviter }),
+    });
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to store referral: ${response.statusText}`);
+    }
+  }
+
+  /**
+   * Store multiple referral private keys in a single request (max 200)
    *
-   * This is a public endpoint - no authentication required.
-   * Used by invitees to look up who invited them.
+   * Processing is independent — one failure doesn't block others.
+   */
+  async storeBatch(
+    invitations: Array<{ privateKey: string; inviter: string }>
+  ): Promise<StoreBatchResult> {
+    const response = await fetch(`${this.getBaseUrl()}/store-batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ invitations }),
+    });
+
+    if (!response.ok) {
+      const error = (await response.json()) as ApiError;
+      throw new Error(error.error || `Failed to store batch: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<StoreBatchResult>;
+  }
+
+  /**
+   * Retrieve referral info by private key (public endpoint, no auth required)
    *
-   * @param privateKey - The referral private key
-   * @returns Referral info including inviter and status
-   * @throws InvitationError if referral not found or expired
+   * Returns ReferralInfo for both active (200) and already-claimed (410) referrals.
+   * The caller can check `result.status === 'claimed'` to branch accordingly.
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
-    try {
-      const url = `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`;
-      const response = await fetch(url);
+    const url = `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`;
+    const response = await fetch(url);
 
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const error = (await response.json()) as ApiError;
-          errorMessage = error.error || errorMessage;
-        } catch {
-          errorMessage = response.statusText || errorMessage;
-        }
-
-        throw new InvitationError(errorMessage, {
-          code: 'INVITATION_RETRIEVE_FAILED',
-          source: 'INVITATIONS',
-          context: { status: response.status, url, privateKey }
-        });
-      }
-
+    // 410 = already claimed — body still contains valid ReferralInfo
+    if (response.status === 410 || response.ok) {
       return response.json() as Promise<ReferralInfo>;
-    } catch (error) {
-      if (error instanceof InvitationError) {
-        throw error;
-      }
-      throw new InvitationError(`Failed to retrieve referral: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        code: 'INVITATION_RETRIEVE_ERROR',
-        source: 'INVITATIONS',
-        cause: error,
-        context: { privateKey }
-      });
     }
+
+    const body = await response.json().catch(() => null);
+    const message = (body as ApiError)?.error || `Failed to retrieve referral: ${response.statusText}`;
+    throw new InvitationError(message, {
+      code: 'INVITATION_RETRIEVE_FAILED',
+      source: 'INVITATIONS',
+      context: { status: response.status, url, privateKey }
+    });
   }
 
   /**

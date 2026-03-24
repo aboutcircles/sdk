@@ -13,6 +13,8 @@ export interface ReferralInfo {
   status: ReferralStatus;
   /** The Safe account address (if available) */
   accountAddress?: string;
+  /** Human-readable message, present on claimed (410) responses */
+  error?: string;
 }
 
 /**
@@ -78,6 +80,20 @@ export interface ReferralPreviewList {
   total: number;
   limit: number;
   offset: number;
+}
+
+/**
+ * Result of a batch store operation
+ */
+export interface StoreBatchResult {
+  success: boolean;
+  stored: number;
+  failed: number;
+  errors?: Array<{
+    index: number;
+    keyPreview: string;
+    reason: string;
+  }>;
 }
 
 /**
