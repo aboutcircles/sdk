@@ -142,8 +142,9 @@ Use this for UI components that need names/avatars alongside each transfer.
 
 ### Raw events (paginated)
 
-- `circles_events(address?, fromBlock?, toBlock?, eventTypes?, filterPredicates?, sortAscending?, limit?, cursor?)`
-- Now returns `PagedEventsResponse` with:
+- `circles_events_paginated(address?, fromBlock?, toBlock?, eventTypes?, filterPredicates?, sortAscending?, limit?, cursor?)`
+- Returns `PagedEventsResponse` with:
+- Note: `circles_events` (without `_paginated`) returns a flat array for backwards compatibility
   - `events`: array of event objects
   - `hasMore`: boolean indicating more results available
   - `nextCursor`: Base64 cursor for next page
@@ -209,7 +210,7 @@ const suggestions = await rpc.sdk.searchProfileByAddressOrName(
 - [x] Use `circles_getInvitationOrigin` to determine how a user was invited.
 - [x] Switch group/transaction list views to `circles_findGroups` + `circles_getGroupMembers` + `circles_getTransactionHistory`.
 - [x] Use `searchProfileByAddressOrName` for address autocomplete inputs.
-- [x] Update `circles_events` usage to handle paginated `PagedEventsResponse` (returns `events`, `hasMore`, `nextCursor`).
+- [x] SDK `events()` method now calls `circles_events_paginated` (returns `events`, `hasMore`, `nextCursor`). `circles_events` returns flat array for backwards compat.
 
 All items now ship in `sdk-v2` (packages `rpc`, `sdk`, and supporting docs/examples). Recent additions also brought in the remaining SDK enablement endpoints—`circles_getTrustNetworkSummary`, `circles_getAggregatedTrustRelationsEnriched`, `circles_getTransactionHistoryEnriched`, `circles_getTokenHolders`, and `circles_searchProfileByAddressOrName`—so the migration guide reflects the full surface of the current implementation.
 
