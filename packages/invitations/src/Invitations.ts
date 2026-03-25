@@ -540,7 +540,7 @@ export class Invitations {
 
     const ownerRemap = new Map<string, string>();
     for (const info of tokenInfos) {
-      const tokenAddr = ((info as any).tokenAddress ?? info.token) as Address | undefined;
+      const tokenAddr = ((info as any).tokenAddress ?? (info as any).token) as Address | undefined;
       if (tokenAddr && info?.tokenOwner) {
         ownerRemap.set(tokenAddr.toLowerCase(), info.tokenOwner.toLowerCase());
       }
