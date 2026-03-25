@@ -88,7 +88,11 @@ export class Sdk {
 
     // Initialize referrals client if service URL is configured
     if (config.referralsServiceUrl) {
-      this.referralsClient = new Referrals(config.referralsServiceUrl);
+      this.referralsClient = new Referrals(
+        config.referralsServiceUrl,
+        config.referralsModuleAddress,
+        config.circlesRpcUrl
+      );
     }
 
     // Validate and extract sender address from contract runner

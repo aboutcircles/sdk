@@ -1,19 +1,19 @@
 /**
  * Referral status lifecycle
  */
-export type ReferralStatus = "pending" | "confirmed" | "claimed" | "expired";
+export type ReferralStatus = "pending" | "stale" | "confirmed" | "claimed" | "expired";
 
 /**
  * Referral info returned from retrieve endpoint
  */
 export interface ReferralInfo {
-  /** The inviter's Ethereum address */
-  inviter: string;
-  /** Current status of the referral */
-  status: ReferralStatus;
+  /** The inviter's Ethereum address (absent when key is not found on-chain) */
+  inviter?: string;
+  /** Current status of the referral (absent when key is not found on-chain) */
+  status?: ReferralStatus;
   /** The Safe account address (if available) */
   accountAddress?: string;
-  /** Human-readable message, present on claimed (410) responses */
+  /** Human-readable error message */
   error?: string;
 }
 
