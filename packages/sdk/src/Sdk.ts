@@ -91,7 +91,7 @@ export class Sdk {
       this.referralsClient = new Referrals(
         config.referralsServiceUrl,
         config.referralsModuleAddress,
-        config.circlesRpcUrl
+        config.chainRpcUrl ?? config.circlesRpcUrl
       );
     }
 
