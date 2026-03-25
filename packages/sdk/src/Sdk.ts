@@ -11,7 +11,7 @@ import type {
 import type { GroupTokenHolderRow } from '@aboutcircles/sdk-rpc';
 import { circlesConfig, Core, CirclesType, BaseGroupContract } from '@aboutcircles/sdk-core';
 import { Profiles } from '@aboutcircles/sdk-profiles';
-import { Referrals } from '@aboutcircles/sdk-referrals';
+import { Referrals } from '@aboutcircles/sdk-invitations';
 import { CirclesRpc, PagedQuery } from '@aboutcircles/sdk-rpc';
 import { cidV0ToHex } from '@aboutcircles/sdk-utils';
 import { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars/index.js';
@@ -91,7 +91,7 @@ export class Sdk {
       this.referralsClient = new Referrals(
         config.referralsServiceUrl,
         config.referralsModuleAddress,
-        config.circlesRpcUrl
+        config.chainRpcUrl ?? config.circlesRpcUrl
       );
     }
 
