@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/miniapp-sdk",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Tiny SDK for mini apps running inside the Circles miniapps iframe host",
   "type": "module",
   "main": "./dist/index.js",
