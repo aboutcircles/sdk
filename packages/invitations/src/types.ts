@@ -13,7 +13,7 @@ export interface ReferralInfo {
   status?: ReferralStatus;
   /** The Safe account address (if available) */
   accountAddress?: string;
-  /** Human-readable message, present on claimed (410) responses */
+  /** Human-readable error message */
   error?: string;
 }
 
