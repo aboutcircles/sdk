@@ -7,6 +7,88 @@ import type { Address } from '@aboutcircles/sdk-types';
 export type InvitationErrorSource = 'INVITATIONS' | 'PATHFINDING' | 'VALIDATION';
 
 /**
+ * Referral error source
+ */
+export type ReferralErrorSource = 'REFERRALS' | 'VALIDATION' | 'ONCHAIN';
+
+/**
+ * Referral-specific errors for the Referrals service client
+ */
+export class ReferralError extends CirclesError<ReferralErrorSource> {
+  public readonly httpStatus?: number;
+
+  constructor(
+    message: string,
+    options?: {
+      code?: string | number;
+      source?: ReferralErrorSource;
+      cause?: unknown;
+      context?: Record<string, any>;
+      httpStatus?: number;
+    }
+  ) {
+    super('ReferralError', message, { ...options, source: options?.source || 'REFERRALS' });
+    this.httpStatus = options?.httpStatus;
+  }
+
+  static notFoundOnChain(signer: Address): ReferralError {
+    return new ReferralError(
+      `Referral not found on-chain for signer ${signer}`,
+      {
+        code: 'REFERRAL_NOT_FOUND_ONCHAIN',
+        source: 'ONCHAIN',
+        httpStatus: 404,
+        context: { signer },
+      }
+    );
+  }
+
+  static alreadyClaimed(signer: Address): ReferralError {
+    return new ReferralError(
+      `Referral for signer ${signer} has already been claimed`,
+      {
+        code: 'REFERRAL_ALREADY_CLAIMED',
+        source: 'ONCHAIN',
+        httpStatus: 410,
+        context: { signer },
+      }
+    );
+  }
+
+  static storeFailed(reason: string): ReferralError {
+    return new ReferralError(`Failed to store referral: ${reason}`, {
+      code: 'REFERRAL_STORE_FAILED',
+    });
+  }
+
+  static storeBatchFailed(reason: string): ReferralError {
+    return new ReferralError(`Failed to store referral batch: ${reason}`, {
+      code: 'REFERRAL_STORE_BATCH_FAILED',
+    });
+  }
+
+  static retrieveFailed(reason: string, httpStatus?: number): ReferralError {
+    return new ReferralError(`Failed to retrieve referral: ${reason}`, {
+      code: 'REFERRAL_RETRIEVE_FAILED',
+      httpStatus,
+    });
+  }
+
+  static listFailed(reason: string): ReferralError {
+    return new ReferralError(`Failed to list referrals: ${reason}`, {
+      code: 'REFERRAL_LIST_FAILED',
+    });
+  }
+
+  static authRequired(): ReferralError {
+    return new ReferralError('Authentication required to list referrals', {
+      code: 'REFERRAL_AUTH_REQUIRED',
+      source: 'VALIDATION',
+    });
+  }
+}
+
+/**
  * Base error for invitations package
  */
 export class InvitationError extends CirclesError<InvitationErrorSource> {

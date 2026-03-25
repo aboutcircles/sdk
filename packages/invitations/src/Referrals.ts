@@ -1,3 +1,7 @@
+import { ReferralsModuleContract } from "@aboutcircles/sdk-core/referralsModule";
+import { privateKeyToAddress, ZERO_ADDRESS } from "@aboutcircles/sdk-utils";
+import type { Address } from "@aboutcircles/sdk-types";
+import { ReferralError } from "./errors.js";
 import type { ReferralInfo, ReferralList, ReferralPreviewList, StoreBatchResult, ApiError } from "./types.js";
 
 /**
@@ -9,10 +13,16 @@ import type { ReferralInfo, ReferralList, ReferralPreviewList, StoreBatchResult,
  * - List: Get all referrals created by authenticated user
  */
 export class Referrals {
+  private readonly referralsModule: ReferralsModuleContract;
+
   constructor(
     private readonly baseUrl: string,
+    referralsModuleAddress: Address,
+    rpcUrl: string,
     private readonly getToken?: () => Promise<string>
-  ) {}
+  ) {
+    this.referralsModule = new ReferralsModuleContract({ address: referralsModuleAddress, rpcUrl });
+  }
 
   private getBaseUrl(): string {
     return this.baseUrl.endsWith("/")
@@ -43,7 +53,7 @@ export class Referrals {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(error.error || `Failed to store referral: ${response.statusText}`);
+      throw ReferralError.storeFailed(error.error || response.statusText);
     }
   }
 
@@ -63,7 +73,7 @@ export class Referrals {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(error.error || `Failed to store batch: ${response.statusText}`);
+      throw ReferralError.storeBatchFailed(error.error || response.statusText);
     }
 
     return response.json() as Promise<StoreBatchResult>;
@@ -72,25 +82,37 @@ export class Referrals {
   /**
    * Retrieve referral info by private key (public endpoint, no auth required)
    *
-   * Returns ReferralInfo for both active (200) and already-claimed (410) referrals.
-   * The caller can check `result.status === 'claimed'` to branch accordingly.
+   * Performs an on-chain check via ReferralsModule.accounts(signer):
+   * - If account is 0x0 → key not found on-chain (404)
+   * - If claimed on-chain → 410
+   * - Otherwise returns the active ReferralInfo (200)
    */
   async retrieve(privateKey: string): Promise<ReferralInfo> {
+    const signer = privateKeyToAddress(privateKey);
+    const { account, claimed } = await this.referralsModule.accounts(signer);
+
     const response = await fetch(
       `${this.getBaseUrl()}/retrieve?key=${encodeURIComponent(privateKey)}`
     );
 
-    // 410 = already claimed — body still contains valid ReferralInfo
-    if (response.status === 410 || response.ok) {
-      return response.json() as Promise<ReferralInfo>;
+    // 200 or 410 — body always contains valid ReferralInfo
+    if (response.ok || response.status === 410 || claimed) {
+      const info = await response.json() as ReferralInfo;
+      if (account === ZERO_ADDRESS) {
+        return { ...info, error: `Referral not found on-chain for signer ${signer}` };
+      }
+      return info;
+    }
+
+    if (account === ZERO_ADDRESS) {
+      return { error: `Referral not found on-chain for signer ${signer}` };
     }
 
     const body = await response.json().catch(() => null);
-    const message = (body as ApiError)?.error || `Failed to retrieve referral: ${response.statusText}`;
-    const err = new Error(message) as Error & { status: number; body: unknown };
-    err.status = response.status;
-    err.body = body;
-    throw err;
+    throw ReferralError.retrieveFailed(
+      (body as ApiError)?.error || response.statusText,
+      response.status
+    );
   }
 
   /**
@@ -105,7 +127,7 @@ export class Referrals {
     status?: string;
   }): Promise<ReferralList> {
     if (!this.getToken) {
-      throw new Error("Authentication required to list referrals");
+      throw ReferralError.authRequired();
     }
 
     const params = new URLSearchParams();
@@ -120,7 +142,7 @@ export class Referrals {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(error.error || `Failed to list referrals: ${response.statusText}`);
+      throw ReferralError.listFailed(error.error || response.statusText);
     }
 
     return response.json() as Promise<ReferralList>;
@@ -147,7 +169,7 @@ export class Referrals {
 
     if (!response.ok) {
       const error = (await response.json()) as ApiError;
-      throw new Error(error.error || `Failed to list referrals: ${response.statusText}`);
+      throw ReferralError.listFailed(error.error || response.statusText);
     }
 
     return response.json() as Promise<ReferralPreviewList>;
