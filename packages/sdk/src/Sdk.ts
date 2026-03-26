@@ -84,7 +84,7 @@ export class Sdk {
     this.contractRunner = contractRunner;
     this.core = new Core(config);
     this.rpc = new CirclesRpc(config.circlesRpcUrl);
-    this.profilesClient = new Profiles(config.profileServiceUrl);
+    this.profilesClient = new Profiles(config.circlesRpcUrl, config.profileServiceUrl);
 
     // Initialize referrals client if service URL is configured
     if (config.referralsServiceUrl) {

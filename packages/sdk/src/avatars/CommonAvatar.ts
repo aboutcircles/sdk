@@ -117,8 +117,8 @@ export abstract class CommonAvatar {
 
     this.runner = contractRunner;
 
-    // Initialize profiles client with the profile service URL from config
-    this.profiles = new Profiles(core.config.profileServiceUrl);
+    // Initialize profiles client using the main RPC URL (profiles/ path is derived automatically)
+    this.profiles = new Profiles(core.config.circlesRpcUrl, core.config.profileServiceUrl);
 
     // Initialize RPC client
     this.rpc = new CirclesRpc(core.config.circlesRpcUrl);
