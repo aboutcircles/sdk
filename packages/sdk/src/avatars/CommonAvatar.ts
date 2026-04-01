@@ -30,6 +30,15 @@ import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 export type PathfindingOptions = Omit<FindPathParams, 'from' | 'to' | 'targetFlow'>;
 
 /**
+ * Forward reference to Sdk type to avoid circular imports
+ * The actual Sdk instance is set via setSdk() after avatar creation
+ */
+interface SdkReference {
+  readonly rpc: CirclesRpc;
+  readonly circlesConfig: any;
+}
+
+/**
  * CommonAvatar abstract class
  * Provides common functionality shared across all avatar types (Human, Organisation, Group)
  *
@@ -46,6 +55,33 @@ export abstract class CommonAvatar {
   public readonly core: Core;
   public readonly contractRunner?: ContractRunner;
   public events: Observable<CirclesEvent>;
+
+  /**
+   * Reference to the parent SDK instance.
+   * Set automatically when avatar is created via Sdk.getAvatar().
+   * Provides access to SDK-level RPC methods like getTransactionHistoryEnriched.
+   */
+  private _sdk?: SdkReference;
+
+  /**
+   * Get the parent SDK instance.
+   * Throws if the avatar was not created via Sdk.getAvatar().
+   */
+  public get sdk(): SdkReference {
+    if (!this._sdk) {
+      throw new Error('SDK reference not set. Avatar must be created via Sdk.getAvatar()');
+    }
+    return this._sdk;
+  }
+
+  /**
+   * Set the parent SDK reference.
+   * Called internally by Sdk.getAvatar().
+   * @internal
+   */
+  public setSdk(sdk: SdkReference): void {
+    this._sdk = sdk;
+  }
 
   protected readonly runner: ContractRunner;
   protected readonly profiles: Profiles;
@@ -81,8 +117,8 @@ export abstract class CommonAvatar {
 
     this.runner = contractRunner;
 
-    // Initialize profiles client with the profile service URL from config
-    this.profiles = new Profiles(core.config.profileServiceUrl);
+    // Initialize profiles client using the main RPC URL (profiles/ path is derived automatically)
+    this.profiles = new Profiles(core.config.circlesRpcUrl, core.config.profileServiceUrl);
 
     // Initialize RPC client
     this.rpc = new CirclesRpc(core.config.circlesRpcUrl);
@@ -431,8 +467,8 @@ export abstract class CommonAvatar {
      * }
      * ```
      */
-    getTransactions: (limit: number = 50, sortOrder: 'ASC' | 'DESC' = 'DESC') => {
-      return this.rpc.transaction.getTransactionHistory(this.address, limit, sortOrder);
+    getTransactions: (limit: number = 50) => {
+      return this.rpc.transaction.getTransactionHistory(this.address, limit);
     },
   };
 

@@ -15,7 +15,32 @@ export type {
 } from './base.js';
 
 // JSON-RPC types
-export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, QueryResponse } from './rpc.js';
+export type { JsonRpcRequest, JsonRpcResponse, CirclesQueryResponse, PaginatedQueryResponse, QueryResponse } from './rpc.js';
+export type {
+  PagedResponse,
+  ProfileView,
+  TrustStats,
+  TrustNetworkSummary,
+  AggregatedTrustRelationsResponse,
+  TrustRelationInfo,
+  ValidInvitersResponse,
+  InviterInfo,
+  ParticipantInfo,
+  EnrichedTransaction,
+  ProfileSearchResponse,
+  InvitationType,
+  InvitationOriginResponse,
+  InvitationSource,
+  InvitationInfo,
+  TrustInvitation,
+  EscrowInvitation,
+  AtScaleInvitation,
+  Invitation,
+  InvitedAccountInfo,
+  InvitationsFromResponse,
+  AllInvitationsResponse
+} from './rpc-responses.js';
+export type { TransactionHistoryRow } from './rows.js';
 
 // Query and filter types
 export type {
@@ -27,6 +52,8 @@ export type {
   SortOrder,
   OrderBy,
   QueryParams,
+  TableColumnInfo,
+  TableDefinition,
   TableInfo,
   EventRow,
   Cursor,
@@ -38,7 +65,7 @@ export type {
 export type { AvatarInfo, Profile, GroupProfile } from './avatar.js';
 
 // Token types
-export type { TokenBalance, TokenInfo, TokenHolder } from './token.js';
+export type { TokenBalance, TokenInfo, TokenHolder, TokenHolderRow } from './token.js';
 
 // Trust relation types
 export type { TrustRelation, TrustRelationType, AggregatedTrustRelation } from './trust.js';
@@ -71,7 +98,7 @@ export type { WrappedTokenInfo, WrappedTokensRecord } from './wrapper.js';
 
 // SDK types
 export { GroupType } from './sdk.js';
-export type { AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery } from './sdk.js';
+export type { AvatarType, AvatarRow, TokenBalanceRow, TrustRelationRow, CirclesQuery } from './sdk.js';
 
 // Event types
 export type { CirclesBaseEvent, CirclesEventType, CirclesEvent, CirclesEventOfType, RpcSubscriptionEvent } from './events.js';

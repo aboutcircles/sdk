@@ -1,16 +1,12 @@
 import type { Address, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
 import type { ContractRunner, BatchRun } from './runner';
-import type { PublicClient, TransactionReceipt, Chain } from 'viem';
+import type { PublicClient, TransactionReceipt } from 'viem';
 import type { SafeTransaction } from '@safe-global/types-kit';
 import { createPublicClient, http } from 'viem';
 import { type MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types';
 import { RunnerError } from './errors';
-
-// Use require for Safe to ensure compatibility with bun's CJS/ESM interop
-// Safe Protocol Kit v5 uses CommonJS exports, so we use require() for proper interop
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const SafeModule = require('@safe-global/protocol-kit');
-const Safe = SafeModule.default || SafeModule;
+import { type ChainLike, asViemChain } from './chain-types';
+import Safe from '@safe-global/protocol-kit';
 
 /**
  * Batch transaction runner for Safe
@@ -20,7 +16,7 @@ export class SafeBatchRun implements BatchRun {
   private readonly transactions: TransactionRequest[] = [];
 
   constructor(
-    private readonly safe: any,
+    private readonly safe: InstanceType<typeof Safe>,
     private readonly publicClient: PublicClient
   ) {}
 
@@ -92,7 +88,7 @@ export class SafeContractRunner implements ContractRunner {
   private privateKey: Hex;
   private rpcUrl: string;
   private safeAddress?: Address;
-  private safe?: any;
+  private safe?: InstanceType<typeof Safe>;
 
   /**
    * Creates a new SafeContractRunner
@@ -119,19 +115,28 @@ export class SafeContractRunner implements ContractRunner {
    * @param rpcUrl - The RPC URL to connect to
    * @param privateKey - The private key of one of the Safe signers
    * @param safeAddress - The address of the Safe wallet
-   * @param chain - The viem chain configuration (e.g., gnosis from 'viem/chains')
+   * @param chain - Chain configuration (accepts viem Chain or ChainConfig object)
    * @returns An initialized SafeContractRunner instance
    *
    * @example
    * ```typescript
    * import { gnosis } from 'viem/chains';
-   * import { SafeContractRunner } from '@aboutcircles/sdk-runner';
+   * import { SafeContractRunner, chains } from '@aboutcircles/sdk-runner';
    *
+   * // Using viem chain (for backward compatibility)
    * const runner = await SafeContractRunner.create(
    *   'https://rpc.gnosischain.com',
    *   '0xYourPrivateKey...',
    *   '0xYourSafeAddress...',
    *   gnosis
+   * );
+   *
+   * // Using built-in chain config (no viem import needed)
+   * const runner = await SafeContractRunner.create(
+   *   'https://rpc.gnosischain.com',
+   *   '0xYourPrivateKey...',
+   *   '0xYourSafeAddress...',
+   *   chains.gnosis
    * );
    * ```
    */
@@ -139,10 +144,10 @@ export class SafeContractRunner implements ContractRunner {
     rpcUrl: string,
     privateKey: Hex,
     safeAddress: Address,
-    chain: Chain
+    chain: ChainLike
   ): Promise<SafeContractRunner> {
     const publicClient = createPublicClient({
-      chain,
+      chain: asViemChain(chain),
       transport: http(rpcUrl),
     });
 
@@ -177,7 +182,7 @@ export class SafeContractRunner implements ContractRunner {
   /**
    * Ensures the Safe is initialized
    */
-  private ensureSafe(): any {
+  private ensureSafe(): InstanceType<typeof Safe> {
     if (!this.safe) {
       throw new Error('SafeContractRunner not initialized. Call init() first.');
     }

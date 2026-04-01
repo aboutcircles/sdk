@@ -10,6 +10,7 @@ import {
   InvitationMethods,
   TransactionMethods,
   GroupMethods,
+  SdkMethods,
 } from './methods/index.js';
 
 /**
@@ -24,7 +25,7 @@ import {
  * const rpc = new CirclesRpc();
  *
  * // Use custom RPC endpoint
- * const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+ * const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
  *
  * // Find a path
  * const path = await rpc.pathfinder.findPath({
@@ -44,6 +45,9 @@ import {
  *
  * // Get profile
  * const profile = await rpc.profile.getProfileByAddress('0xc3a1428c04c426cdf513c6fc8e09f55ddaf50cd7');
+ *
+ * // Get consolidated profile view (Phase 3 SDK enablement)
+ * const profileView = await rpc.sdk.getProfileView('0xde374ece6fa50e781e81aac78e811b33d16912c7');
  * ```
  */
 export class CirclesRpc {
@@ -59,13 +63,14 @@ export class CirclesRpc {
   private _invitation?: InvitationMethods;
   private _transaction?: TransactionMethods;
   private _group?: GroupMethods;
+  private _sdk?: SdkMethods;
 
   /**
    * Create a new CirclesRpc instance
    *
-   * @param rpcUrl RPC URL to use (defaults to https://rpc.circlesubi.network/)
+   * @param rpcUrl RPC URL to use (defaults to https://rpc.aboutcircles.com/)
    */
-  constructor(rpcUrl: string = 'https://rpc.circlesubi.network/') {
+  constructor(rpcUrl: string = 'https://rpc.aboutcircles.com/') {
     this.client = new RpcClient(rpcUrl);
   }
 
@@ -137,6 +142,13 @@ export class CirclesRpc {
       this._group = new GroupMethods(this.client);
     }
     return this._group;
+  }
+
+  get sdk(): SdkMethods {
+    if (!this._sdk) {
+      this._sdk = new SdkMethods(this.client);
+    }
+    return this._sdk;
   }
 
   /**

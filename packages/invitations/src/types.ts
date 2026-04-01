@@ -80,6 +80,20 @@ export interface ReferralPreviewList {
 }
 
 /**
+ * Result of a batch store operation
+ */
+export interface StoreBatchResult {
+  success: boolean;
+  stored: number;
+  failed: number;
+  errors?: Array<{
+    index: number;
+    keyPreview: string;
+    reason: string;
+  }>;
+}
+
+/**
  * Error response from API
  */
 export interface ApiError {

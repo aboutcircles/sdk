@@ -404,8 +404,8 @@ export class TransferBuilder {
     const completeExcludeFromTokenList = new Set<Address>();
 
     // If recipient is a group mint handler, exclude the group's tokens
-    if (groups.length > 0) {
-      const groupInfo = groups[0];
+    if (groups.results.length > 0) {
+      const groupInfo = groups.results[0];
       completeExcludeFromTokenList.add(groupInfo.group.toLowerCase() as Address);
 
       if (groupInfo.erc20WrapperDemurraged) {

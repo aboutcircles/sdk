@@ -10,14 +10,16 @@ import type { Address } from './base.js';
 export interface CirclesConfig {
   /** RPC URL for Circles-specific endpoints */
   circlesRpcUrl: string;
-  /** Pathfinder service URL for computing transfer paths */
-  pathfinderUrl: string;
-  /** Profile service URL for user profiles and metadata */
+  /** RPC URL for direct chain calls (eth_call, etc). Defaults to circlesRpcUrl if not provided */
+  chainRpcUrl?: string;
+  /** @deprecated Pathfinder is now served via the main circlesRpcUrl */
+  pathfinderUrl?: string;
+  /** Profile service URL for IPFS profile pinning (defaults to circlesRpcUrl + 'profiles/') */
   profileServiceUrl: string;
-  /** Referrals service URL for storing referral data */
-  referralsServiceUrl: string;
+  /** Referrals service URL for referral/invitation links (optional) */
+  referralsServiceUrl?: string;
   /** Circles V1 Hub contract address */
-  v1HubAddress: Address;
+  v1HubAddress?: Address;
   /** Circles V2 Hub contract address */
   v2HubAddress: Address;
   /** Name Registry contract address */

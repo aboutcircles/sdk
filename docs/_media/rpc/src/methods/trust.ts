@@ -1,5 +1,5 @@
 import type { RpcClient } from '../client';
-import type { Address, TrustRelation, Filter, CirclesQueryResponse, TrustRelationType, AggregatedTrustRelation } from '@aboutcircles/sdk-types';
+import type { Address, TrustRelation, Filter, CirclesQueryResponse, TrustRelationType, AggregatedTrustRelation, TrustNetworkSummary, AggregatedTrustRelationsResponse, ValidInvitersResponse } from '@aboutcircles/sdk-types';
 import { normalizeAddress, checksumAddresses } from '../utils';
 import { PagedQuery } from '../pagedQuery';
 
@@ -132,9 +132,7 @@ export class TrustMethods {
 
   /**
    * Get aggregated trust relations for an address
-   * Groups trust relations by counterpart and determines relationship type
-   *
-   * Note: This method fetches ALL trust relations for aggregation.
+   * Uses the native RPC method for efficient server-side aggregation
    *
    * @param avatar - Avatar address to query trust relations for
    * @returns Aggregated trust relations with relationship types
@@ -145,62 +143,19 @@ export class TrustMethods {
    *   '0xde374ece6fa50e781e81aac78e811b33d16912c7'
    * );
    * // Returns: [
-   * //   { subjectAvatar: '0x...', relation: 'mutuallyTrusts', objectAvatar: '0x...', timestamp: 123 },
-   * //   { subjectAvatar: '0x...', relation: 'trusts', objectAvatar: '0x...', timestamp: 456 }
+   * //   { subjectAvatar: '0x...', relation: 'mutuallyTrusts', objectAvatar: '0x...', timestamp: 123, expiryTime: 0, objectAvatarType: 'Human' },
+   * //   { subjectAvatar: '0x...', relation: 'trusts', objectAvatar: '0x...', timestamp: 456, expiryTime: 0, objectAvatarType: 'Group' }
    * // ]
    * ```
    */
   async getAggregatedTrustRelations(avatar: Address): Promise<AggregatedTrustRelation[]> {
     const normalized = normalizeAddress(avatar);
 
-    // Fetch all trust relations by paginating
-    const query = this.getTrustRelations(normalized, 1000);
-    const trustListRows: TrustRelation[] = [];
-
-    while (await query.queryNextPage()) {
-      trustListRows.push(...query.currentPage!.results);
-      if (!query.currentPage!.hasMore) break;
-    }
-
-    // Group trust list rows by counterpart avatar
-    const trustBucket: Record<Address, TrustRelation[]> = {};
-
-    trustListRows.forEach((row) => {
-      // Normalize addresses for comparison (both are already checksummed from getTrustRelations)
-      const trusterNorm = normalizeAddress(row.truster);
-      const trusteeNorm = normalizeAddress(row.trustee);
-      const counterpart = trusterNorm !== normalized ? row.truster : row.trustee;
-
-      if (!trustBucket[counterpart]) {
-        trustBucket[counterpart] = [];
-      }
-      trustBucket[counterpart].push(row);
-    });
-
-    // Determine trust relations
-    const result = Object.entries(trustBucket)
-      .filter(([address]) => normalizeAddress(address as Address) !== normalized)
-      .map(([address, rows]) => {
-        const maxTimestamp = Math.max(...rows.map((o) => o.timestamp));
-
-        let relation: TrustRelationType;
-        if (rows.length === 2) {
-          relation = 'mutuallyTrusts';
-        } else if (normalizeAddress(rows[0]?.trustee) === normalized) {
-          relation = 'trustedBy';
-        } else if (normalizeAddress(rows[0]?.truster) === normalized) {
-          relation = 'trusts';
-        } else {
-          throw new Error(`Unexpected trust list row. Couldn't determine trust relation.`);
-        }
-
-        return {
-          subjectAvatar: normalized,
-          relation,
-          objectAvatar: address as Address,
-          timestamp: maxTimestamp,
-        };
-      });
+    // Use native RPC method for server-side aggregation
+    const result = await this.client.call<[Address], AggregatedTrustRelation[]>(
+      'circles_getAggregatedTrustRelations',
+      [normalized]
+    );
 
     return checksumAddresses(result);
   }
@@ -263,5 +218,49 @@ export class TrustMethods {
     const relations = await this.getAggregatedTrustRelations(normalized);
     const filtered = relations.filter((r) => r.relation === 'mutuallyTrusts');
     return checksumAddresses(filtered);
+  }
+
+  /**
+   * Get trust network summary
+   * Includes counts of direct trusts, trusted by, and mutual trusts
+   *
+   * @param avatar - Avatar address to query
+   * @param maxDepth - Maximum depth for network calculation (default: 2)
+   * @returns Trust network summary
+   */
+  async getTrustNetworkSummary(avatar: Address, maxDepth: number = 2): Promise<TrustNetworkSummary> {
+    return this.client.call<[Address, number], TrustNetworkSummary>('circles_getTrustNetworkSummary', [
+      normalizeAddress(avatar),
+      maxDepth
+    ]);
+  }
+
+  /**
+   * Get enriched aggregated trust relations
+   * Returns classified trust relations (mutual, trusts, trustedBy) with avatar info
+   *
+   * @param avatar - Avatar address to query
+   * @returns Enriched aggregated trust relations
+   */
+  async getAggregatedTrustRelationsEnriched(avatar: Address): Promise<AggregatedTrustRelationsResponse> {
+    return this.client.call<[Address], AggregatedTrustRelationsResponse>('circles_getAggregatedTrustRelationsEnriched', [
+      normalizeAddress(avatar)
+    ]);
+  }
+
+  /**
+   * Get valid inviters for an address
+   * Returns addresses that trust the given address and have sufficient balance
+   *
+   * @param avatar - Avatar address to query
+   * @param minimumBalance - Minimum balance required (optional)
+   * @returns List of valid inviters
+   */
+  async getValidInviters(avatar: Address, minimumBalance?: string): Promise<ValidInvitersResponse> {
+    const params: [Address, string?] = [normalizeAddress(avatar)];
+    if (minimumBalance) {
+      params.push(minimumBalance);
+    }
+    return this.client.call<[Address, string?], ValidInvitersResponse>('circles_getValidInviters', params);
   }
 }

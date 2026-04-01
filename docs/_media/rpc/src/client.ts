@@ -101,9 +101,9 @@ export class RpcClient {
     return new Promise<void>((resolve) => {
       let wsUrl = this.rpcUrl.replace('http', 'ws');
       if (wsUrl.endsWith('/')) {
-        wsUrl += 'ws';
+        wsUrl += 'ws/subscribe';
       } else {
-        wsUrl += '/ws';
+        wsUrl += '/ws/subscribe';
       }
       this.websocket = new WebSocket(wsUrl);
 
@@ -124,11 +124,12 @@ export class RpcClient {
           delete this.pendingResponses[id];
         }
 
-        if (method === 'eth_subscription' && params) {
-          const { subscription, result } = params;
-          if (this.subscriptionListeners[subscription]) {
-            this.subscriptionListeners[subscription].forEach(listener => listener(result));
-          }
+        // Handle server event push: { method: "circles_subscription", params: { result: [...] } }
+        if (method === 'circles_subscription' && params?.result) {
+          // Server broadcasts to all subscribers, so notify all listeners
+          Object.values(this.subscriptionListeners).forEach(listeners => {
+            listeners.forEach(listener => listener(params.result));
+          });
         }
       };
 
@@ -222,8 +223,9 @@ export class RpcClient {
     }
 
     const observable = Observable.create<CirclesEvent>();
-    const subscriptionArgs = JSON.stringify(normalizedAddress ? { address: normalizedAddress } : {});
-    const response = await this.sendMessage('eth_subscribe', ['circles', subscriptionArgs]);
+    // Server expects: { method: "circles_subscribe", params: { address: "0x..." } }
+    const subscriptionParams = normalizedAddress ? { address: normalizedAddress } : {};
+    const response = await this.sendMessage('circles_subscribe', subscriptionParams);
     const subscriptionId = response.result;
 
     if (!this.subscriptionListeners[subscriptionId]) {
