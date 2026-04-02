@@ -11,7 +11,7 @@
     },
     "packages/abis": {
       "name": "@aboutcircles/sdk-abis",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "abitype": "^1.1.1",
       },
@@ -21,7 +21,7 @@
     },
     "packages/core": {
       "name": "@aboutcircles/sdk-core",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-abis": "*",
         "@aboutcircles/sdk-types": "*",
@@ -37,7 +37,7 @@
     },
     "packages/invitations": {
       "name": "@aboutcircles/sdk-invitations",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-core": "*",
         "@aboutcircles/sdk-rpc": "*",
@@ -52,13 +52,24 @@
         "typescript": "^5.0.4",
       },
     },
+    "packages/marketplace": {
+      "name": "@aboutcircles/sdk-marketplace",
+      "version": "0.1.29",
+      "dependencies": {
+        "@aboutcircles/sdk": "*",
+      },
+      "devDependencies": {
+        "@types/bun": "^1.2.23",
+        "typescript": "^5.0.4",
+      },
+    },
     "packages/miniapp-sdk": {
       "name": "@aboutcircles/miniapp-sdk",
-      "version": "0.1.28",
+      "version": "0.1.29",
     },
     "packages/pathfinder": {
       "name": "@aboutcircles/sdk-pathfinder",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-rpc": "*",
         "@aboutcircles/sdk-types": "*",
@@ -70,7 +81,7 @@
     },
     "packages/profiles": {
       "name": "@aboutcircles/sdk-profiles",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
       },
@@ -80,7 +91,7 @@
     },
     "packages/rpc": {
       "name": "@aboutcircles/sdk-rpc",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
         "@aboutcircles/sdk-utils": "*",
@@ -94,7 +105,7 @@
     },
     "packages/runner": {
       "name": "@aboutcircles/sdk-runner",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
         "@safe-global/protocol-kit": "^5.1.1",
@@ -107,7 +118,7 @@
     },
     "packages/sdk": {
       "name": "@aboutcircles/sdk",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-core": "*",
         "@aboutcircles/sdk-invitations": "*",
@@ -126,7 +137,7 @@
     },
     "packages/transfers": {
       "name": "@aboutcircles/sdk-transfers",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-core": "*",
         "@aboutcircles/sdk-pathfinder": "*",
@@ -140,7 +151,7 @@
     },
     "packages/types": {
       "name": "@aboutcircles/sdk-types",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "abitype": "^1.1.1",
       },
@@ -150,7 +161,7 @@
     },
     "packages/utils": {
       "name": "@aboutcircles/sdk-utils",
-      "version": "0.1.28",
+      "version": "0.1.29",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
         "@noble/curves": "^1.7.0",
@@ -169,6 +180,8 @@
     "@aboutcircles/sdk-core": ["@aboutcircles/sdk-core@workspace:packages/core"],
 
     "@aboutcircles/sdk-invitations": ["@aboutcircles/sdk-invitations@workspace:packages/invitations"],
+
+    "@aboutcircles/sdk-marketplace": ["@aboutcircles/sdk-marketplace@workspace:packages/marketplace"],
 
     "@aboutcircles/sdk-pathfinder": ["@aboutcircles/sdk-pathfinder@workspace:packages/pathfinder"],
 

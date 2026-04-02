@@ -24,6 +24,7 @@
     { "path": "./packages/pathfinder" },
     { "path": "./packages/transfers" },
     { "path": "./packages/invitations" },
+    { "path": "./packages/marketplace" },
     { "path": "./packages/sdk" },
     { "path": "./packages/runner" },
     { "path": "./packages/miniapp-sdk" }

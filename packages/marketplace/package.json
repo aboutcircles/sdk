@@ -1,0 +1,49 @@
+{
+  "name": "@aboutcircles/sdk-marketplace",
+  "version": "0.1.29",
+  "description": "Circles Marketplace SDK – catalog, cart, orders, offers, and sales",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
+    "dev": "tsc --build --watch",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@aboutcircles/sdk": "*"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.23",
+    "typescript": "^5.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aboutcircles/sdk.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aboutcircles/sdk/issues"
+  },
+  "homepage": "https://github.com/aboutcircles/sdk#readme",
+  "keywords": [
+    "circles",
+    "marketplace",
+    "catalog",
+    "cart",
+    "orders",
+    "offers"
+  ],
+  "author": ""
+}
