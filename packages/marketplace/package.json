@@ -22,7 +22,9 @@
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@aboutcircles/sdk": "*"
+    "@aboutcircles/sdk": "*",
+    "@aboutcircles/sdk-types": "*",
+    "@aboutcircles/sdk-utils": "*"
   },
   "devDependencies": {
     "@types/bun": "^1.2.23",

@@ -1,4 +1,5 @@
-export type Hex = `0x${string}`;
+export type { Hex } from '@aboutcircles/sdk-types';
+import type { Hex } from '@aboutcircles/sdk-types';
 
 export function isAbsoluteUri(u: unknown): u is string {
   if (typeof u !== 'string') return false;

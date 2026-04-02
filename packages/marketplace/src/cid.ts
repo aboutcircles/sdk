@@ -1,50 +1,16 @@
-export type Hex = `0x${string}`;
+import { cidV0ToHex } from '@aboutcircles/sdk-utils';
+import type { Hex } from '@aboutcircles/sdk-types';
 
-const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-const BASE58_MAP: Record<string, number> = {};
-for (let i = 0; i < BASE58_ALPHABET.length; i++) {
-  BASE58_MAP[BASE58_ALPHABET[i]] = i;
-}
-
-function base58btcDecode(s: string): Uint8Array {
-  if (!s || typeof s !== 'string') throw new Error('base58: input');
-  let zeros = 0;
-  while (zeros < s.length && s[zeros] === '1') zeros++;
-  const bytes: number[] = [];
-  const base = 58n;
-  let num = 0n;
-  for (let i = zeros; i < s.length; i++) {
-    const val = BASE58_MAP[s[i]];
-    if (val == null) throw new Error('base58: invalid char');
-    num = num * base + BigInt(val);
-  }
-  while (num > 0n) {
-    bytes.push(Number(num & 0xffn));
-    num >>= 8n;
-  }
-  for (let i = 0; i < zeros; i++) bytes.push(0);
-  bytes.reverse();
-  return new Uint8Array(bytes);
+export function cidV0ToDigest32Strict(cid: string): Hex {
+  return cidV0ToHex(cid);
 }
 
 export function tryCidV0ToDigest32(cid: unknown): Hex | undefined {
   if (typeof cid !== 'string') return undefined;
-  const s = cid.trim();
-  if (!/^Qm[1-9A-HJ-NP-Za-km-z]{44}$/.test(s)) return undefined;
+  if (!/^Qm[1-9A-HJ-NP-Za-km-z]{44}$/.test(cid.trim())) return undefined;
   try {
-    const bytes = base58btcDecode(s);
-    if (bytes.length !== 34) return undefined;
-    if (bytes[0] !== 0x12 || bytes[1] !== 0x20) return undefined;
-    let hex = '0x';
-    for (const b of bytes.slice(2)) hex += b.toString(16).padStart(2, '0');
-    return hex as Hex;
+    return cidV0ToHex(cid.trim());
   } catch {
     return undefined;
   }
-}
-
-export function cidV0ToDigest32Strict(cid: string): Hex {
-  const hex = tryCidV0ToDigest32(cid);
-  if (!hex) throw new Error(`Expected CIDv0 (sha2-256) string, got: ${cid}`);
-  return hex;
 }
