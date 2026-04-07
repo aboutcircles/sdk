@@ -1,6 +1,10 @@
 import type { HttpTransport } from './http.js';
 import type { AuthContext } from './authContext.js';
-import type { SellerOrderDto, SellerOrdersPage, OrderId } from './salesTypes.js';
+import type { SellerOrderDto, SellerOrdersPage, OrderId } from '@aboutcircles/sdk-types';
+
+export function isOrderId(s: string): s is OrderId {
+  return /^ord_[0-9A-F]{32}$/.test(s);
+}
 
 export interface SalesClientApi {
   list(opts?: { page?: number; pageSize?: number }): Promise<SellerOrdersPage>;

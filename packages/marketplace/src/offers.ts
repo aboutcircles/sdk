@@ -1,12 +1,12 @@
-import type { MinimalOfferInput, MinimalProductInput } from './offersTypes.js';
+import type { MinimalOfferInput, MinimalProductInput } from '@aboutcircles/sdk-types';
+import type { Hex } from '@aboutcircles/sdk-types';
 import type { AvatarSigner } from './signers.js';
 import type { ProfilesBindings, Cid } from './namespaces.js';
 import type { CustomDataLink } from './links.js';
-import type { Hex } from './utils.js';
 import { buildProduct } from './offersJsonld.js';
 import { insertIntoHead, loadIndex, loadProfileOrInit, rebaseAndSaveProfile, saveHeadAndIndex } from './namespaces.js';
 import { buildLinkDraft, canonicaliseLink } from './canonicalise.js';
-import { assertSku, normalizeEvmAddress, normalizeHex32 } from './utils.js';
+import { assertSku, normalizeEvmAddress, normalizeHex32 } from '@aboutcircles/sdk-utils';
 import { cidV0ToDigest32Strict } from './cid.js';
 
 export interface OffersClient {

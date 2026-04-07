@@ -115,3 +115,14 @@ export type { DecodedContractError } from './errors.js';
 
 // Transfer data annotation types
 export type { TransferDataType, DecodedTransferData, DecodedAbiPayload, DecodedMetadataPayload } from './transferData.js';
+
+// Marketplace types
+export type {
+  BasketItemInput, OrderedItemRef, BasketItem, PostalAddressInput, ContactPointInput,
+  PersonMinimalInput, Basket, ValidationResult,
+  MinimalProductInput, MinimalOfferInput,
+  OrderOutboxItem, OrderSnapshot, OrderStatusEventPayload, OrderStatusHistoryEvent, OrderStatusHistory,
+  SellerOrderDto, SellerOrdersPage, OrderId,
+  SchemaOrgThingRef, SchemaOrgPropertyValue, SchemaOrgPayAction, SchemaOrgOfferLite,
+  SchemaOrgProductLite, AggregatedCatalogItem, AggregatedCatalog,
+} from './marketplace.js';

@@ -1,6 +1,6 @@
 import { HttpError, type HttpTransport } from './http.js';
 import type { AuthContext } from './authContext.js';
-import type { OrderSnapshot, OrderStatusEventPayload, OrderStatusHistory } from './ordersTypes.js';
+import type { OrderSnapshot, OrderStatusEventPayload, OrderStatusHistory } from '@aboutcircles/sdk-types';
 
 export interface OrdersClient {
   list(opts?: { page?: number; pageSize?: number }): Promise<OrderSnapshot[]>;

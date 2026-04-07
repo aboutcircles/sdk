@@ -100,20 +100,6 @@ export interface ApiError {
   error: string;
 }
 
-/**
- * Result from store-batch endpoint
- */
-export interface StoreBatchResult {
-  success: boolean;
-  stored: number;
-  failed: number;
-  errors?: Array<{
-    index: number;
-    keyPreview: string;
-    reason: string;
-  }>;
-}
-
 // ── Distribution Sessions ─────────────────────────────────────────────────────
 
 /**

@@ -1,5 +1,5 @@
-import type { MinimalOfferInput, MinimalProductInput } from './offersTypes.js';
-import { isAbsoluteUri } from './utils.js';
+import type { MinimalOfferInput, MinimalProductInput } from '@aboutcircles/sdk-types';
+import { isAbsoluteUri } from '@aboutcircles/sdk-utils';
 
 export class CurrencyCodeError extends Error {}
 export class ObjectTooLargeError extends Error {}

@@ -1,4 +1,4 @@
-import { normalizeEvmAddress } from './utils.js';
+import { normalizeEvmAddress } from '@aboutcircles/sdk-utils';
 
 export interface WalletProvider {
   request<T = unknown>(args: { method: string; params?: unknown[] }): Promise<T>;

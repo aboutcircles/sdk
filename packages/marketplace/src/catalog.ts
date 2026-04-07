@@ -1,5 +1,5 @@
-import type { AggregatedCatalog, AggregatedCatalogItem } from './catalogTypes.js';
-import { normalizeEvmAddress } from './utils.js';
+import type { AggregatedCatalog, AggregatedCatalogItem } from '@aboutcircles/sdk-types';
+import { normalizeEvmAddress } from '@aboutcircles/sdk-utils';
 
 export type CatalogQuery = {
   operator: string;

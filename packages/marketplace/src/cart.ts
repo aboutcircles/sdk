@@ -7,7 +7,21 @@ import type {
   ContactPointInput,
   PersonMinimalInput,
   ValidationResult,
-} from './cartTypes.js';
+} from '@aboutcircles/sdk-types';
+
+export function basketToItemInputs(basket: Basket): BasketItemInput[] {
+  const items = Array.isArray((basket as any).items) ? (basket as any).items : [];
+  return items
+    .map((it: any) => {
+      const seller = typeof it?.seller === 'string' ? it.seller : '';
+      const sku = typeof it?.orderedItem?.sku === 'string' ? it.orderedItem.sku : '';
+      const quantity = typeof it?.orderQuantity === 'number' ? it.orderQuantity : 0;
+      const imageUrl = typeof it?.imageUrl === 'string' ? it.imageUrl : undefined;
+      if (!seller || !sku || quantity <= 0) return null;
+      return { seller, sku, quantity, imageUrl } as BasketItemInput;
+    })
+    .filter((x: any): x is BasketItemInput => x !== null);
+}
 
 export interface CartClient {
   createBasket(opts: { buyer: string; operator: string; chainId?: number }): Promise<{ basketId: string }>;
