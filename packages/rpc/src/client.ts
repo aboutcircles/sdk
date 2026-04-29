@@ -19,6 +19,12 @@ export class RpcClient {
     [subscriptionId: string]: ((event: { event: string, values: Record<string, any> }[]) => void)[]
   } = {};
 
+  // Track parameters of active subscriptions so we can re-issue circles_subscribe
+  // after a reconnect. The server forgets prior subscriptionIds when the WS
+  // closes, so without this the server stops pushing events even though the
+  // client's local listeners are still attached.
+  private activeSubscriptions: { id: string, address?: Address }[] = [];
+
   // Backoff-related fields for reconnection
   private reconnectAttempt = 0;
   private readonly initialBackoff = 2000; // 2 seconds
@@ -188,9 +194,44 @@ export class RpcClient {
     try {
       await this.connect();
       console.log('Reconnection successful');
+      await this.resubscribeActive();
     } catch (err) {
       console.error('Reconnection attempt failed:', err);
       this.scheduleReconnect();
+    }
+  }
+
+  /**
+   * Re-issues circles_subscribe for every tracked active subscription so the
+   * server resumes pushing events after a reconnect. Server-assigned
+   * subscriptionIds change on each subscribe, so we move the existing
+   * listeners from the old id to the new one.
+   * @private
+   */
+  private async resubscribeActive(): Promise<void> {
+    if (this.activeSubscriptions.length === 0) return;
+
+    const previous = [...this.activeSubscriptions];
+    this.activeSubscriptions = [];
+
+    for (const entry of previous) {
+      try {
+        const params = entry.address ? { address: entry.address } : {};
+        const response = await this.sendMessage('circles_subscribe', params);
+        const newId = response.result;
+
+        const existingListeners = this.subscriptionListeners[entry.id];
+        if (existingListeners) {
+          this.subscriptionListeners[newId] = existingListeners;
+          delete this.subscriptionListeners[entry.id];
+        }
+
+        this.activeSubscriptions.push({ id: newId, address: entry.address });
+      } catch (err) {
+        console.error('Failed to re-issue circles_subscribe after reconnect:', err);
+        // Keep the entry so a subsequent reconnect can retry it.
+        this.activeSubscriptions.push(entry);
+      }
     }
   }
 
@@ -242,6 +283,8 @@ export class RpcClient {
     this.subscriptionListeners[subscriptionId].push((events) => {
       parseRpcSubscriptionMessage(events).forEach(event => observable.emit(event));
     });
+
+    this.activeSubscriptions.push({ id: subscriptionId, address: normalizedAddress });
 
     return observable.property;
   }
