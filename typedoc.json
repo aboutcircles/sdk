@@ -10,7 +10,8 @@
     "packages/referrals/src/index.ts",
     "packages/pathfinder/src/index.ts",
     "packages/transfers/src/index.ts",
-    "packages/abis/src/index.ts"
+    "packages/abis/src/index.ts",
+    "packages/permissionless-groups/src/index.ts"
   ],
   "out": "docs",
   "readme": "README.md",

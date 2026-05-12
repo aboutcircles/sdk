@@ -40,4 +40,13 @@ export interface CirclesConfig {
   referralsModuleAddress: Address;
   /** Invitation Module contract address */
   invitationModuleAddress: Address;
+  /**
+   * Base URL of the score-groups backend (permissionless / score-gated groups).
+   * Example: `https://<host>/score-groups`. No trailing slash.
+   */
+  scoreGroupsBackendUrl?: string;
+  /** ScoreGatedMintPolicy contract address (permissionless groups). */
+  scoreGatedMintPolicyAddress?: Address;
+  /** Score-gated permissionless group avatar address. */
+  scoreGatedGroupAddress?: Address;
 }

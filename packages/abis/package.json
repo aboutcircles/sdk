@@ -47,6 +47,10 @@
       "types": "./dist/referralsModule.d.ts",
       "default": "./dist/referralsModule.js"
     },
+    "./scoreGatedMintPolicy": {
+      "types": "./dist/scoreGatedMintPolicy.d.ts",
+      "default": "./dist/scoreGatedMintPolicy.js"
+    },
     "./minimal": {
       "types": "./dist/minimal/index.d.ts",
       "default": "./dist/minimal/index.js"

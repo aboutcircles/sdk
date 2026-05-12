@@ -16,6 +16,7 @@ const packages = [
   "pathfinder",
   "transfers",
   "invitations",
+  "permissionless-groups",
   "runner",
   "sdk",
   "miniapp-sdk",

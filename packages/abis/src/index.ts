@@ -10,3 +10,4 @@ export { demurrageCirclesAbi } from './demurrageCircles.js';
 export { liftERC20Abi } from './liftERC20.js';
 export { invitationFarmAbi } from './invitationFarm.js';
 export { referralsModuleAbi } from './referralsModule.js';
+export { scoreGatedMintPolicyAbi } from './scoreGatedMintPolicy.js';
