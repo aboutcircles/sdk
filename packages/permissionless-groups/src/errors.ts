@@ -84,15 +84,6 @@ export class PermissionlessGroupError extends CirclesError<PermissionlessGroupEr
     });
   }
 
-  /** On-chain mint tx reverted (policy rejected proof, snapshot missing, etc). */
-  static mintReverted(reason: string, context?: Record<string, any>): PermissionlessGroupError {
-    return new PermissionlessGroupError(`Hub.groupMint reverted: ${reason}`, {
-      code: 'SCORE_GROUPS_MINT_REVERTED',
-      source: 'ONCHAIN',
-      context,
-    });
-  }
-
   /** Caller passed bad/missing parameters to `mint()`. */
   static invalidInput(message: string, context?: Record<string, any>): PermissionlessGroupError {
     return new PermissionlessGroupError(message, {

@@ -1,4 +1,4 @@
-import type { Address, Hex, ContractRunner } from '@aboutcircles/sdk-types';
+import type { Address, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
 
 /**
  * Response shape from the score-groups backend's `/groups/{group}/proof/{address}` endpoint.
@@ -34,25 +34,22 @@ export interface ProofResponse {
 /**
  * Configuration for a PermissionlessGroup instance.
  *
- * No separate verifier contract: the policy holds the SMT root itself via
- * `merkleRoots(group)`, so freshness is checked against the policy directly.
+ * The mint policy is not configured here — it is resolved at runtime from
+ * `Hub.mintPolicies(groupAddress)`. The policy itself holds the SMT root via
+ * `merkleRoots(group)`, so freshness is checked against the resolved policy.
+ *
+ * No runner here either — `mint()` returns the tx batch and the caller
+ * decides how to submit it (Safe multisend, single-shot, simulation, …).
  */
 export interface PermissionlessGroupConfig {
   /** The score-gated group avatar address. */
   groupAddress: Address;
   /** Hub V2 contract address (prod Gnosis Hub for staging+prod). */
   hubAddress: Address;
-  /**
-   * ScoreGatedMintPolicy address. Must be the policy currently registered for
-   * `groupAddress` on `hubAddress` (i.e. `Hub.mintPolicies(group)` returns it).
-   */
-  mintPolicyAddress: Address;
   /** Base URL of the score-groups backend, e.g. `https://host/score-groups` (no trailing slash). */
   backendBaseUrl: string;
   /** JSON-RPC endpoint for read calls. */
   rpcUrl: string;
-  /** Runner that signs and submits the mint batch. */
-  runner: ContractRunner;
 }
 
 /** Parameters for PermissionlessGroup.mint(). */
@@ -84,15 +81,19 @@ export interface MintParams {
 
 export interface MintResult {
   /**
-   * Transaction receipt from the batched runner call
-   * (snapshot, personalMint, groupMint, wrap).
+   * Ordered transaction batch — submit these atomically (e.g. Safe multisend)
+   * for the mint to succeed. Order:
+   *   1. policy.snapshotIssuance()
+   *   2. Hub.personalMint()
+   *   3. Hub.groupMint(group, [avatar], [amount], abi.encode(score, proof))
+   *   4. Hub.wrap(group, amount, CirclesType.Inflation)
    */
-  receipt: unknown;
-  /** Proof used for the mint. */
+  txs: TransactionRequest[];
+  /** Proof used to build the batch. */
   proof: ProofResponse;
   /**
-   * Atto-CRC actually submitted to `groupMint`. Identical to the input
-   * `amount` except `0n` ("mint max") is replaced with the resolved cap.
+   * Atto-CRC encoded into `groupMint` and `wrap`. Identical to the input
+   * `amount` except `0n`/omitted ("mint max") is replaced with the resolved cap.
    */
   amount: bigint;
 }

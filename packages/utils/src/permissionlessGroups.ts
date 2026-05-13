@@ -15,24 +15,16 @@ export const PERMISSIONLESS_GROUPS_STAGING = {
   /** Score-gated group avatar served by the staging backend. */
   groupAddress: '0x24c9bA1fB88533B0cD2aEa37DaD75B809eEcF2C0' as Address,
 
-  /**
-   * ScoreGatedMintPolicy bound to `groupAddress` on the prod Hub.
-   *
-   * Verified via `Hub.mintPolicies(groupAddress)`. The policy holds the SMT
-   * root keyed by group (multi-group ready) and is invoked by
-   * `Hub.groupMint(group, …, data)` where
-   * `data = abi.encode(uint256 score, bytes proof)`.
-   *
-   * Caller-side ops on this policy:
-   *   - `merkleRoots(group)` → current SMT root the policy verifies against.
-   *   - `snapshotIssuance()` → minter must call before `Hub.groupMint`.
-   *   - `updateMerkleRoot(group, root)` → admin-only (publisher uses it).
-   */
-  mintPolicyAddress: '0x7855e3BD792aa810A7c4F1c9959EC20b2580aCCC' as Address,
-
   /** Treasury of the score-gated group. */
   treasuryAddress: '0x4cb3b2Bb537d6252e57c021B95f2fB1aa11d09aa' as Address,
 } as const;
+
+// The ScoreGatedMintPolicy address is intentionally NOT in this constant —
+// `Hub.mintPolicies(groupAddress)` is the source of truth and the SDK reads
+// it lazily. Caller-side ops on the resolved policy:
+//   - `merkleRoots(group)` → current SMT root the policy verifies against.
+//   - `snapshotIssuance()` → minter must call before `Hub.groupMint`.
+//   - `updateMerkleRoot(group, root)` → admin-only (publisher uses it).
 
 /**
  * Migration-path stack: legacy GnosisGroup → ScoreGroup via router + sink
@@ -93,13 +85,11 @@ export function withPermissionlessGroupsStaging(
   base: CirclesConfig,
   overrides?: Partial<Pick<CirclesConfig,
     | 'scoreGroupsBackendUrl'
-    | 'scoreGatedMintPolicyAddress'
     | 'scoreGatedGroupAddress'>>
 ): CirclesConfig {
   return {
     ...base,
     scoreGroupsBackendUrl: SCORE_GROUPS_STAGING_BACKEND_URL,
-    scoreGatedMintPolicyAddress: PERMISSIONLESS_GROUPS_STAGING.mintPolicyAddress,
     scoreGatedGroupAddress: PERMISSIONLESS_GROUPS_STAGING.groupAddress,
     ...overrides,
   };

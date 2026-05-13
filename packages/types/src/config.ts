@@ -45,8 +45,9 @@ export interface CirclesConfig {
    * Example: `https://<host>/score-groups`. No trailing slash.
    */
   scoreGroupsBackendUrl?: string;
-  /** ScoreGatedMintPolicy contract address (permissionless groups). */
-  scoreGatedMintPolicyAddress?: Address;
-  /** Score-gated permissionless group avatar address. */
+  /**
+   * Score-gated permissionless group avatar address. The mint policy is
+   * resolved at runtime from `Hub.mintPolicies(scoreGatedGroupAddress)`.
+   */
   scoreGatedGroupAddress?: Address;
 }

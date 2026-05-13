@@ -4,7 +4,6 @@ import { CirclesType } from '@aboutcircles/sdk-types';
 import type {
   Address,
   Hex,
-  ContractRunner,
   TransactionRequest,
 } from '@aboutcircles/sdk-types';
 
@@ -39,36 +38,58 @@ export class PermissionlessGroup {
   public readonly config: PermissionlessGroupConfig;
   public readonly client: ScoreGroupsClient;
   public readonly hub: HubV2Contract;
-  public readonly policy: ScoreGatedMintPolicyContract;
 
-  private readonly runner: ContractRunner;
+  /**
+   * Lazily-resolved mint-policy wrapper. The address is read from
+   * `Hub.mintPolicies(groupAddress)` on first use and cached. We store a
+   * Promise so concurrent first callers share one round-trip.
+   */
+  private policyPromise: Promise<ScoreGatedMintPolicyContract> | null = null;
 
   constructor(config: PermissionlessGroupConfig) {
     this.config = config;
-    this.runner = config.runner;
     this.client = new ScoreGroupsClient(config.backendBaseUrl);
     this.hub = new HubV2Contract({ address: config.hubAddress, rpcUrl: config.rpcUrl });
-    this.policy = new ScoreGatedMintPolicyContract({
-      address: config.mintPolicyAddress,
-      rpcUrl: config.rpcUrl,
-    });
   }
 
   /**
-   * Mint group CRC for `avatar` against the avatar's own personal CRC,
-   * gated by an SMT score proof. Always wraps as `CirclesType.Inflation`.
+   * Resolve the ScoreGatedMintPolicy bound to this group on the Hub.
+   * Cached after the first call.
+   */
+  async policy(): Promise<ScoreGatedMintPolicyContract> {
+    if (!this.policyPromise) {
+      this.policyPromise = this.hub.mintPolicies(this.config.groupAddress).then(
+        (address) =>
+          new ScoreGatedMintPolicyContract({
+            address,
+            rpcUrl: this.config.rpcUrl,
+          }),
+        (err) => {
+          this.policyPromise = null;
+          throw err;
+        }
+      );
+    }
+    return this.policyPromise;
+  }
+
+  /**
+   * Build the mint-tx batch for `avatar` against the avatar's own personal
+   * CRC, gated by an SMT score proof. Always wraps as `CirclesType.Inflation`.
+   * Submission is the caller's job — the returned `txs` are meant to be sent
+   * atomically (e.g. Safe multisend) for the policy invariant to hold.
    *
-   * Flow (single atomic Safe multisend):
+   * Flow:
    *   1. fetch (score, proof) from the score-groups backend            — off-chain
    *   2. compare backend proof.root vs `policy.merkleRoots(group)`;
    *      if backend is ahead, poll the on-chain root every
    *      `rootPollIntervalMs` (default 3s) until it matches or
    *      `rootPollTimeoutMs` elapses
-   *   3. policy.snapshotIssuance()                                     — on-chain
-   *   4. Hub.personalMint()                                            — on-chain
-   *   5. Hub.groupMint(group, [avatar], [amount],
-   *                    abi.encode(score, proof))                       — on-chain
-   *   6. Hub.wrap(group, amount, CirclesType.Inflation)                — on-chain
+   *   3. emit tx: policy.snapshotIssuance()
+   *   4. emit tx: Hub.personalMint()
+   *   5. emit tx: Hub.groupMint(group, [avatar], [amount],
+   *                             abi.encode(score, proof))
+   *   6. emit tx: Hub.wrap(group, amount, CirclesType.Inflation)
    */
   async mint(params: MintParams): Promise<MintResult> {
     this.validateMintParams(params);
@@ -89,7 +110,7 @@ export class PermissionlessGroup {
       pollTimeoutMs
     );
 
-    return this.submitMint(params, proof);
+    return this.buildMintBatch(params, proof);
   }
 
   /**
@@ -107,8 +128,9 @@ export class PermissionlessGroup {
     pollIntervalMs: number,
     pollTimeoutMs: number
   ): Promise<ProofResponse> {
+    const policy = await this.policy();
     let proof = initialProof;
-    let chainRoot = await this.policy.merkleRoots(this.config.groupAddress);
+    let chainRoot = await policy.merkleRoots(this.config.groupAddress);
     if (hexEq(chainRoot, proof.root)) return proof;
 
     if (pollTimeoutMs <= 0) {
@@ -122,7 +144,7 @@ export class PermissionlessGroup {
     while (Date.now() - startedAt < pollTimeoutMs) {
       await sleep(pollIntervalMs);
 
-      chainRoot = await this.policy.merkleRoots(this.config.groupAddress);
+      chainRoot = await policy.merkleRoots(this.config.groupAddress);
       if (hexEq(chainRoot, proof.root)) return proof;
 
       // Re-fetch the proof: the backend may have rotated to a newer root since
@@ -138,17 +160,18 @@ export class PermissionlessGroup {
     );
   }
 
-  private async submitMint(
+  private async buildMintBatch(
     params: MintParams,
     proof: ProofResponse
   ): Promise<MintResult> {
     const score = BigInt(proof.scoreRaw);
     const policyData = encodePolicyData(score, proof.proof);
     const amount = await this.resolveAmount(params, score);
+    const policy = await this.policy();
 
     const txs: TransactionRequest[] = [
       // Step 3: policy.snapshotIssuance()
-      this.policy.snapshotIssuance(),
+      policy.snapshotIssuance(),
       // Step 4: Hub.personalMint() — must come after snapshot (the policy
       // requires currentIssuance == 0 between snapshot and groupMint).
       this.hub.personalMint(),
@@ -163,24 +186,7 @@ export class PermissionlessGroup {
       this.hub.wrap(this.config.groupAddress, amount, CirclesType.Inflation),
     ];
 
-    if (!this.runner.sendTransaction) {
-      throw PermissionlessGroupError.invalidInput(
-        'Runner does not support sendTransaction',
-        { runner: this.runner.constructor?.name }
-      );
-    }
-
-    try {
-      const receipt = await this.runner.sendTransaction(txs);
-      return { receipt, proof, amount };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      throw PermissionlessGroupError.mintReverted(msg, {
-        group: this.config.groupAddress,
-        avatar: params.avatar,
-        amount: amount.toString(),
-      });
-    }
+    return { txs, proof, amount };
   }
 
   /**
