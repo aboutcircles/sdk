@@ -29,6 +29,7 @@
   "dependencies": {
     "@aboutcircles/sdk-abis": "*",
     "@aboutcircles/sdk-core": "*",
+    "@aboutcircles/sdk-transfers": "*",
     "@aboutcircles/sdk-types": "*",
     "@aboutcircles/sdk-utils": "*"
   },

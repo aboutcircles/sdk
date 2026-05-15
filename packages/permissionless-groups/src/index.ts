@@ -6,6 +6,9 @@ export type {
   PermissionlessGroupConfig,
   MintParams,
   MintResult,
+  MigrationParams,
+  MigrationResult,
+  BalanceResult,
   ProofResponse,
 } from './types.js';
 

@@ -1,4 +1,4 @@
-import type { Address, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
+import type { Address, CirclesConfig, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
 
 /**
  * Response shape from the score-groups backend's `/groups/{group}/proof/{address}` endpoint.
@@ -46,6 +46,12 @@ export interface PermissionlessGroupConfig {
   groupAddress: Address;
   /** Hub V2 contract address (prod Gnosis Hub for staging+prod). */
   hubAddress: Address;
+  /**
+   * LiftERC20 contract address — needed by `balance()` to look up the group's
+   * demurrage / inflationary ERC20 wrapper addresses.
+   * `circlesConfig[100].liftERC20Address` on Gnosis Chain.
+   */
+  liftERC20Address: Address;
   /** Base URL of the score-groups backend, e.g. `https://host/score-groups` (no trailing slash). */
   backendBaseUrl: string;
   /** JSON-RPC endpoint for read calls. */
@@ -77,6 +83,60 @@ export interface MintParams {
    * the publisher to push the backend's proof root. Default 3000 (3s).
    */
   rootPollIntervalMs?: number;
+}
+
+/**
+ * Result of `PermissionlessGroup.balance()` — an avatar's holdings of the
+ * group's token in all three forms.
+ *
+ * Note: `erc1155` and `demurrageWrapper` share the same demurraged unit, while
+ * `inflationary` is in inflationary atto-CRC (different time-units). Don't
+ * blindly sum them — convert via `CirclesConverter` first if you need a total.
+ */
+export interface BalanceResult {
+  /** ERC1155 group-CRC balance held by the avatar (demurraged atto-CRC). */
+  erc1155: bigint;
+  /**
+   * ERC20 demurrage-wrapper balance (demurraged atto-CRC). 0n when the
+   * wrapper has not been deployed for this group yet.
+   */
+  demurrageWrapper: bigint;
+  /**
+   * ERC20 inflationary-wrapper balance (inflationary atto-CRC). 0n when the
+   * wrapper has not been deployed for this group yet.
+   */
+  inflationaryWrapper: bigint;
+  /** Resolved demurrage wrapper address (zero when not deployed). */
+  demurrageWrapperAddress: Address;
+  /** Resolved inflationary wrapper address (zero when not deployed). */
+  inflationaryWrapperAddress: Address;
+}
+
+/**
+ * Parameters for `PermissionlessGroup.migration()` — moves the avatar's legacy
+ * GnosisGroup CRC into the destination ScoreGroup via the SinkWrapper.
+ */
+export interface MigrationParams {
+  /** Avatar holding the legacy GnosisGroup CRC (and the recipient of the wrapped ERC20). */
+  avatar: Address;
+  /** Atto-CRC to migrate. Pathfinder will refuse if the avatar can't source this much GnosisGroup CRC. */
+  amount: bigint;
+  /**
+   * Full CirclesConfig used to drive the pathfinder + flow-matrix build.
+   * Needs at minimum `circlesRpcUrl`, `v2HubAddress`, `liftERC20Address`.
+   * `circlesConfig[100]` from `@aboutcircles/sdk-utils` works as-is.
+   */
+  config: CirclesConfig;
+}
+
+/** Result of `PermissionlessGroup.migration()`. */
+export interface MigrationResult {
+  /**
+   * Ordered transaction batch — submit atomically via the runner. Built by
+   * `TransferBuilder` (self-approval if needed, optional unwraps,
+   * `operateFlowMatrix`, optional re-wraps).
+   */
+  txs: TransactionRequest[];
 }
 
 export interface MintResult {

@@ -1,5 +1,13 @@
-import { HubV2Contract, ScoreGatedMintPolicyContract } from '@aboutcircles/sdk-core';
+import {
+  HubV2Contract,
+  ScoreGatedMintPolicyContract,
+  LiftERC20Contract,
+  DemurrageCirclesContract,
+  InflationaryCirclesContract,
+} from '@aboutcircles/sdk-core';
+import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
+import { PERMISSIONLESS_GROUPS_MIGRATION } from '@aboutcircles/sdk-utils';
 import { CirclesType } from '@aboutcircles/sdk-types';
 import type {
   Address,
@@ -13,7 +21,10 @@ import type {
   PermissionlessGroupConfig,
   MintParams,
   MintResult,
+  MigrationParams,
+  MigrationResult,
   ProofResponse,
+  BalanceResult,
 } from './types.js';
 
 /** Safety margin (s) before next root rotation at which we wait it out. Hardcoded. */
@@ -38,6 +49,7 @@ export class PermissionlessGroup {
   public readonly config: PermissionlessGroupConfig;
   public readonly client: ScoreGroupsClient;
   public readonly hub: HubV2Contract;
+  public readonly lift: LiftERC20Contract;
 
   /**
    * Lazily-resolved mint-policy wrapper. The address is read from
@@ -50,6 +62,10 @@ export class PermissionlessGroup {
     this.config = config;
     this.client = new ScoreGroupsClient(config.backendBaseUrl);
     this.hub = new HubV2Contract({ address: config.hubAddress, rpcUrl: config.rpcUrl });
+    this.lift = new LiftERC20Contract({
+      address: config.liftERC20Address,
+      rpcUrl: config.rpcUrl,
+    });
   }
 
   /**
@@ -71,6 +87,49 @@ export class PermissionlessGroup {
       );
     }
     return this.policyPromise;
+  }
+
+  /**
+   * Read the avatar's holdings of this group's token across all three forms:
+   * ERC1155 group-CRC (unwrapped), ERC20 demurrage wrapper, and ERC20
+   * inflationary wrapper. Wrappers that haven't been deployed yet return 0n
+   * with `address = 0x0…0` — that's the chain state, not an error.
+   *
+   * Four `eth_call`s total, no transactions.
+   */
+  async balance(avatar: Address): Promise<BalanceResult> {
+    const group = this.config.groupAddress;
+
+    const [tokenId, demurrageWrapperAddress, inflationaryWrapperAddress] =
+      await Promise.all([
+        this.hub.toTokenId(group),
+        this.lift.erc20Circles(CirclesType.Demurrage, group),
+        this.lift.erc20Circles(CirclesType.Inflation, group),
+      ]);
+
+    const [erc1155, demurrageWrapper, inflationaryWrapper] = await Promise.all([
+      this.hub.balanceOf(avatar, tokenId),
+      isZeroAddress(demurrageWrapperAddress)
+        ? Promise.resolve(0n)
+        : new DemurrageCirclesContract({
+            address: demurrageWrapperAddress,
+            rpcUrl: this.config.rpcUrl,
+          }).balanceOf(avatar),
+      isZeroAddress(inflationaryWrapperAddress)
+        ? Promise.resolve(0n)
+        : new InflationaryCirclesContract({
+            address: inflationaryWrapperAddress,
+            rpcUrl: this.config.rpcUrl,
+          }).balanceOf(avatar),
+    ]);
+
+    return {
+      erc1155,
+      demurrageWrapper,
+      inflationaryWrapper,
+      demurrageWrapperAddress,
+      inflationaryWrapperAddress,
+    };
   }
 
   /**
@@ -111,6 +170,43 @@ export class PermissionlessGroup {
     );
 
     return this.buildMintBatch(params, proof);
+  }
+
+  /**
+   * Build the tx batch that migrates `amount` of legacy GnosisGroup CRC held
+   * by `avatar` into the destination ScoreGroup, via the SinkWrapper at
+   * `PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress`.
+   *
+   * Pathfinder constraints baked in:
+   *   - destination = SinkWrapper
+   *   - `toTokens`          = [GnosisGroup]    (only GnosisGroup CRC may land at the sink)
+   *   - `excludeFromTokens` = [ScoreGroup]     (don't drain already-migrated ScoreGroup CRC as collateral)
+   *
+   * Submission is the caller's job — the returned `txs` are meant to be sent
+   * atomically through a Safe runner.
+   */
+  async migration(params: MigrationParams): Promise<MigrationResult> {
+    if (!params.avatar) {
+      throw PermissionlessGroupError.invalidInput('migration() requires `avatar`');
+    }
+    if (params.amount <= 0n) {
+      throw PermissionlessGroupError.invalidInput('migration() requires `amount > 0`', {
+        amount: params.amount.toString(),
+      });
+    }
+
+    const builder = new TransferBuilder(params.config);
+    const txs = await builder.constructAdvancedTransfer(
+      params.avatar,
+      PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
+      params.amount,
+      {
+        toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.gnosisGroupAddress],
+        excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+      }
+    );
+
+    return { txs };
   }
 
   /**
@@ -304,6 +400,10 @@ export function computeStalenessWaitMs(
   }
 
   return 0;
+}
+
+function isZeroAddress(a: Address): boolean {
+  return a.toLowerCase() === '0x0000000000000000000000000000000000000000';
 }
 
 function hexEq(a: Hex, b: Hex): boolean {
