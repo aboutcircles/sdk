@@ -40,4 +40,14 @@ export interface CirclesConfig {
   referralsModuleAddress: Address;
   /** Invitation Module contract address */
   invitationModuleAddress: Address;
+  /**
+   * Base URL of the score-groups backend (permissionless / score-gated groups).
+   * Example: `https://<host>/score-groups`. No trailing slash.
+   */
+  scoreGroupsBackendUrl?: string;
+  /**
+   * Score-gated permissionless group avatar address. The mint policy is
+   * resolved at runtime from `Hub.mintPolicies(scoreGatedGroupAddress)`.
+   */
+  scoreGatedGroupAddress?: Address;
 }

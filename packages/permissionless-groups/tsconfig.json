@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "types": ["bun"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../types" },
+    { "path": "../abis" },
+    { "path": "../utils" },
+    { "path": "../core" },
+    { "path": "../rpc" },
+    { "path": "../pathfinder" },
+    { "path": "../transfers" }
+  ]
+}

@@ -40,6 +40,10 @@
       "types": "./dist/contracts/referralsModule.d.ts",
       "default": "./dist/contracts/referralsModule.js"
     },
+    "./scoreGatedMintPolicy": {
+      "types": "./dist/contracts/scoreGatedMintPolicy.d.ts",
+      "default": "./dist/contracts/scoreGatedMintPolicy.js"
+    },
     "./inflationaryCircles": {
       "types": "./dist/contracts/inflationaryCircles.d.ts",
       "default": "./dist/contracts/inflationaryCircles.js"

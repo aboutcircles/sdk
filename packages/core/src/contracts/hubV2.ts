@@ -86,6 +86,14 @@ export class HubV2Contract extends Contract<typeof hubV2Abi> {
   }
 
   /**
+   * Look up the mint policy registered for a group avatar.
+   * Returns the zero address if the group is not registered.
+   */
+  async mintPolicies(group: Address): Promise<Address> {
+    return this.read('mintPolicies', [group]) as Promise<Address>;
+  }
+
+  /**
    * Get the current day based on timestamp
    */
   async day(timestamp: bigint): Promise<bigint> {

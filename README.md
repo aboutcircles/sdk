@@ -63,6 +63,7 @@ const path = await rpc.circlesV2.findPath({
 - **[@aboutcircles/sdk-profiles](./packages/profiles/)** - Profile management
 - **[@aboutcircles/sdk-pathfinder](./packages/pathfinder/)** - Transfer pathfinding algorithms
 - **[@aboutcircles/sdk-transfers](./packages/transfers/)** - Transfer operations
+- **[@aboutcircles/sdk-permissionless-groups](./packages/permissionless-groups/)** - Score-gated (permissionless) group minting
 - **[@aboutcircles/sdk-runner](./packages/runner/)** - Transaction execution
 
 ## 💡 Examples

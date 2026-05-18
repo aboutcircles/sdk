@@ -17,6 +17,7 @@ const packages = [
   'pathfinder',     // Pathfinder - depends on types, utils
   'transfers',      // Transfers - depends on types, core, pathfinder
   'invitations',    // Invitations - depends on types, utils, rpc, core, transfers
+  'permissionless-groups', // Score-gated groups - depends on types, utils, core
   'runner',         // Contract runner - depends on sdk
   'sdk',            // Main SDK - depends on most packages
   'miniapp-sdk',    // Mini app iframe SDK - standalone
