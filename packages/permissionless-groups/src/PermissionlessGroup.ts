@@ -178,9 +178,8 @@ export class PermissionlessGroup {
    * `PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress`.
    *
    * Pathfinder constraints baked in:
-   *   - destination = SinkWrapper
-   *   - `toTokens`          = [GnosisGroup]    (only GnosisGroup CRC may land at the sink)
-   *   - `excludeFromTokens` = [ScoreGroup]     (don't drain already-migrated ScoreGroup CRC as collateral)
+   *   - destination         = SinkWrapper
+   *   - `excludeFromTokens` = [ScoreGroup]   (already-migrated ScoreGroup CRC may not be used as a source)
    *
    * Submission is the caller's job — the returned `txs` are meant to be sent
    * atomically through a Safe runner.
@@ -201,10 +200,11 @@ export class PermissionlessGroup {
       PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
       params.amount,
       {
-        toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.gnosisGroupAddress],
         excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+        useWrappedBalances: true
       }
     );
+    console.log(txs)
 
     return { txs };
   }
