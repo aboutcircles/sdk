@@ -6,6 +6,7 @@ import {
   InflationaryCirclesContract,
 } from '@aboutcircles/sdk-core';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
+import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
 import { PERMISSIONLESS_GROUPS_MIGRATION } from '@aboutcircles/sdk-utils';
 import { CirclesType } from '@aboutcircles/sdk-types';
@@ -158,8 +159,11 @@ export class PermissionlessGroup {
 
     let proof = await this.fetchFreshProof(params.avatar);
 
+    // Score 0 = avatar not in the SMT, ineligible for the group mint. Don't
+    // fail the caller. Emit only
+    // Hub.personalMint() and skip snapshot/groupMint/wrap entirely.
     if (proof.scoreRaw === '0') {
-      throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
+      return { txs: [this.hub.personalMint()], proof, amount: 0n };
     }
 
     proof = await this.waitForChainRootToMatchBackend(
@@ -173,9 +177,12 @@ export class PermissionlessGroup {
   }
 
   /**
-   * Build the tx batch that migrates `amount` of legacy GnosisGroup CRC held
-   * by `avatar` into the destination ScoreGroup, via the SinkWrapper at
+   * Build the tx batch that migrates legacy GnosisGroup CRC held by `avatar`
+   * into the destination ScoreGroup, via the SinkWrapper at
    * `PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress`.
+   *
+   * When `amount` is omitted, the pathfinder is probed for the maximum the
+   * avatar can source under the same constraints, and that value is used.
    *
    * Pathfinder constraints baked in:
    *   - destination         = SinkWrapper
@@ -188,25 +195,45 @@ export class PermissionlessGroup {
     if (!params.avatar) {
       throw PermissionlessGroupError.invalidInput('migration() requires `avatar`');
     }
-    if (params.amount <= 0n) {
-      throw PermissionlessGroupError.invalidInput('migration() requires `amount > 0`', {
+    if (params.amount !== undefined && params.amount <= 0n) {
+      throw PermissionlessGroupError.invalidInput('migration() requires `amount > 0` when set', {
         amount: params.amount.toString(),
       });
     }
 
-    const builder = new TransferBuilder(params.config);
+    const amount = params.amount ?? (await this.resolveMaxMigratable(params.avatar));
+    if (amount === 0n) {
+      throw PermissionlessGroupError.invalidInput(
+        'no GnosisGroup CRC reachable from this avatar — nothing to migrate',
+        { avatar: params.avatar }
+      );
+    }
+
+    const builder = new TransferBuilder(this.config.circlesConfig);
     const txs = await builder.constructAdvancedTransfer(
       params.avatar,
       PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
-      params.amount,
+      amount,
       {
         excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
-        useWrappedBalances: true
+        toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+        useWrappedBalances: true,
       }
     );
-    console.log(txs)
 
-    return { txs };
+    return { txs, amount };
+  }
+
+  private async resolveMaxMigratable(avatar: Address): Promise<bigint> {
+    const pathfinder = new PathfinderMethods(
+      new RpcClient(this.config.circlesConfig.circlesRpcUrl)
+    );
+    return pathfinder.findMaxFlow({
+      from: avatar,
+      to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
+      excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+      toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+    });
   }
 
   /**

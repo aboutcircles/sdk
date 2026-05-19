@@ -56,6 +56,13 @@ export interface PermissionlessGroupConfig {
   backendBaseUrl: string;
   /** JSON-RPC endpoint for read calls. */
   rpcUrl: string;
+  /**
+   * Full CirclesConfig used to drive the pathfinder + flow-matrix build for
+   * `migration()`. Needs at minimum `circlesRpcUrl`, `v2HubAddress`,
+   * `liftERC20Address`. `circlesConfig[100]` from `@aboutcircles/sdk-utils`
+   * works as-is.
+   */
+  circlesConfig: CirclesConfig;
 }
 
 /** Parameters for PermissionlessGroup.mint(). */
@@ -119,14 +126,12 @@ export interface BalanceResult {
 export interface MigrationParams {
   /** Avatar holding the legacy GnosisGroup CRC (and the recipient of the wrapped ERC20). */
   avatar: Address;
-  /** Atto-CRC to migrate. Pathfinder will refuse if the avatar can't source this much GnosisGroup CRC. */
-  amount: bigint;
   /**
-   * Full CirclesConfig used to drive the pathfinder + flow-matrix build.
-   * Needs at minimum `circlesRpcUrl`, `v2HubAddress`, `liftERC20Address`.
-   * `circlesConfig[100]` from `@aboutcircles/sdk-utils` works as-is.
+   * Atto-CRC to migrate. Omit to migrate the maximum the pathfinder can source
+   * from this avatar (any reachable CRC except already-migrated ScoreGroup CRC).
+   * Pathfinder will refuse if a specified amount cannot be sourced.
    */
-  config: CirclesConfig;
+  amount?: bigint;
 }
 
 /** Result of `PermissionlessGroup.migration()`. */
@@ -137,6 +142,11 @@ export interface MigrationResult {
    * `operateFlowMatrix`, optional re-wraps).
    */
   txs: TransactionRequest[];
+  /**
+   * Atto-CRC routed into the SinkWrapper. Identical to the input `amount`
+   * except when omitted ("migrate max") — then it's the resolved max-flow.
+   */
+  amount: bigint;
 }
 
 export interface MintResult {

@@ -13,7 +13,7 @@ import type { Address, CirclesConfig } from '@aboutcircles/sdk-types';
  */
 export const PERMISSIONLESS_GROUPS_STAGING = {
   /** Score-gated group avatar served by the staging backend. */
-  groupAddress: '0x24c9bA1fB88533B0cD2aEa37DaD75B809eEcF2C0' as Address,
+  groupAddress: '0x7CadB2E92295F3E4fA65D3d4E7265E2e05d7a783' as Address,
 
   /** Treasury of the score-gated group. */
   treasuryAddress: '0x4cb3b2Bb537d6252e57c021B95f2fB1aa11d09aa' as Address,
@@ -40,7 +40,7 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
    * SinkWrapper / PathDestinationWrapper. Receives scoreGroupCRC via 1155
    * safeTransferFrom and mints out a stable ERC20 to the source.
    */
-  sinkWrapperAddress: '0xc1936539cF967e3b3C20cE994EBc6659a19aBa99' as Address,
+  sinkWrapperAddress: '0x3B7C57AA5E73F164aEE8395c9C5328822C229775' as Address,
 
   /** Source group of the migration path (legacy GnosisGroup). */
   gnosisGroupAddress: '0xC19BC204eb1c1D5B3FE500E5E5dfaBaB625F286c' as Address,
@@ -57,7 +57,7 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
   scoreRouterAddress: '0x819fB2af6d66A4fdE8D2F8396283Cc9b40208c1D' as Address,
 
   /** Destination ScoreGroup of the migration. Same as PERMISSIONLESS_GROUPS_STAGING.groupAddress. */
-  scoreGroupAddress: '0x24c9bA1fB88533B0cD2aEa37DaD75B809eEcF2C0' as Address,
+  scoreGroupAddress: '0x7CadB2E92295F3E4fA65D3d4E7265E2e05d7a783' as Address,
 
   /** Treasury of the destination ScoreGroup. */
   scoreGroupTreasuryAddress: '0x4cb3b2Bb537d6252e57c021B95f2fB1aa11d09aa' as Address,
