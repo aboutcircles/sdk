@@ -56,6 +56,13 @@ export interface PermissionlessGroupConfig {
   backendBaseUrl: string;
   /** JSON-RPC endpoint for read calls. */
   rpcUrl: string;
+  /**
+   * Full CirclesConfig used to drive the pathfinder + flow-matrix build for
+   * `migration()`. Needs at minimum `circlesRpcUrl`, `v2HubAddress`,
+   * `liftERC20Address`. `circlesConfig[100]` from `@aboutcircles/sdk-utils`
+   * works as-is.
+   */
+  circlesConfig: CirclesConfig;
 }
 
 /** Parameters for PermissionlessGroup.mint(). */
@@ -72,17 +79,6 @@ export interface MintParams {
    * policy allows right now: `(snapshottedIssuance × score) / 100`.
    */
   amount?: bigint;
-  /**
-   * Maximum time (ms) to spend polling the on-chain root before giving up.
-   * Default 120_000 (2 min). Set to 0 to disable polling entirely (one check,
-   * then fail).
-   */
-  rootPollTimeoutMs?: number;
-  /**
-   * How often (ms) to re-read `policy.merkleRoots(group)` while waiting for
-   * the publisher to push the backend's proof root. Default 3000 (3s).
-   */
-  rootPollIntervalMs?: number;
 }
 
 /**
@@ -119,14 +115,79 @@ export interface BalanceResult {
 export interface MigrationParams {
   /** Avatar holding the legacy GnosisGroup CRC (and the recipient of the wrapped ERC20). */
   avatar: Address;
-  /** Atto-CRC to migrate. Pathfinder will refuse if the avatar can't source this much GnosisGroup CRC. */
+  /**
+   * Atto-CRC to migrate. Omit to migrate the maximum the pathfinder can source
+   * from this avatar (any reachable CRC except already-migrated ScoreGroup CRC).
+   * Pathfinder will refuse if a specified amount cannot be sourced.
+   */
+  amount?: bigint;
+  /**
+   * Restrict which source CRC token(s) the pathfinder may draw from. Each
+   * entry is an avatar address (a token id = `uint256(avatar)`). Useful when
+   * only a specific set of CRCs is acceptable as collateral for the
+   * destination — e.g. routing collateral that the ScoreGroup actually
+   * trusts. When omitted, the pathfinder may use any CRC reachable from
+   * `avatar` (except those in `excludeFromTokens`).
+   */
+  fromTokens?: Address[];
+}
+
+/** Per-collateral mint-limit response from the score-groups backend. */
+export interface CollateralMintLimit {
+  /** Collateral avatar address this limit applies to. */
+  collateral: Address;
+  /** ERC1155 tokenId of the collateral (= `uint256(collateral)`). */
+  collateralTokenId: string;
+  /**
+   * Whether the on-chain policy has already snapshotted historic supply for
+   * this collateral. When `false`, on-chain `leftToMintRaw` reads 0 but the
+   * backend reports an *effective* cap via `leftToMintEffective` — that's
+   * what migrations should clip against.
+   */
+  historicalSupplyInitialized: boolean;
+  /** Historic supply the on-chain policy currently exposes (atto-CRC). */
+  historicalSupplyOnTodayRaw: bigint;
+  /** Atto-CRC already minted from this collateral today. */
+  mintedAmountOnToday: bigint;
+  /** Atto-CRC of this collateral already sitting in the treasury. */
+  alreadyInTreasury: bigint;
+  /** On-chain room left today — 0 until `historicalSupplyInitialized` flips. */
+  leftToMintRaw: bigint;
+  /**
+   * Effective room left today as the backend computes it — equals `leftToMintRaw`
+   * when historic supply is initialized; otherwise the projected room once
+   * initialization runs. **Use this** as the migration cap.
+   */
+  leftToMintEffective: bigint;
+  /** Whether the treasury cap for this collateral is already saturated. */
+  collateralLimitReached: boolean;
+}
+
+/**
+ * Result of `PermissionlessGroup.resolveMigrationAmount()` — describes how
+ * much the avatar can actually migrate right now, given the pathfinder
+ * route and the per-collateral on-chain caps reported by the backend.
+ */
+export interface MigrationAmountResolution {
+  /** Atto-CRC that can be migrated atomically without breaching any cap. */
   amount: bigint;
   /**
-   * Full CirclesConfig used to drive the pathfinder + flow-matrix build.
-   * Needs at minimum `circlesRpcUrl`, `v2HubAddress`, `liftERC20Address`.
-   * `circlesConfig[100]` from `@aboutcircles/sdk-utils` works as-is.
+   * Total atto-CRC the pathfinder *could* have sourced ignoring caps. When
+   * `amount < requested`, this records the headroom that was scaled away.
    */
-  config: CirclesConfig;
+  unconstrainedAmount: bigint;
+  /** Per-collateral breakdown: how much the path used vs. how much was allowed. */
+  collateralUsage: Array<{
+    collateral: Address;
+    used: bigint;
+    leftToMint: bigint;
+    overCap: boolean;
+  }>;
+  /**
+   * If the unconstrained amount had to be trimmed, this is the limiting
+   * factor (`leftToMintRaw / used`) for the tightest collateral.
+   */
+  trimRatioMilli?: bigint;
 }
 
 /** Result of `PermissionlessGroup.migration()`. */
@@ -137,6 +198,11 @@ export interface MigrationResult {
    * `operateFlowMatrix`, optional re-wraps).
    */
   txs: TransactionRequest[];
+  /**
+   * Atto-CRC routed into the SinkWrapper. Identical to the input `amount`
+   * except when omitted ("migrate max") — then it's the resolved max-flow.
+   */
+  amount: bigint;
 }
 
 export interface MintResult {

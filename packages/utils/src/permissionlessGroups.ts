@@ -13,10 +13,13 @@ import type { Address, CirclesConfig } from '@aboutcircles/sdk-types';
  */
 export const PERMISSIONLESS_GROUPS_STAGING = {
   /** Score-gated group avatar served by the staging backend. */
-  groupAddress: '0x24c9bA1fB88533B0cD2aEa37DaD75B809eEcF2C0' as Address,
+  groupAddress: '0x7CadB2E92295F3E4fA65D3d4E7265E2e05d7a783' as Address,
 
-  /** Treasury of the score-gated group. */
-  treasuryAddress: '0x4cb3b2Bb537d6252e57c021B95f2fB1aa11d09aa' as Address,
+  /** Treasury holding collateral routed from low-score (below threshold) minters. */
+  lowScoreTreasuryAddress: '0xe7Dc5Fae0b2d6f3392d45fCA03F58DC224c63e6F' as Address,
+
+  /** Treasury holding collateral routed from high-score (above threshold) minters. */
+  highScoreTreasuryAddress: '0x4b767D106F4e552Ffdb7Ce6547eB0398E208fc96' as Address,
 } as const;
 
 // The ScoreGatedMintPolicy address is intentionally NOT in this constant —
@@ -31,16 +34,17 @@ export const PERMISSIONLESS_GROUPS_STAGING = {
  * wrapper. The first-iteration SDK doesn't drive this path, but the
  * addresses are stored here so they're discoverable from one place.
  *
- * Note `scoreGroupAddress` and `scoreGroupTreasuryAddress` deliberately
- * overlap with `PERMISSIONLESS_GROUPS_STAGING.groupAddress` and `.treasuryAddress` —
- * the destination of the migration *is* the staging score-gated group.
+ * Note `scoreGroupAddress`, `scoreGroupLowScoreTreasuryAddress`, and
+ * `scoreGroupHighScoreTreasuryAddress` deliberately overlap with the fields
+ * on `PERMISSIONLESS_GROUPS_STAGING` — the destination of the migration *is*
+ * the staging score-gated group.
  */
 export const PERMISSIONLESS_GROUPS_MIGRATION = {
   /**
    * SinkWrapper / PathDestinationWrapper. Receives scoreGroupCRC via 1155
    * safeTransferFrom and mints out a stable ERC20 to the source.
    */
-  sinkWrapperAddress: '0xc1936539cF967e3b3C20cE994EBc6659a19aBa99' as Address,
+  sinkWrapperAddress: '0x3B7C57AA5E73F164aEE8395c9C5328822C229775' as Address,
 
   /** Source group of the migration path (legacy GnosisGroup). */
   gnosisGroupAddress: '0xC19BC204eb1c1D5B3FE500E5E5dfaBaB625F286c' as Address,
@@ -54,13 +58,16 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
    *   - `enableCRCForRouting(address[])`
    *   - `setApprovalForCRC(address[])`
    */
-  scoreRouterAddress: '0x819fB2af6d66A4fdE8D2F8396283Cc9b40208c1D' as Address,
+  scoreRouterAddress: '0xA60Cd6ddbB4eBa93246D6f80ff4504476c8117D1' as Address,
 
   /** Destination ScoreGroup of the migration. Same as PERMISSIONLESS_GROUPS_STAGING.groupAddress. */
-  scoreGroupAddress: '0x24c9bA1fB88533B0cD2aEa37DaD75B809eEcF2C0' as Address,
+  scoreGroupAddress: '0x7CadB2E92295F3E4fA65D3d4E7265E2e05d7a783' as Address,
 
-  /** Treasury of the destination ScoreGroup. */
-  scoreGroupTreasuryAddress: '0x4cb3b2Bb537d6252e57c021B95f2fB1aa11d09aa' as Address,
+  /** Treasury of the destination ScoreGroup, low-score branch. */
+  scoreGroupLowScoreTreasuryAddress: '0xe7Dc5Fae0b2d6f3392d45fCA03F58DC224c63e6F' as Address,
+
+  /** Treasury of the destination ScoreGroup, high-score branch. */
+  scoreGroupHighScoreTreasuryAddress: '0x4b767D106F4e552Ffdb7Ce6547eB0398E208fc96' as Address,
 } as const;
 
 /**
