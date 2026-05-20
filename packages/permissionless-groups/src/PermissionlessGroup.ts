@@ -24,18 +24,11 @@ import type {
   MintResult,
   MigrationParams,
   MigrationResult,
+  MigrationAmountResolution,
   ProofResponse,
   BalanceResult,
 } from './types.js';
 
-/** Safety margin (s) before next root rotation at which we wait it out. Hardcoded. */
-const SAFETY_MARGIN_SECONDS = 5;
-/** Cushion added on top of the publisher cadence when sleeping past a pending root. */
-const PENDING_ROOT_CONFIRMATION_BUFFER_SECONDS = 5;
-/** Default polling cadence (ms) while waiting for the publisher to push the proof's root. */
-const DEFAULT_ROOT_POLL_INTERVAL_MS = 3_000;
-/** Default total time budget (ms) for the polling loop before we give up. */
-const DEFAULT_ROOT_POLL_TIMEOUT_MS = 120_000;
 /** Score scale used by the policy: max score == 100. */
 const MAX_SCORE = 100n;
 
@@ -142,9 +135,7 @@ export class PermissionlessGroup {
    * Flow:
    *   1. fetch (score, proof) from the score-groups backend            — off-chain
    *   2. compare backend proof.root vs `policy.merkleRoots(group)`;
-   *      if backend is ahead, poll the on-chain root every
-   *      `rootPollIntervalMs` (default 3s) until it matches or
-   *      `rootPollTimeoutMs` elapses
+   *      throw `proofStale` if they disagree
    *   3. emit tx: policy.snapshotIssuance()
    *   4. emit tx: Hub.personalMint()
    *   5. emit tx: Hub.groupMint(group, [avatar], [amount],
@@ -154,10 +145,7 @@ export class PermissionlessGroup {
   async mint(params: MintParams): Promise<MintResult> {
     this.validateMintParams(params);
 
-    const pollIntervalMs = params.rootPollIntervalMs ?? DEFAULT_ROOT_POLL_INTERVAL_MS;
-    const pollTimeoutMs = params.rootPollTimeoutMs ?? DEFAULT_ROOT_POLL_TIMEOUT_MS;
-
-    let proof = await this.fetchFreshProof(params.avatar);
+    const proof = await this.client.getProof(this.config.groupAddress, params.avatar);
 
     // Score 0 = avatar not in the SMT, ineligible for the group mint. Don't
     // fail the caller. Emit only
@@ -166,12 +154,14 @@ export class PermissionlessGroup {
       return { txs: [this.hub.personalMint()], proof, amount: 0n };
     }
 
-    proof = await this.waitForChainRootToMatchBackend(
-      params.avatar,
-      proof,
-      pollIntervalMs,
-      pollTimeoutMs
-    );
+    const policy = await this.policy();
+    const chainRoot = await policy.merkleRoots(this.config.groupAddress);
+    if (!hexEq(chainRoot, proof.root)) {
+      throw PermissionlessGroupError.proofStale(
+        'policy.merkleRoots disagrees with backend proof root',
+        { chainRoot, backendRoot: proof.root }
+      );
+    }
 
     return this.buildMintBatch(params, proof);
   }
@@ -201,11 +191,12 @@ export class PermissionlessGroup {
       });
     }
 
-    const amount = params.amount ?? (await this.resolveMaxMigratable(params.avatar));
+    const amount =
+      params.amount ?? (await this.resolveMaxMigratable(params.avatar, params.fromTokens));
     if (amount === 0n) {
       throw PermissionlessGroupError.invalidInput(
         'no GnosisGroup CRC reachable from this avatar — nothing to migrate',
-        { avatar: params.avatar }
+        { avatar: params.avatar, fromTokens: params.fromTokens }
       );
     }
 
@@ -217,6 +208,7 @@ export class PermissionlessGroup {
       {
         excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
         toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+        ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
         useWrappedBalances: true,
       }
     );
@@ -224,7 +216,7 @@ export class PermissionlessGroup {
     return { txs, amount };
   }
 
-  private async resolveMaxMigratable(avatar: Address): Promise<bigint> {
+  private async resolveMaxMigratable(avatar: Address, fromTokens?: Address[]): Promise<bigint> {
     const pathfinder = new PathfinderMethods(
       new RpcClient(this.config.circlesConfig.circlesRpcUrl)
     );
@@ -233,54 +225,119 @@ export class PermissionlessGroup {
       to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
       excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
       toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+      ...(fromTokens?.length ? { fromTokens } : {}),
     });
   }
 
   /**
-   * Read `policy.merkleRoots(group)` and compare to the backend proof's root.
-   * If they disagree, poll the chain every `pollIntervalMs` until either it
-   * catches up, the backend rotates to a newer root (re-fetched then), or the
-   * `pollTimeoutMs` budget runs out.
+   * Resolve a migration amount that won't breach any per-collateral cap.
    *
-   * Returns the proof that is consistent with the on-chain root at the moment
-   * the loop exits.
+   * Algorithm:
+   *   1. Pathfind from `avatar` to the SinkWrapper for the requested amount
+   *      (or pathfinder max when omitted).
+   *   2. Group the pathfinder's `transfers[]` by `tokenOwner` (the collateral
+   *      avatar) and sum the value each collateral contributes to the sink.
+   *   3. Query `/groups/{group}/mint-limits/{collateral}` for every unique
+   *      collateral. The backend returns `leftToMintRaw` — the atto-CRC of
+   *      that collateral that can still be routed today.
+   *   4. If every collateral fits, return the unconstrained amount unchanged.
+   *      Otherwise compute `ratio = leftToMintRaw / used` for each over-cap
+   *      collateral, pick the tightest, and scale the *whole* migration
+   *      amount by that ratio. We scale the whole amount (not just the
+   *      offending leg) because the flow matrix's conservation invariant
+   *      requires it — trimming a single leg leaves the matrix unbalanced.
+   *
+   * Returns the breakdown so callers (or the example) can show exactly
+   * which collateral was the binding constraint.
    */
-  private async waitForChainRootToMatchBackend(
-    avatar: Address,
-    initialProof: ProofResponse,
-    pollIntervalMs: number,
-    pollTimeoutMs: number
-  ): Promise<ProofResponse> {
-    const policy = await this.policy();
-    let proof = initialProof;
-    let chainRoot = await policy.merkleRoots(this.config.groupAddress);
-    if (hexEq(chainRoot, proof.root)) return proof;
-
-    if (pollTimeoutMs <= 0) {
-      throw PermissionlessGroupError.proofStale(
-        'policy.merkleRoots disagrees with backend proof root (polling disabled)',
-        { chainRoot, backendRoot: proof.root }
-      );
+  async resolveMigrationAmount(params: MigrationParams): Promise<MigrationAmountResolution> {
+    if (!params.avatar) {
+      throw PermissionlessGroupError.invalidInput('resolveMigrationAmount() requires `avatar`');
     }
 
-    const startedAt = Date.now();
-    while (Date.now() - startedAt < pollTimeoutMs) {
-      await sleep(pollIntervalMs);
-
-      chainRoot = await policy.merkleRoots(this.config.groupAddress);
-      if (hexEq(chainRoot, proof.root)) return proof;
-
-      // Re-fetch the proof: the backend may have rotated to a newer root since
-      // we last looked, in which case `proof.root` is the stale one — not the
-      // chain. Picking up the new proof keeps the comparison meaningful.
-      proof = await this.fetchFreshProof(avatar);
-      if (hexEq(chainRoot, proof.root)) return proof;
-    }
-
-    throw PermissionlessGroupError.proofStale(
-      `on-chain merkleRoots(group) did not catch up to backend within ${pollTimeoutMs}ms`,
-      { chainRoot, backendRoot: proof.root, pollTimeoutMs, pollIntervalMs }
+    const pathfinder = new PathfinderMethods(
+      new RpcClient(this.config.circlesConfig.circlesRpcUrl)
     );
+    const requested =
+      params.amount ?? (await this.resolveMaxMigratable(params.avatar, params.fromTokens));
+
+    if (requested === 0n) {
+      return { amount: 0n, unconstrainedAmount: 0n, collateralUsage: [] };
+    }
+
+    const path = await pathfinder.findPath({
+      from: params.avatar,
+      to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
+      targetFlow: requested,
+      excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+      toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
+      ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
+    });
+
+    // Group hops *into the scoreRouter* — that's where each real source
+    // collateral lands during the migration. Earlier hops shuttle CRC between
+    // intermediate trustees; the final hop into the sink carries aggregated
+    // ScoreGroup CRC (synthetic) and isn't a per-collateral deposit.
+    const router = PERMISSIONLESS_GROUPS_MIGRATION.scoreRouterAddress.toLowerCase();
+    const usagePerCollateral = new Map<string, bigint>();
+    for (const step of path.transfers) {
+      if (step.to.toLowerCase() !== router) continue;
+      const owner = step.tokenOwner.toLowerCase() as Address;
+      usagePerCollateral.set(owner, (usagePerCollateral.get(owner) ?? 0n) + step.value);
+    }
+
+    if (usagePerCollateral.size === 0) {
+      // No deposits-into-sink legs found in the pathfinder response. Fall
+      // back to the unconstrained amount and let the caller proceed.
+      return {
+        amount: requested,
+        unconstrainedAmount: requested,
+        collateralUsage: [],
+      };
+    }
+
+    // Fetch caps for each distinct collateral in parallel.
+    const collaterals = Array.from(usagePerCollateral.keys()) as Address[];
+    const limits = await Promise.all(
+      collaterals.map((c) => this.client.getMintLimits(this.config.groupAddress, c))
+    );
+
+    const RATIO_SCALE = 1_000_000_000n;
+    let minNumerator = RATIO_SCALE;
+    let minDenominator = RATIO_SCALE;
+    const collateralUsage = collaterals.map((c, i) => {
+      const used = usagePerCollateral.get(c) ?? 0n;
+      // Use leftToMintEffective: it equals leftToMintRaw once the policy has
+      // snapshotted historic supply for this collateral, but is non-zero
+      // beforehand. On-chain leftToMintRaw stays 0 until initialization runs.
+      const leftToMint = limits[i]!.leftToMintEffective;
+      const overCap = used > leftToMint;
+      if (overCap) {
+        // ratio = leftToMint / used. Track the smallest in fraction form to
+        // avoid bigint precision loss before the final scale.
+        if (leftToMint * minDenominator < minNumerator * used) {
+          minNumerator = leftToMint;
+          minDenominator = used;
+        }
+      }
+      return { collateral: c, used, leftToMint, overCap };
+    });
+
+    if (minDenominator === RATIO_SCALE && minNumerator === RATIO_SCALE) {
+      // Nothing was over-cap.
+      return { amount: requested, unconstrainedAmount: requested, collateralUsage };
+    }
+
+    // Apply the tightest ratio to the whole requested amount. Round down to
+    // stay strictly under each cap.
+    const trimmed = (requested * minNumerator) / minDenominator;
+    const trimRatioMilli = (minNumerator * 1000n) / minDenominator;
+    return {
+      amount: trimmed,
+      unconstrainedAmount: requested,
+      collateralUsage,
+      trimRatioMilli,
+    };
   }
 
   private async buildMintBatch(
@@ -310,23 +367,6 @@ export class PermissionlessGroup {
     ];
 
     return { txs, proof, amount };
-  }
-
-  /**
-   * Fetch a proof and, if its freshness hints indicate staleness, sleep and
-   * refetch exactly once. We deliberately don't loop here — the outer root
-   * poll handles the longer wait.
-   */
-  private async fetchFreshProof(avatar: Address): Promise<ProofResponse> {
-    const proof = await this.client.getProof(this.config.groupAddress, avatar);
-
-    const waitMs = computeStalenessWaitMs(proof, SAFETY_MARGIN_SECONDS);
-    if (waitMs > 0) {
-      await sleep(waitMs);
-      return this.client.getProof(this.config.groupAddress, avatar);
-    }
-
-    return proof;
   }
 
   /**
@@ -386,57 +426,10 @@ export function encodePolicyData(score: bigint, proof: Hex): Hex {
   return encodeAbiParameters(['uint256', 'bytes'], [score, proof]);
 }
 
-/**
- * Decide how long to wait before refetching the proof based on the backend's
- * freshness hints. Returns 0 when the proof is good to submit immediately.
- *
- * - publishStatus === "pending": wait until lastHeadChangedAt + cadence + buffer.
- * - nextHeadEarliestAt within safetyMargin: wait one cadence window.
- *
- * Uses `serverTime` (not local clock) as the reference so client-side skew
- * doesn't blow up the math.
- */
-export function computeStalenessWaitMs(
-  proof: ProofResponse,
-  safetyMarginSeconds: number
-): number {
-  if (proof.publishStatus === 'pending') {
-    // Always wait at least one cadence window when the publisher hasn't
-    // broadcast the proof's root yet. If `lastHeadChangedAt` is set and very
-    // recent, prefer the longer of "anchor + cadence" and "one cadence from
-    // now" — never return 0, otherwise the caller will refetch a still-pending
-    // proof in a tight loop.
-    const minWaitMs =
-      (proof.publishCadenceSeconds + PENDING_ROOT_CONFIRMATION_BUFFER_SECONDS) * 1000;
-    if (!proof.lastHeadChangedAt) return minWaitMs;
-    const anchorMs = Date.parse(proof.lastHeadChangedAt);
-    const serverMs = Date.parse(proof.serverTime);
-    const targetMs =
-      anchorMs +
-      (proof.publishCadenceSeconds + PENDING_ROOT_CONFIRMATION_BUFFER_SECONDS) * 1000;
-    return Math.max(minWaitMs, targetMs - serverMs);
-  }
-
-  if (proof.nextHeadEarliestAt) {
-    const nextMs = Date.parse(proof.nextHeadEarliestAt);
-    const serverMs = Date.parse(proof.serverTime);
-    const remainingMs = nextMs - serverMs;
-    if (remainingMs < safetyMarginSeconds * 1000) {
-      return Math.max(0, remainingMs) + PENDING_ROOT_CONFIRMATION_BUFFER_SECONDS * 1000;
-    }
-  }
-
-  return 0;
-}
-
 function isZeroAddress(a: Address): boolean {
   return a.toLowerCase() === '0x0000000000000000000000000000000000000000';
 }
 
 function hexEq(a: Hex, b: Hex): boolean {
   return a.toLowerCase() === b.toLowerCase();
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

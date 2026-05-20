@@ -1,4 +1,4 @@
-export { PermissionlessGroup, encodePolicyData, computeStalenessWaitMs } from './PermissionlessGroup.js';
+export { PermissionlessGroup, encodePolicyData } from './PermissionlessGroup.js';
 export { ScoreGroupsClient } from './ScoreGroupsClient.js';
 export { PermissionlessGroupError } from './errors.js';
 export type { PermissionlessGroupErrorSource } from './errors.js';
