@@ -116,11 +116,12 @@ export interface MigrationParams {
   /** Avatar holding the legacy GnosisGroup CRC (and the recipient of the wrapped ERC20). */
   avatar: Address;
   /**
-   * Atto-CRC to migrate. Omit to migrate the maximum the pathfinder can source
-   * from this avatar (any reachable CRC except already-migrated ScoreGroup CRC).
-   * Pathfinder will refuse if a specified amount cannot be sourced.
+   * Atto-CRC to migrate. Required — passed verbatim to the pathfinder as
+   * `targetFlow`. The pathfinder refuses if the amount cannot be sourced.
+   * Callers wanting "as much as possible" should drive that through the
+   * pathfinder's max-flow API themselves and pass the resulting number here.
    */
-  amount?: bigint;
+  amount: bigint;
   /**
    * Restrict which source CRC token(s) the pathfinder may draw from. Each
    * entry is an avatar address (a token id = `uint256(avatar)`). Useful when
@@ -132,63 +133,6 @@ export interface MigrationParams {
   fromTokens?: Address[];
 }
 
-/** Per-collateral mint-limit response from the score-groups backend. */
-export interface CollateralMintLimit {
-  /** Collateral avatar address this limit applies to. */
-  collateral: Address;
-  /** ERC1155 tokenId of the collateral (= `uint256(collateral)`). */
-  collateralTokenId: string;
-  /**
-   * Whether the on-chain policy has already snapshotted historic supply for
-   * this collateral. When `false`, on-chain `leftToMintRaw` reads 0 but the
-   * backend reports an *effective* cap via `leftToMintEffective` — that's
-   * what migrations should clip against.
-   */
-  historicalSupplyInitialized: boolean;
-  /** Historic supply the on-chain policy currently exposes (atto-CRC). */
-  historicalSupplyOnTodayRaw: bigint;
-  /** Atto-CRC already minted from this collateral today. */
-  mintedAmountOnToday: bigint;
-  /** Atto-CRC of this collateral already sitting in the treasury. */
-  alreadyInTreasury: bigint;
-  /** On-chain room left today — 0 until `historicalSupplyInitialized` flips. */
-  leftToMintRaw: bigint;
-  /**
-   * Effective room left today as the backend computes it — equals `leftToMintRaw`
-   * when historic supply is initialized; otherwise the projected room once
-   * initialization runs. **Use this** as the migration cap.
-   */
-  leftToMintEffective: bigint;
-  /** Whether the treasury cap for this collateral is already saturated. */
-  collateralLimitReached: boolean;
-}
-
-/**
- * Result of `PermissionlessGroup.resolveMigrationAmount()` — describes how
- * much the avatar can actually migrate right now, given the pathfinder
- * route and the per-collateral on-chain caps reported by the backend.
- */
-export interface MigrationAmountResolution {
-  /** Atto-CRC that can be migrated atomically without breaching any cap. */
-  amount: bigint;
-  /**
-   * Total atto-CRC the pathfinder *could* have sourced ignoring caps. When
-   * `amount < requested`, this records the headroom that was scaled away.
-   */
-  unconstrainedAmount: bigint;
-  /** Per-collateral breakdown: how much the path used vs. how much was allowed. */
-  collateralUsage: Array<{
-    collateral: Address;
-    used: bigint;
-    leftToMint: bigint;
-    overCap: boolean;
-  }>;
-  /**
-   * If the unconstrained amount had to be trimmed, this is the limiting
-   * factor (`leftToMintRaw / used`) for the tightest collateral.
-   */
-  trimRatioMilli?: bigint;
-}
 
 /** Result of `PermissionlessGroup.migration()`. */
 export interface MigrationResult {

@@ -6,7 +6,6 @@ import {
   InflationaryCirclesContract,
 } from '@aboutcircles/sdk-core';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
-import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
 import { PERMISSIONLESS_GROUPS_MIGRATION } from '@aboutcircles/sdk-utils';
 import { CirclesType } from '@aboutcircles/sdk-types';
@@ -24,7 +23,6 @@ import type {
   MintResult,
   MigrationParams,
   MigrationResult,
-  MigrationAmountResolution,
   ProofResponse,
   BalanceResult,
 } from './types.js';
@@ -171,12 +169,16 @@ export class PermissionlessGroup {
    * into the destination ScoreGroup, via the SinkWrapper at
    * `PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress`.
    *
-   * When `amount` is omitted, the pathfinder is probed for the maximum the
-   * avatar can source under the same constraints, and that value is used.
+   * `amount` is forwarded verbatim to the pathfinder as `targetFlow`. The
+   * pathfinder is the authority on what can be sourced — if the requested
+   * amount can't be reached under the path constraints, it will refuse.
+   * Callers wanting "max migratable" should compute that upstream (e.g. via
+   * the pathfinder's max-flow API) and pass the resulting value here.
    *
    * Pathfinder constraints baked in:
    *   - destination         = SinkWrapper
    *   - `excludeFromTokens` = [ScoreGroup]   (already-migrated ScoreGroup CRC may not be used as a source)
+   *   - `toTokens`          = [ScoreGroup]   (the sink wraps ScoreGroup CRC)
    *
    * Submission is the caller's job — the returned `txs` are meant to be sent
    * atomically through a Safe runner.
@@ -185,26 +187,17 @@ export class PermissionlessGroup {
     if (!params.avatar) {
       throw PermissionlessGroupError.invalidInput('migration() requires `avatar`');
     }
-    if (params.amount !== undefined && params.amount <= 0n) {
-      throw PermissionlessGroupError.invalidInput('migration() requires `amount > 0` when set', {
-        amount: params.amount.toString(),
+    if (params.amount === undefined || params.amount <= 0n) {
+      throw PermissionlessGroupError.invalidInput('migration() requires `amount > 0`', {
+        amount: params.amount?.toString(),
       });
-    }
-
-    const amount =
-      params.amount ?? (await this.resolveMaxMigratable(params.avatar, params.fromTokens));
-    if (amount === 0n) {
-      throw PermissionlessGroupError.invalidInput(
-        'no GnosisGroup CRC reachable from this avatar — nothing to migrate',
-        { avatar: params.avatar, fromTokens: params.fromTokens }
-      );
     }
 
     const builder = new TransferBuilder(this.config.circlesConfig);
     const txs = await builder.constructAdvancedTransfer(
       params.avatar,
       PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
-      amount,
+      params.amount,
       {
         excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
         toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
@@ -213,131 +206,7 @@ export class PermissionlessGroup {
       }
     );
 
-    return { txs, amount };
-  }
-
-  private async resolveMaxMigratable(avatar: Address, fromTokens?: Address[]): Promise<bigint> {
-    const pathfinder = new PathfinderMethods(
-      new RpcClient(this.config.circlesConfig.circlesRpcUrl)
-    );
-    return pathfinder.findMaxFlow({
-      from: avatar,
-      to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
-      excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
-      toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
-      ...(fromTokens?.length ? { fromTokens } : {}),
-    });
-  }
-
-  /**
-   * Resolve a migration amount that won't breach any per-collateral cap.
-   *
-   * Algorithm:
-   *   1. Pathfind from `avatar` to the SinkWrapper for the requested amount
-   *      (or pathfinder max when omitted).
-   *   2. Group the pathfinder's `transfers[]` by `tokenOwner` (the collateral
-   *      avatar) and sum the value each collateral contributes to the sink.
-   *   3. Query `/groups/{group}/mint-limits/{collateral}` for every unique
-   *      collateral. The backend returns `leftToMintRaw` — the atto-CRC of
-   *      that collateral that can still be routed today.
-   *   4. If every collateral fits, return the unconstrained amount unchanged.
-   *      Otherwise compute `ratio = leftToMintRaw / used` for each over-cap
-   *      collateral, pick the tightest, and scale the *whole* migration
-   *      amount by that ratio. We scale the whole amount (not just the
-   *      offending leg) because the flow matrix's conservation invariant
-   *      requires it — trimming a single leg leaves the matrix unbalanced.
-   *
-   * Returns the breakdown so callers (or the example) can show exactly
-   * which collateral was the binding constraint.
-   */
-  async resolveMigrationAmount(params: MigrationParams): Promise<MigrationAmountResolution> {
-    if (!params.avatar) {
-      throw PermissionlessGroupError.invalidInput('resolveMigrationAmount() requires `avatar`');
-    }
-
-    const pathfinder = new PathfinderMethods(
-      new RpcClient(this.config.circlesConfig.circlesRpcUrl)
-    );
-    const requested =
-      params.amount ?? (await this.resolveMaxMigratable(params.avatar, params.fromTokens));
-
-    if (requested === 0n) {
-      return { amount: 0n, unconstrainedAmount: 0n, collateralUsage: [] };
-    }
-
-    const path = await pathfinder.findPath({
-      from: params.avatar,
-      to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
-      targetFlow: requested,
-      excludeFromTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
-      toTokens: [PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress],
-      ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
-    });
-
-    // Group hops *into the scoreRouter* — that's where each real source
-    // collateral lands during the migration. Earlier hops shuttle CRC between
-    // intermediate trustees; the final hop into the sink carries aggregated
-    // ScoreGroup CRC (synthetic) and isn't a per-collateral deposit.
-    const router = PERMISSIONLESS_GROUPS_MIGRATION.scoreRouterAddress.toLowerCase();
-    const usagePerCollateral = new Map<string, bigint>();
-    for (const step of path.transfers) {
-      if (step.to.toLowerCase() !== router) continue;
-      const owner = step.tokenOwner.toLowerCase() as Address;
-      usagePerCollateral.set(owner, (usagePerCollateral.get(owner) ?? 0n) + step.value);
-    }
-
-    if (usagePerCollateral.size === 0) {
-      // No deposits-into-sink legs found in the pathfinder response. Fall
-      // back to the unconstrained amount and let the caller proceed.
-      return {
-        amount: requested,
-        unconstrainedAmount: requested,
-        collateralUsage: [],
-      };
-    }
-
-    // Fetch caps for each distinct collateral in parallel.
-    const collaterals = Array.from(usagePerCollateral.keys()) as Address[];
-    const limits = await Promise.all(
-      collaterals.map((c) => this.client.getMintLimits(this.config.groupAddress, c))
-    );
-
-    const RATIO_SCALE = 1_000_000_000n;
-    let minNumerator = RATIO_SCALE;
-    let minDenominator = RATIO_SCALE;
-    const collateralUsage = collaterals.map((c, i) => {
-      const used = usagePerCollateral.get(c) ?? 0n;
-      // Use leftToMintEffective: it equals leftToMintRaw once the policy has
-      // snapshotted historic supply for this collateral, but is non-zero
-      // beforehand. On-chain leftToMintRaw stays 0 until initialization runs.
-      const leftToMint = limits[i]!.leftToMintEffective;
-      const overCap = used > leftToMint;
-      if (overCap) {
-        // ratio = leftToMint / used. Track the smallest in fraction form to
-        // avoid bigint precision loss before the final scale.
-        if (leftToMint * minDenominator < minNumerator * used) {
-          minNumerator = leftToMint;
-          minDenominator = used;
-        }
-      }
-      return { collateral: c, used, leftToMint, overCap };
-    });
-
-    if (minDenominator === RATIO_SCALE && minNumerator === RATIO_SCALE) {
-      // Nothing was over-cap.
-      return { amount: requested, unconstrainedAmount: requested, collateralUsage };
-    }
-
-    // Apply the tightest ratio to the whole requested amount. Round down to
-    // stay strictly under each cap.
-    const trimmed = (requested * minNumerator) / minDenominator;
-    const trimRatioMilli = (minNumerator * 1000n) / minDenominator;
-    return {
-      amount: trimmed,
-      unconstrainedAmount: requested,
-      collateralUsage,
-      trimRatioMilli,
-    };
+    return { txs, amount: params.amount };
   }
 
   private async buildMintBatch(
