@@ -1,6 +1,8 @@
 import type { Address } from '@aboutcircles/sdk-types';
 import { PermissionlessGroupError } from './errors.js';
-import type { ProofResponse } from './types.js';
+import type { MintLimitsBatchEntry, ProofResponse } from './types.js';
+
+const BATCH_LIMIT = 100;
 
 /**
  * HTTP wrapper around the score-groups backend.
@@ -42,5 +44,51 @@ export class ScoreGroupsClient {
     }
 
     return (await res.json()) as ProofResponse;
+  }
+
+  /**
+   * Per-collateral migration caps for a fixed `group` across many `users`
+   * (collateral providers). Wraps `POST /groups/mint-limits/batch` in
+   * `groupUsers` mode and transparently re-batches when the input exceeds the
+   * backend's 100-cell cap. Returns one cell per unique address — failed
+   * cells stay in the response with `ok: false` so callers can react per
+   * collateral instead of failing the whole migration.
+   */
+  async getMintLimitsBatch(
+    group: Address,
+    users: Address[]
+  ): Promise<MintLimitsBatchEntry[]> {
+    if (users.length === 0) return [];
+
+    const seen = new Set<string>();
+    const unique = users.filter((u) => {
+      const key = u.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const all: MintLimitsBatchEntry[] = [];
+    for (let offset = 0; offset < unique.length; offset += BATCH_LIMIT) {
+      const chunk = unique.slice(offset, offset + BATCH_LIMIT);
+      const url = `${this.baseUrl}/groups/mint-limits/batch`;
+      const res = await this.fetchImpl(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ mode: 'groupUsers', group, users: chunk }),
+      });
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        throw PermissionlessGroupError.backendUnavailable(res.status, body);
+      }
+
+      const { results } = (await res.json()) as { results: MintLimitsBatchEntry[] };
+      all.push(...results);
+    }
+    return all;
   }
 }

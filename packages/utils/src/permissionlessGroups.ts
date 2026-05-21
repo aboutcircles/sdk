@@ -44,7 +44,7 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
    * SinkWrapper / PathDestinationWrapper. Receives scoreGroupCRC via 1155
    * safeTransferFrom and mints out a stable ERC20 to the source.
    */
-  sinkWrapperAddress: '0x3B7C57AA5E73F164aEE8395c9C5328822C229775' as Address,
+  sinkWrapperAddress: '0xD4cF9afd3aE777C24454b70dd28E32d1bd516F05' as Address,
 
   /** Source group of the migration path (legacy GnosisGroup). */
   gnosisGroupAddress: '0xC19BC204eb1c1D5B3FE500E5E5dfaBaB625F286c' as Address,

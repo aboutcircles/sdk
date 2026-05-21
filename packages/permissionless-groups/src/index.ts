@@ -8,6 +8,12 @@ export type {
   MintResult,
   MigrationParams,
   MigrationResult,
+  MigrationRawResult,
+  MigrationCollateralReport,
+  MigratableAmountResult,
+  MintLimitsBatchEntry,
+  MintLimitsCell,
+  MintLimitsCellError,
   BalanceResult,
   ProofResponse,
 } from './types.js';

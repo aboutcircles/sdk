@@ -1,12 +1,23 @@
 /**
  * Live migration example — legacy GnosisGroup CRC → ScoreGroup via SinkWrapper.
  *
- * `PermissionlessGroup.migration()` builds the path-based tx batch:
- *   - destination       = SinkWrapper (PathDestinationWrapper)
- *   - excludeFromTokens = [ScoreGroup]   (already-migrated ScoreGroup CRC may not be used as a source)
+ * `PermissionlessGroup.migration()` does the heavy lifting:
+ *   1. asks the pathfinder for `MAX_FLOW` from `avatar` to the SinkWrapper —
+ *      everything the trust graph can route in one shot
+ *   2. drops *sink-bypass branches* (edges that deposit group-CRC into the
+ *      sink from a non-group address; those revert on-chain) and the
+ *      predecessor edges that funded them
+ *   3. batch-queries the score-groups backend for each collateral's
+ *      `leftToMintEffective` cap
+ *   4. uniformly scales the whole path down to the most-binding cap so no
+ *      branch can trip `CollateralLimitReached` on-chain
+ *   5. hands the (possibly scaled) path to the transfers package to emit the
+ *      unwrap + `operateFlowMatrix` + re-wrap batch
  *
- * The sink mints out the wrapped ERC20 to the original sender inside its
- * `onERC1155Received` hook — no extra step required from the SDK.
+ * The script migrates the maximum possible amount by default. Pass
+ * `MIGRATION_AMOUNT` only when you want to cap the migration at a specific
+ * size (e.g. for a slider UI or a test) — pathfinder will then refuse if the
+ * exact amount can't be sourced.
  *
  * Run:
  *   set -a && source .env && set +a
@@ -17,10 +28,9 @@
  *   SAFE_ADDRESS       Safe wallet address holding the GnosisGroup CRC
  *
  * Optional env:
- *   MIGRATION_AMOUNT   Atto-CRC to migrate. Omit to fall back to the example
- *                      default (6400 CRC). `migration()` forwards this verbatim
- *                      to the pathfinder as `targetFlow`; the pathfinder will
- *                      refuse if the requested amount cannot be sourced.
+ *   MIGRATION_AMOUNT   Atto-CRC to migrate. Omit for max migratable.
+ *   MIGRATION_DEBUG    When `1`, prints raw signed execTransaction calldata
+ *                      (paste into Tenderly) instead of submitting.
  */
 import { SafeContractRunner, chains } from '@aboutcircles/sdk-runner';
 import { circlesConfig, PERMISSIONLESS_GROUPS_MIGRATION } from '@aboutcircles/sdk-utils';
@@ -55,21 +65,26 @@ function req(name: string): string {
 
 const log = (...a: unknown[]) => console.log('[migration]', ...a);
 
+const formatCrc = (atto: bigint): string => {
+  const sign = atto < 0n ? '-' : '';
+  const abs = atto < 0n ? -atto : atto;
+  const whole = abs / 10n ** 18n;
+  const frac = abs % 10n ** 18n;
+  const fracStr = frac.toString().padStart(18, '0').replace(/0+$/, '');
+  return fracStr ? `${sign}${whole}.${fracStr}` : `${sign}${whole}`;
+};
+
 async function main() {
   const PRIVATE_KEY = req('PRIVATE_KEY') as Hex;
   const SAFE = req('SAFE_ADDRESS') as Address;
   const ENV_AMOUNT = process.env.MIGRATION_AMOUNT;
+  const requestedAmount = ENV_AMOUNT ? BigInt(ENV_AMOUNT) : undefined;
 
-  log('rpc         =', RPC);
-  log('safe        =', SAFE);
-  log('sink        =', SINK);
-  log('exclude     =', SCORE_GROUP, '(ScoreGroup CRC, source-side)');
-  log('amount      =', ENV_AMOUNT ?? '6400 CRC (default)');
-
-  // `migration()` requires an explicit `amount`. Default to 6400 CRC when env
-  // omits a value — callers wanting "max migratable" should query the
-  // pathfinder's max-flow API themselves and pass the result.
-  const amount: bigint | undefined = ENV_AMOUNT ? BigInt(ENV_AMOUNT) : undefined;
+  log('rpc        =', RPC);
+  log('safe       =', SAFE);
+  log('sink       =', SINK);
+  log('scoreGroup =', SCORE_GROUP);
+  log('requested  =', requestedAmount ? `${formatCrc(requestedAmount)} CRC` : 'MAX');
 
   const group = new PermissionlessGroup({
     groupAddress: GROUP,
@@ -80,41 +95,55 @@ async function main() {
     circlesConfig: CONFIG,
   });
 
-  log('\n=== probe max redeemable amount ===');
-  // Ask the score-groups backend how much this avatar can still migrate
-  // today against this group. `leftToMintEffective` is the source of truth —
-  // it folds in the on-chain policy state plus what's already in the treasury.
-  const limitsUrl =
-    `${SCORE_GROUPS_STAGING_BACKEND_URL}/groups/${GROUP}/mint-limits/${SAFE}`;
-  const limitsRes = await fetch(limitsUrl, { headers: { Accept: 'application/json' } });
-  if (!limitsRes.ok) throw new Error(`mint-limits ${limitsRes.status}: ${await limitsRes.text()}`);
-  const limits = (await limitsRes.json()) as {
-    migration: { leftToMintEffective: string; leftToMintEffectiveCrc: string };
-  };
-  const maxRedeemable = BigInt(limits.migration.leftToMintEffective);
-  log('  leftToMintEffective =', limits.migration.leftToMintEffective, 'atto');
-  log('  leftToMintEffective =', limits.migration.leftToMintEffectiveCrc, 'CRC');
+  log('\n=== preview migratable amount ===');
+  // `migratableAmount()` runs the same pruning pipeline as `migration()`
+  // but stops before building txs. Useful for showing "you could migrate
+  // up to X CRC" in a UI before committing.
+  const preview = await group.migratableAmount({
+    avatar: SAFE,
+    ...(requestedAmount !== undefined ? { amount: requestedAmount } : {}),
+  });
+  log('  probedMaxFlow    =', formatCrc(preview.probedMaxFlow), 'CRC (raw pathfinder headline)');
+  log('  bypass branches  =', formatCrc(preview.bypassPruned), 'CRC removed');
+  log('  → migratable now =', formatCrc(preview.amount), 'CRC');
+  if (preview.collaterals.length) {
+    log('  per-collateral cap report:');
+    for (const c of preview.collaterals) {
+      const capStr = c.cap === null ? 'n/a' : formatCrc(c.cap);
+      const tag = c.capped ? ' [CAPPED]' : '';
+      log(
+        `    ${c.collateral} path=${formatCrc(c.pathAmount)} cap=${capStr} → final=${formatCrc(c.finalAmount)}${tag}`
+      );
+    }
+  }
 
-  log('\n=== build migration batch ===');
-  // `migration()` forwards `amount` straight to the pathfinder as `targetFlow`.
-  // Clamp the requested amount to what the backend says the avatar can still
-  // redeem today — otherwise the pathfinder may return a path that reverts
-  // on-chain when the policy enforces its cap.
-  const REQUESTED = amount ?? BigInt(6400e18);
-  const targetFlow = REQUESTED < maxRedeemable ? REQUESTED : maxRedeemable;
-  log('  requested      =', REQUESTED.toString(), 'atto');
-  log('  maxRedeemable  =', maxRedeemable.toString(), 'atto');
-  log('  targetFlow     =', targetFlow.toString(), 'atto (min of the two)');
-  if (targetFlow === 0n) {
-    log('  nothing to migrate today — exiting');
+  if (preview.amount === 0n) {
+    log('\nnothing to migrate after pruning — exiting');
     return;
   }
-  const { txs, amount: resolvedAmount } = await group.migration({
-    avatar: SAFE,
-    amount: targetFlow,
-  });
-  log('  amount =', resolvedAmount.toString(), 'atto');
-  log('  txs    =', txs.length);
+
+  log('\n=== build migration batch ===');
+  // Re-queries the pathfinder + reapplies pruning, then builds the tx
+  // batch. Numbers may differ slightly from the preview if the chain
+  // moved (typically within the 10 bp pathfinder buffer).
+  const { txs, amount, requestedAmount: pathMax, probedMaxFlow, bypassPruned } =
+    await group.migration({
+      avatar: SAFE,
+      ...(requestedAmount !== undefined ? { amount: requestedAmount } : {}),
+    });
+
+  if (probedMaxFlow !== null) {
+    log('  probedMaxFlow      =', formatCrc(probedMaxFlow), 'CRC (raw MAX_FLOW probe)');
+  }
+  log('  feasible path      =', formatCrc(pathMax), 'CRC');
+  log('  bypass branches    =', formatCrc(bypassPruned), 'CRC removed');
+  log('  after cap pruning  =', formatCrc(amount), 'CRC');
+  log('  txs                =', txs.length);
+
+  if (amount === 0n) {
+    log('\nnothing to migrate after pruning — exiting');
+    return;
+  }
 
   const runner = await SafeContractRunner.create(RPC, PRIVATE_KEY, SAFE, chains.gnosis);
 

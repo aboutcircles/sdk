@@ -32,6 +32,64 @@ export interface ProofResponse {
 }
 
 /**
+ * Per-cell migration cap from the score-groups batch endpoint.
+ * Mirrors `POST /groups/mint-limits/batch` results (groupUsers mode), where
+ * each cell is keyed on `(group, user)` and `user` is interpreted as the
+ * source-collateral avatar (`tokenId = uint256(uint160(user))`).
+ */
+export interface MintLimitsCell {
+  ok: true;
+  groupAddress: Address;
+  userAddress: Address;
+  collateralTokenId: string;
+  migration: {
+    historicalSupplyInitialized: boolean;
+    historicalSupplyOnTodayRaw: string;
+    mintedAmountOnToday: string;
+    alreadyInTreasury: string;
+    maxTotalRaw: string;
+    maxTotalEffective: string;
+    maxTotalEffectiveCrc: string;
+    leftToMintRaw: string;
+    leftToMintEffective: string;
+    leftToMintEffectiveCrc: string;
+    collateralLimitReached: boolean;
+  };
+  personalMint: {
+    score: string;
+    currentIssuance: string;
+    scoreAdjustedIssuanceLimit: string;
+    scoreAdjustedIssuanceLimitCrc: string;
+  };
+}
+
+export interface MintLimitsCellError {
+  ok: false;
+  groupAddress: Address;
+  userAddress: Address;
+  error: { code: string; message: string };
+}
+
+export type MintLimitsBatchEntry = MintLimitsCell | MintLimitsCellError;
+
+/**
+ * Per-collateral diagnostics returned alongside the migration tx batch — one
+ * entry per distinct collateral avatar that fed the destination router.
+ */
+export interface MigrationCollateralReport {
+  /** Collateral avatar (== token owner — token id is `uint256(uint160(avatar))`). */
+  collateral: Address;
+  /** Amount the original pathfinder result routed through this collateral. */
+  pathAmount: bigint;
+  /** Backend-reported cap (`leftToMintEffective`). `null` when the backend cell errored. */
+  cap: bigint | null;
+  /** Amount actually routed through this collateral after pruning. */
+  finalAmount: bigint;
+  /** True when `pathAmount > cap` and we had to scale this branch down. */
+  capped: boolean;
+}
+
+/**
  * Configuration for a PermissionlessGroup instance.
  *
  * The mint policy is not configured here — it is resolved at runtime from
@@ -116,12 +174,17 @@ export interface MigrationParams {
   /** Avatar holding the legacy GnosisGroup CRC (and the recipient of the wrapped ERC20). */
   avatar: Address;
   /**
-   * Atto-CRC to migrate. Required — passed verbatim to the pathfinder as
-   * `targetFlow`. The pathfinder refuses if the amount cannot be sourced.
-   * Callers wanting "as much as possible" should drive that through the
-   * pathfinder's max-flow API themselves and pass the resulting number here.
+   * Atto-CRC to migrate. Optional — when omitted, the SDK runs a two-stage
+   * pathfinder probe: first `findPath(MAX_FLOW)` to discover the headline
+   * number, then a second `findPath(headline)` for a feasible plan. The
+   * indirection is necessary because the pathfinder over-commits
+   * intermediate balances when given its `MAX_FLOW` sentinel (it doesn't
+   * enforce that intermediates actually hold the routed token in the
+   * required quantity), but is reliable for concrete targets. When
+   * supplied, `amount` is forwarded verbatim to the pathfinder as
+   * `targetFlow`; the pathfinder refuses if it can't be sourced.
    */
-  amount: bigint;
+  amount?: bigint;
   /**
    * Restrict which source CRC token(s) the pathfinder may draw from. Each
    * entry is an avatar address (a token id = `uint256(avatar)`). Useful when
@@ -134,6 +197,44 @@ export interface MigrationParams {
 }
 
 
+/**
+ * Result of `PermissionlessGroup.migratableAmount()` — same pruning pipeline
+ * as `migration()` but stops short of building the tx batch. Use this to
+ * show "you could migrate up to X CRC" in a UI before the user commits.
+ *
+ * Note these numbers reflect the chain + pathfinder state *at query time*.
+ * The actual `migration()` call re-queries the pathfinder; if the chain
+ * has moved, the executed amount may differ slightly (typically within the
+ * 10 bp pathfinder buffer baked into the SDK).
+ */
+export interface MigratableAmountResult {
+  /**
+   * Atto-CRC the SDK would route into the SinkWrapper if `migration()` were
+   * called now. Already net of bypass-branch pruning and per-collateral cap
+   * scaling. `0n` when there's nothing migratable.
+   */
+  amount: bigint;
+  /** Raw pathfinder `MAX_FLOW` probe — the headline before any pruning. */
+  probedMaxFlow: bigint;
+  /** Atto-CRC of sink-bypass branches removed from the pathfinder's plan. */
+  bypassPruned: bigint;
+  /** Per-collateral diagnostics (same shape as `MigrationResult.collaterals`). */
+  collaterals: MigrationCollateralReport[];
+}
+
+/**
+ * Result of `PermissionlessGroup.migrationRaw()` — pathfinder output handed
+ * straight to the flow-matrix builder, no pruning. Use this when you want
+ * to debug the pathfinder in isolation or know the path is feasible (e.g.
+ * a fixed-amount mint well below caps).
+ */
+export interface MigrationRawResult {
+  /** Ordered transaction batch — submit atomically via the runner. */
+  txs: TransactionRequest[];
+  /** Atto-CRC the pathfinder routed into the SinkWrapper. */
+  amount: bigint;
+}
+
 /** Result of `PermissionlessGroup.migration()`. */
 export interface MigrationResult {
   /**
@@ -143,10 +244,38 @@ export interface MigrationResult {
    */
   txs: TransactionRequest[];
   /**
-   * Atto-CRC routed into the SinkWrapper. Identical to the input `amount`
-   * except when omitted ("migrate max") — then it's the resolved max-flow.
+   * Atto-CRC routed into the SinkWrapper after all pruning. May be strictly
+   * less than the pathfinder's reported max because of bypass branches /
+   * per-collateral cap / max-flow factor.
    */
   amount: bigint;
+  /**
+   * Atto-CRC the pathfinder produced before any pruning. When the SDK ran
+   * the two-stage probe (max-flow mode), this is the feasible-target path's
+   * `maxFlow` (already after the `maxFlowFactor` shrink), not the headline
+   * MAX_FLOW probe — that's reported separately as `probedMaxFlow`.
+   */
+  requestedAmount: bigint;
+  /**
+   * Only populated in max-flow mode (when `params.amount` was omitted): the
+   * headline number from the initial MAX_FLOW probe, before the
+   * `maxFlowFactor` shrink. `null` otherwise.
+   */
+  probedMaxFlow: bigint | null;
+  /**
+   * Atto-CRC removed from the pathfinder's plan because it would have been
+   * deposited into the SinkWrapper from an avatar OTHER than the score group
+   * (a bypass branch — the sink only accepts group-CRC deposits via the
+   * canonical `router → group → sink` chain). 0n when the path was clean.
+   */
+  bypassPruned: bigint;
+  /**
+   * One entry per distinct collateral avatar that contributed to the path.
+   * `capped: true` flags the collaterals that forced the global scale-down.
+   * Useful for surfacing "you would migrate X CRC, capped to Y because of
+   * collateral Z" in the UI.
+   */
+  collaterals: MigrationCollateralReport[];
 }
 
 export interface MintResult {
