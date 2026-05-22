@@ -244,6 +244,38 @@ export class SafeContractRunner implements ContractRunner {
    *
    * @throws {RunnerError} If transaction reverts or execution fails
    */
+  /**
+   * Build the Safe `execTransaction` calldata for `txs` *without* sending it.
+   *
+   * Useful for debugging (e.g. pasting into Tenderly's simulator) when the
+   * Safe execution reverts but the underlying error is hidden inside the
+   * multisend. The returned calldata includes a real signature from the
+   * configured signer, so it's directly submittable / simulatable.
+   *
+   * `from` is the signer address (the owner that would broadcast), `to` is
+   * the Safe itself, `data` is the encoded `execTransaction` call.
+   */
+  encodeTransaction = async (
+    txs: TransactionRequest[]
+  ): Promise<{ from: Address; to: Address; data: Hex; value: '0' }> => {
+    const safe = this.ensureSafe();
+    if (txs.length === 0) {
+      throw RunnerError.executionFailed('No transactions provided');
+    }
+    const metaTransactions: MetaTransactionData[] = txs.map((tx) => ({
+      operation: OperationType.Call,
+      to: tx.to!,
+      value: (tx.value?.toString() ?? '0'),
+      data: tx.data ?? '0x',
+    }));
+    const safeTransaction = await safe.createTransaction({ transactions: metaTransactions });
+    const signed = await safe.signTransaction(safeTransaction);
+    const data = (await safe.getEncodedTransaction(signed)) as Hex;
+    const to = (await safe.getAddress()) as Address;
+    if (!this.address) throw RunnerError.executionFailed('signer address not initialized');
+    return { from: this.address, to, data, value: '0' };
+  };
+
   sendTransaction = async (txs: TransactionRequest[]): Promise<TransactionReceipt> => {
     const safe = this.ensureSafe();
 

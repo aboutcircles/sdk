@@ -8,6 +8,14 @@ export type {
   MintResult,
   MigrationParams,
   MigrationResult,
+  MigrationRawResult,
+  MigrationCollateralReport,
+  MigratableAmountResult,
+  TransferGCRCAndScoreParams,
+  TransferGCRCAndScoreResult,
+  MintLimitsBatchEntry,
+  MintLimitsCell,
+  MintLimitsCellError,
   BalanceResult,
   ProofResponse,
 } from './types.js';
@@ -20,6 +28,7 @@ export {
   PERMISSIONLESS_GROUPS_STAGING,
   PERMISSIONLESS_GROUPS_MIGRATION,
   SCORE_GROUPS_STAGING_BACKEND_URL,
+  SCORE_GROUPS_STAGING_RPC_URL,
   DEFAULT_SCORE_THRESHOLD,
   withPermissionlessGroupsStaging,
 } from '@aboutcircles/sdk-utils';

@@ -44,7 +44,7 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
    * SinkWrapper / PathDestinationWrapper. Receives scoreGroupCRC via 1155
    * safeTransferFrom and mints out a stable ERC20 to the source.
    */
-  sinkWrapperAddress: '0x3B7C57AA5E73F164aEE8395c9C5328822C229775' as Address,
+  sinkWrapperAddress: '0xD4cF9afd3aE777C24454b70dd28E32d1bd516F05' as Address,
 
   /** Source group of the migration path (legacy GnosisGroup). */
   gnosisGroupAddress: '0xC19BC204eb1c1D5B3FE500E5E5dfaBaB625F286c' as Address,
@@ -77,6 +77,19 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
  * (Renamed from `/pgroups` on 2026-05-11. The legacy path no longer responds.)
  */
 export const SCORE_GROUPS_STAGING_BACKEND_URL = 'https://rpc.staging.aboutcircles.com/score-groups';
+
+/**
+ * Staging Circles RPC URL — the only indexer that knows about the
+ * score-groups migration stack (sinkWrapper, scoreRouter, score-gated
+ * trust). The `PermissionlessGroup` SDK relies on the pathfinder hosted
+ * here; pointing `circlesConfig.circlesRpcUrl` at the prod indexer
+ * `rpc.aboutcircles.com` will silently return paths that don't route
+ * through the score router and revert at the sink.
+ *
+ * Use this as the source of truth — the constructor of `PermissionlessGroup`
+ * warns when `circlesConfig.circlesRpcUrl` doesn't match.
+ */
+export const SCORE_GROUPS_STAGING_RPC_URL = 'https://rpc.staging.aboutcircles.com/';
 
 /**
  * Default score threshold used by the deployed ScoreGatedMintPolicy. Scores
