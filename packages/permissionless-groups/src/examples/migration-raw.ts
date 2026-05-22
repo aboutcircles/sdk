@@ -8,6 +8,9 @@
  * in one shot — note MAX_FLOW plans are often over-committed and may
  * revert on-chain). Pass an explicit `amount` for a fixed-size migration.
  *
+ * Single attempt — if the on-chain submission reverts, just re-run the
+ * script; the pathfinder snapshot is fresh on every invocation.
+ *
  * For production migrations use `migration()` (it adds the pruning that
  * keeps the live tx from reverting).
  *
@@ -30,10 +33,11 @@ import {
   PermissionlessGroup,
   PERMISSIONLESS_GROUPS_STAGING,
   SCORE_GROUPS_STAGING_BACKEND_URL,
+  SCORE_GROUPS_STAGING_RPC_URL,
 } from '../index.js';
 import type { Address, Hex } from '@aboutcircles/sdk-types';
 
-const RPC = 'https://rpc.staging.aboutcircles.com/';
+const RPC = SCORE_GROUPS_STAGING_RPC_URL;
 const CONFIG = { ...circlesConfig[100]!, circlesRpcUrl: RPC, pathfinderUrl: RPC };
 const SAFE = process.env.SAFE_ADDRESS as Address;
 const PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
@@ -49,6 +53,8 @@ const group = new PermissionlessGroup({
   circlesConfig: CONFIG,
 });
 
+const runner = await SafeContractRunner.create(RPC, PRIVATE_KEY, SAFE, chains.gnosis);
+
 const { txs, amount: routed } = await group.migrationRaw({
   avatar: SAFE,
   ...(amount !== undefined ? { amount } : {}),
@@ -56,8 +62,6 @@ const { txs, amount: routed } = await group.migrationRaw({
 console.log('requested =', amount !== undefined ? `${Number(amount) / 1e18} CRC` : 'MAX');
 console.log('routed    =', Number(routed) / 1e18, 'CRC');
 console.log('txs       =', txs.length);
-
-const runner = await SafeContractRunner.create(RPC, PRIVATE_KEY, SAFE, chains.gnosis);
 
 if (process.env.MIGRATION_DEBUG === '1') {
   const call = await runner.encodeTransaction!(txs);

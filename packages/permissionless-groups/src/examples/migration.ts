@@ -39,13 +39,14 @@ import {
   PermissionlessGroup,
   PERMISSIONLESS_GROUPS_STAGING,
   SCORE_GROUPS_STAGING_BACKEND_URL,
+  SCORE_GROUPS_STAGING_RPC_URL,
 } from '../index.js';
 import type { Address, Hex } from '@aboutcircles/sdk-types';
 
 // Staging indexer / pathfinder. The on-chain contracts are still prod
 // (Hub V2, Lift, GnosisGroup, SinkWrapper) — only the indexer + pathfinder
 // move to staging because that's where the score-groups stack is wired up.
-const RPC = 'https://rpc.staging.aboutcircles.com/';
+const RPC = SCORE_GROUPS_STAGING_RPC_URL;
 const CONFIG = {
   ...circlesConfig[100]!,
   circlesRpcUrl: RPC,

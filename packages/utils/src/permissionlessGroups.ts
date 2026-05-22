@@ -79,6 +79,19 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
 export const SCORE_GROUPS_STAGING_BACKEND_URL = 'https://rpc.staging.aboutcircles.com/score-groups';
 
 /**
+ * Staging Circles RPC URL — the only indexer that knows about the
+ * score-groups migration stack (sinkWrapper, scoreRouter, score-gated
+ * trust). The `PermissionlessGroup` SDK relies on the pathfinder hosted
+ * here; pointing `circlesConfig.circlesRpcUrl` at the prod indexer
+ * `rpc.aboutcircles.com` will silently return paths that don't route
+ * through the score router and revert at the sink.
+ *
+ * Use this as the source of truth — the constructor of `PermissionlessGroup`
+ * warns when `circlesConfig.circlesRpcUrl` doesn't match.
+ */
+export const SCORE_GROUPS_STAGING_RPC_URL = 'https://rpc.staging.aboutcircles.com/';
+
+/**
  * Default score threshold used by the deployed ScoreGatedMintPolicy. Scores
  * are on a 0–100 integer scale; minters with a score below this revert.
  */

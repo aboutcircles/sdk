@@ -18,10 +18,11 @@ import {
   PermissionlessGroup,
   PERMISSIONLESS_GROUPS_STAGING,
   SCORE_GROUPS_STAGING_BACKEND_URL,
+  SCORE_GROUPS_STAGING_RPC_URL,
 } from '../index.js';
 import type { Address } from '@aboutcircles/sdk-types';
 
-const RPC = 'https://rpc.staging.aboutcircles.com/';
+const RPC = SCORE_GROUPS_STAGING_RPC_URL;
 const CONFIG = { ...circlesConfig[100]!, circlesRpcUrl: RPC, pathfinderUrl: RPC };
 const SAFE = process.env.SAFE_ADDRESS as Address;
 if (!SAFE) throw new Error('Missing env: SAFE_ADDRESS');

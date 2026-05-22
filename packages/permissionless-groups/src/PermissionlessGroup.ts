@@ -12,7 +12,10 @@ import {
 } from '@aboutcircles/sdk-pathfinder';
 import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
-import { PERMISSIONLESS_GROUPS_MIGRATION } from '@aboutcircles/sdk-utils';
+import {
+  PERMISSIONLESS_GROUPS_MIGRATION,
+  SCORE_GROUPS_STAGING_RPC_URL,
+} from '@aboutcircles/sdk-utils';
 import { MAX_FLOW } from '@aboutcircles/sdk-utils/constants';
 import { CirclesType } from '@aboutcircles/sdk-types';
 import type {
@@ -33,6 +36,8 @@ import type {
   MigrationRawResult,
   MigrationCollateralReport,
   MigratableAmountResult,
+  TransferGCRCAndScoreParams,
+  TransferGCRCAndScoreResult,
   ProofResponse,
   BalanceResult,
 } from './types.js';
@@ -61,12 +66,37 @@ export class PermissionlessGroup {
   private policyPromise: Promise<ScoreGatedMintPolicyContract> | null = null;
 
   constructor(config: PermissionlessGroupConfig) {
-    this.config = config;
+    // The score-groups migration stack (sinkWrapper, scoreRouter, score-gated
+    // trust) only lives in the staging Circles indexer. Pointing the
+    // pathfinder at any other RPC silently returns paths that don't route
+    // through the score router and revert at the sink. Force both
+    // `rpcUrl` and `circlesConfig.circlesRpcUrl` to the staging URL,
+    // warning the caller if they passed something else so misconfiguration
+    // is visible instead of silently broken.
+    const stagingRpc = SCORE_GROUPS_STAGING_RPC_URL;
+    const rpcUrlMatches = isSameRpcUrl(config.rpcUrl, stagingRpc);
+    const circlesRpcMatches = isSameRpcUrl(
+      config.circlesConfig.circlesRpcUrl,
+      stagingRpc
+    );
+    if (!rpcUrlMatches || !circlesRpcMatches) {
+      console.warn(
+        `[PermissionlessGroup] overriding rpcUrl(s) to ${stagingRpc} — ` +
+        `the score-groups pathfinder + indexer only exist on staging. ` +
+        `Caller passed rpcUrl=${config.rpcUrl}, ` +
+        `circlesConfig.circlesRpcUrl=${config.circlesConfig.circlesRpcUrl}.`
+      );
+    }
+    this.config = {
+      ...config,
+      rpcUrl: stagingRpc,
+      circlesConfig: { ...config.circlesConfig, circlesRpcUrl: stagingRpc },
+    };
     this.client = new ScoreGroupsClient(config.backendBaseUrl);
-    this.hub = new HubV2Contract({ address: config.hubAddress, rpcUrl: config.rpcUrl });
+    this.hub = new HubV2Contract({ address: config.hubAddress, rpcUrl: this.config.rpcUrl });
     this.lift = new LiftERC20Contract({
       address: config.liftERC20Address,
-      rpcUrl: config.rpcUrl,
+      rpcUrl: this.config.rpcUrl,
     });
   }
 
@@ -175,6 +205,79 @@ export class PermissionlessGroup {
   }
 
   /**
+   * Send the avatar's *own* personal CRC via `Hub.safeTransferFrom`, with
+   * the avatar's score + Merkle proof encoded as the ERC1155 `data` field.
+   *
+   * The proof is fetched from the score-groups backend
+   * (`GET /groups/{group}/proof/{avatar}`) and abi-encoded as
+   * `(uint256 score, bytes proof)` — the exact format the score-gated mint
+   * policy decodes when this CRC lands in a contract that runs the policy
+   * inside `onERC1155Received`. Recipients that aren't policy-aware just
+   * ignore the `data` (standard ERC1155 behavior).
+   *
+   * Single-tx batch: no snapshot/personalMint/wrap pre-steps — this is a
+   * plain transfer with score-attestation data, NOT a mint flow. For
+   * minting against the score group call `mint()` instead.
+   *
+   *  1. fetch (score, proof) from the score-groups backend
+   *  2. throw if `scoreRaw === "0"` (avatar not eligible; the transfer
+   *     would still execute but the recipient can't act on the proof)
+   *  3. compare backend proof.root vs `policy.merkleRoots(group)` — throw
+   *     `proofStale` on mismatch so callers know to refetch
+   *  4. emit tx: Hub.safeTransferFrom(avatar, to, uint256(avatar), amount,
+   *                                   abi.encode(score, proof))
+   */
+  async transferGCRCAndScore(
+    params: TransferGCRCAndScoreParams
+  ): Promise<TransferGCRCAndScoreResult> {
+    if (!params.avatar) {
+      throw PermissionlessGroupError.invalidInput(
+        'transferGCRCAndScore() requires `avatar`'
+      );
+    }
+    if (!params.to) {
+      throw PermissionlessGroupError.invalidInput(
+        'transferGCRCAndScore() requires `to`'
+      );
+    }
+    if (params.amount === undefined || params.amount <= 0n) {
+      throw PermissionlessGroupError.invalidInput(
+        'transferGCRCAndScore() requires `amount > 0`',
+        { amount: params.amount?.toString() }
+      );
+    }
+
+    const proof = await this.client.getProof(this.config.groupAddress, params.avatar);
+    if (proof.scoreRaw === '0') {
+      throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
+    }
+
+    // Match the proof root against the on-chain root — refetching usually
+    // resolves transient mismatches (publisher cadence ~minutes).
+    const policy = await this.policy();
+    const chainRoot = await policy.merkleRoots(this.config.groupAddress);
+    if (!hexEq(chainRoot, proof.root)) {
+      throw PermissionlessGroupError.proofStale(
+        'policy.merkleRoots disagrees with backend proof root',
+        { chainRoot, backendRoot: proof.root }
+      );
+    }
+
+    const score = BigInt(proof.scoreRaw);
+    const data = encodePolicyData(score, proof.proof);
+    const tokenId = BigInt(params.avatar); // ERC1155 id of avatar's own CRC
+    const tx = this.hub.safeTransferFrom(
+      params.avatar,
+      params.to,
+      tokenId,
+      params.amount,
+      data
+    );
+
+    return { txs: [tx], proof, amount: params.amount };
+  }
+
+  /**
    * Build the tx batch that migrates legacy GnosisGroup CRC held by `avatar`
    * into the destination ScoreGroup via the SinkWrapper at
    * `PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress`.
@@ -248,11 +351,15 @@ export class PermissionlessGroup {
 
   /**
    * Raw migration: pathfinder → flow-matrix → tx batch, with **no** SDK-side
-   * pruning. No bypass-branch removal, no per-collateral cap scaling, no
-   * two-stage probe. `params.amount` is forwarded verbatim as `targetFlow`;
-   * omit it to request the pathfinder's `MAX_FLOW` sentinel (everything the
-   * trust graph can route in one shot — caveat that MAX_FLOW plans are
-   * often over-committed and may revert on-chain).
+   * pruning or retries. No bypass-branch removal, no per-collateral cap
+   * scaling, no two-stage probe. `params.amount` is forwarded verbatim as
+   * `targetFlow`; omit it to request the pathfinder's `MAX_FLOW` sentinel
+   * (everything the trust graph can route in one shot — caveat that
+   * MAX_FLOW plans are often over-committed and may revert on-chain).
+   *
+   * Single attempt: if `findPath` returns nothing or `buildFlowMatrixTx`
+   * throws, the error bubbles straight up. Any retry policy is the
+   * caller's responsibility.
    *
    * Use this when you want to inspect the pathfinder in isolation or you
    * already know the path is feasible. For production use cases call
@@ -274,7 +381,7 @@ export class PermissionlessGroup {
     const rpcUrl = this.config.circlesConfig.circlesRpcUrl;
     const pathfinder = new PathfinderMethods(new RpcClient(rpcUrl));
 
-    const findPathArgs = {
+    const path = await pathfinder.findPath({
       from: params.avatar,
       to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
       targetFlow: params.amount ?? MAX_FLOW,
@@ -282,9 +389,7 @@ export class PermissionlessGroup {
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
       useWrappedBalances: true,
-    };
-
-    const path = await pathfinder.findPath(findPathArgs);
+    });
     if (!path.transfers || path.transfers.length === 0) {
       throw PermissionlessGroupError.invalidInput(
         'pathfinder returned no transfers for the requested migration amount',
@@ -304,7 +409,6 @@ export class PermissionlessGroup {
         useWrappedBalances: true,
       }
     );
-
     return { txs: txs as TransactionRequest[], amount: path.maxFlow };
   }
 
@@ -612,6 +716,15 @@ export class PermissionlessGroup {
  */
 export function encodePolicyData(score: bigint, proof: Hex): Hex {
   return encodeAbiParameters(['uint256', 'bytes'], [score, proof]);
+}
+
+/**
+ * Loose URL match — ignores trailing slashes and case. Good enough for
+ * detecting "did the caller hand us the staging RPC under a slightly
+ * different spelling".
+ */
+function isSameRpcUrl(a: string, b: string): boolean {
+  return a.replace(/\/+$/, '').toLowerCase() === b.replace(/\/+$/, '').toLowerCase();
 }
 
 function isZeroAddress(a: Address): boolean {

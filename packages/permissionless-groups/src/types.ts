@@ -278,6 +278,40 @@ export interface MigrationResult {
   collaterals: MigrationCollateralReport[];
 }
 
+/**
+ * Parameters for `PermissionlessGroup.transferGCRCAndScore()` — sends a
+ * raw `Hub.safeTransferFrom` of the avatar's *own* personal CRC with the
+ * score + Merkle proof attached as `data`. The score-gated mint policy
+ * decodes this `data` on the receiving side and rejects the transfer if
+ * the proof is stale / the avatar isn't in the tree.
+ */
+export interface TransferGCRCAndScoreParams {
+  /**
+   * Sender + proof subject. Token id transferred is
+   * `uint256(uint160(avatar))` (the avatar's personal CRC). Must equal the
+   * runner's signing account — the policy binds the proof to msg.sender.
+   */
+  avatar: Address;
+  /** Recipient of the ERC1155 transfer. */
+  to: Address;
+  /** Atto-CRC to send. Required (the policy enforces non-zero amount). */
+  amount: bigint;
+}
+
+/** Result of `PermissionlessGroup.transferGCRCAndScore()`. */
+export interface TransferGCRCAndScoreResult {
+  /**
+   * Single-transaction batch: `Hub.safeTransferFrom(avatar, to, tokenId,
+   * amount, abi.encode(score, proof))`. Submit through the runner like any
+   * other tx batch.
+   */
+  txs: TransactionRequest[];
+  /** Proof fetched from the score-groups backend and encoded into the tx data. */
+  proof: ProofResponse;
+  /** Atto-CRC sent — identical to the input `amount`. */
+  amount: bigint;
+}
+
 export interface MintResult {
   /**
    * Ordered transaction batch — submit these atomically (e.g. Safe multisend)
