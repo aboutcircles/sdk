@@ -11,7 +11,10 @@ import {
   replaceWrappedTokensWithAvatars,
 } from '@aboutcircles/sdk-pathfinder';
 import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
-import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
+import {
+  encodeAbiParameters,
+  encodeFunctionData,
+} from '@aboutcircles/sdk-utils/abi';
 import {
   PERMISSIONLESS_GROUPS_MIGRATION,
   SCORE_GROUPS_STAGING_RPC_URL,
@@ -339,8 +342,11 @@ export class PermissionlessGroup {
       }
     );
 
+    const routerApprovalTx = await this._routerApprovalTxIfNeeded(params.avatar);
+    const allTxs = routerApprovalTx ? [routerApprovalTx, ...txs] : txs;
+
     return {
-      txs: txs as TransactionRequest[],
+      txs: allTxs as TransactionRequest[],
       amount: prep.scaledPath.maxFlow,
       requestedAmount: prep.rawPath.maxFlow,
       probedMaxFlow: prep.probedMaxFlow,
@@ -370,9 +376,24 @@ export class PermissionlessGroup {
     if (!params.avatar) {
       throw PermissionlessGroupError.invalidInput('migrationRaw() requires `avatar`');
     }
-    if (params.amount !== undefined && params.amount <= 0n) {
+    // The pathfinder's `MAX_FLOW` sentinel over-commits intermediate balances
+    // (sums per-edge flows without checking that intermediates actually hold
+    // the routed token), so the resulting plan typically reverts on-chain with
+    // `ERC1155InsufficientBalance`. `migration()` works around this with a
+    // two-stage probe + 10 bp buffer; `migrationRaw()` is the un-buffered
+    // pathfinder primitive and shouldn't paper over the footgun. Require an
+    // explicit amount.
+    if (params.amount === undefined) {
       throw PermissionlessGroupError.invalidInput(
-        'migrationRaw() amount must be > 0 when supplied (omit it to use MAX_FLOW)',
+        'migrationRaw() requires an explicit `amount` — the pathfinder ' +
+          "MAX_FLOW sentinel over-commits intermediate balances and the " +
+          'resulting plan usually reverts on-chain. Use migration() for a ' +
+          'safe max-flow path, or pass an explicit amount here.'
+      );
+    }
+    if (params.amount <= 0n) {
+      throw PermissionlessGroupError.invalidInput(
+        'migrationRaw() amount must be > 0',
         { amount: params.amount.toString() }
       );
     }
@@ -384,7 +405,7 @@ export class PermissionlessGroup {
     const path = await pathfinder.findPath({
       from: params.avatar,
       to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
-      targetFlow: params.amount ?? MAX_FLOW,
+      targetFlow: params.amount,
       excludeFromTokens: [scoreGroup],
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
@@ -393,7 +414,7 @@ export class PermissionlessGroup {
     if (!path.transfers || path.transfers.length === 0) {
       throw PermissionlessGroupError.invalidInput(
         'pathfinder returned no transfers for the requested migration amount',
-        { amount: params.amount?.toString() ?? 'max' }
+        { amount: params.amount.toString() }
       );
     }
 
@@ -409,7 +430,11 @@ export class PermissionlessGroup {
         useWrappedBalances: true,
       }
     );
-    return { txs: txs as TransactionRequest[], amount: path.maxFlow };
+
+    const routerApprovalTx = await this._routerApprovalTxIfNeeded(params.avatar);
+    const allTxs = routerApprovalTx ? [routerApprovalTx, ...txs] : txs;
+
+    return { txs: allTxs as TransactionRequest[], amount: path.maxFlow };
   }
 
   /**
@@ -632,6 +657,34 @@ export class PermissionlessGroup {
     };
   }
 
+  /**
+   * If the score router hasn't authorized `avatar` as an ERC1155 operator on
+   * the Hub yet, build the `setApprovalForCRC([avatar])` tx that grants the
+   * authorization. Returns `null` when the approval is already in place (or
+   * when the on-chain probe fails — we bias toward including the approval tx
+   * since it's cheap, idempotent, and a missing approval reverts the whole
+   * migration with `ERC1155MissingApprovalForAll`).
+   *
+   * The approval is permissionless on the router side, so this tx can be the
+   * first entry of the migration multisend without any prior on-chain state.
+   */
+  private async _routerApprovalTxIfNeeded(
+    avatar: Address
+  ): Promise<TransactionRequest | null> {
+    const router = PERMISSIONLESS_GROUPS_MIGRATION.scoreRouterAddress;
+    try {
+      const approved = await this.hub.isApprovedForAll(router, avatar);
+      if (approved) return null;
+    } catch (err) {
+      console.warn(
+        '[PermissionlessGroup] isApprovedForAll probe failed — ' +
+          'prepending setApprovalForCRC defensively',
+        err
+      );
+    }
+    return buildRouterApprovalTx(router, avatar);
+  }
+
   private async buildMintBatch(
     params: MintParams,
     proof: ProofResponse
@@ -719,6 +772,44 @@ export function encodePolicyData(score: bigint, proof: Hex): Hex {
 }
 
 /**
+ * Minimal ABI for the score router's permissionless approval entrypoint.
+ * `setApprovalForCRC(address[])` makes the router call
+ * `HUB.setApprovalForAll(crc, true)` for each address in the list — granting
+ * those addresses ERC1155 operator rights to spend CRCs held *by the router*.
+ * Without this, the Hub rejects the Router→ScoreGroup hop in operateFlowMatrix
+ * with `ERC1155MissingApprovalForAll(operator=avatar, owner=router)`.
+ */
+const SCORE_ROUTER_SET_APPROVAL_ABI = [
+  {
+    type: 'function',
+    name: 'setApprovalForCRC',
+    inputs: [{ name: 'crcArray', type: 'address[]' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const;
+
+/**
+ * Build the router's `setApprovalForCRC([avatar])` call. The Router runs this
+ * permissionlessly — any caller can authorize any address — so this tx can be
+ * the first sub-tx in the migration multisend.
+ */
+export function buildRouterApprovalTx(
+  router: Address,
+  avatar: Address
+): TransactionRequest {
+  return {
+    to: router,
+    value: 0n,
+    data: encodeFunctionData({
+      abi: SCORE_ROUTER_SET_APPROVAL_ABI,
+      functionName: 'setApprovalForCRC',
+      args: [[avatar]],
+    }),
+  };
+}
+
+/**
  * Loose URL match — ignores trailing slashes and case. Good enough for
  * detecting "did the caller hand us the staging RPC under a slightly
  * different spelling".
@@ -771,7 +862,7 @@ function bucketPerCollateralAtRouter(
  * by their underlying avatars — we use it to identify which edges deposit
  * the *group* token id at the sink.
  */
-function pruneSinkBypassBranches(
+export function pruneSinkBypassBranches(
   path: PathfindingResult,
   resolvedPath: PathfindingResult,
   sink: Address,
@@ -780,8 +871,13 @@ function pruneSinkBypassBranches(
   const sinkLc = sink.toLowerCase();
   const groupLc = scoreGroup.toLowerCase();
 
-  // Mark indices that are bypass-edges to start.
-  const drop = new Set<number>();
+  // Per-edge drop bookkeeping. `dropAmount.get(i)` is how much to subtract
+  // from edge i's value when emitting the cleaned path. Bypass seed edges
+  // get a full drop (set to the edge's full value). Predecessor edges may
+  // get a partial drop when only part of their value funded the bypass —
+  // splitting an edge in two preserves the per-vertex netting invariant
+  // _verifyFlowMatrix relies on without losing the legitimate fraction.
+  const dropAmount = new Map<number, bigint>();
   let prunedAmount = 0n;
 
   // Find bypass *sink* edges in the resolved path: to == sink AND tokenOwner
@@ -794,9 +890,10 @@ function pruneSinkBypassBranches(
       t.tokenOwner.toLowerCase() === groupLc &&
       t.from.toLowerCase() !== groupLc
     ) {
-      drop.add(i);
-      prunedAmount += BigInt(t.value);
-      seedVertices.push({ vertex: t.from.toLowerCase(), remaining: BigInt(t.value) });
+      const value = BigInt(t.value);
+      dropAmount.set(i, value);
+      prunedAmount += value;
+      seedVertices.push({ vertex: t.from.toLowerCase(), remaining: value });
     }
   }
 
@@ -807,48 +904,60 @@ function pruneSinkBypassBranches(
   // Walk backwards: each bypass vertex V0 had its outflow X dropped, so V0's
   // net is now `+X` (received more than sent). To restore `V0` net = 0, drop
   // X-worth of V0's inflow edges. Each predecessor edge `W → V0` we drop
-  // moves W from net=0 to net=+X (W's outflow dropped). Continue until W is
-  // the original source (Safe) — at which point reduced outflow is fine,
-  // since the maxFlow is meant to drop by the bypassed amount.
+  // moves W from net=0 to net=+(dropped). Continue until W is the original
+  // source (Safe) — reduced outflow is fine there since the maxFlow drops by
+  // the bypassed amount anyway.
   //
-  // _verifyFlowMatrix nets per-vertex (not per-tokenOwner), so dropping an
-  // inflow edge of a different tokenOwner than the outflow that triggered it
-  // is still consistent.
+  // When a predecessor edge funds *more* than the bypass needs, we partial-
+  // drop just the bypass share and leave the rest intact (the edge had a
+  // legitimate downstream use we mustn't break). Each edge has exactly one
+  // `to`, so the same edge is never visited as inflow by two different
+  // vertices — no need to track residual capacity across walks.
+  //
+  // _verifyFlowMatrix nets per-vertex (not per-tokenOwner), so dropping or
+  // partial-dropping an inflow edge of a different tokenOwner than the
+  // outflow that triggered it is still consistent.
   const queue: Array<{ vertex: string; remaining: bigint }> = [...seedVertices];
   while (queue.length) {
     const { vertex, remaining } = queue.shift()!;
     let stillNeeded = remaining;
     for (let i = 0; i < resolvedPath.transfers.length; i++) {
       if (stillNeeded === 0n) break;
-      if (drop.has(i)) continue;
+      if (dropAmount.has(i)) continue;
       const t = resolvedPath.transfers[i];
       if (t.to.toLowerCase() !== vertex) continue;
       const value = BigInt(t.value);
-      // The pathfinder's bypass branches are single-edge funding chains in
-      // practice (verified against the staging path). Whole-edge drops keep
-      // values bigint-exact — splitting edges would require recomputing
-      // coordinates downstream. If we ever hit `value > stillNeeded`, the
-      // assumption no longer holds and we bail out loudly.
       if (value > stillNeeded) {
-        throw new Error(
-          `pruneSinkBypassBranches: predecessor edge ${i} (value=${value}) ` +
-            `exceeds bypassed outflow ${stillNeeded} for vertex ${vertex}. ` +
-            `Path topology not supported — re-run pathfinder with a different ` +
-            `excludeFromTokens / fromTokens combination.`
-        );
+        // Partial drop: take exactly stillNeeded out of this edge, leave the
+        // remainder funding whatever downstream the rest was for. Push the
+        // partial amount onto W's queue so its inflow also shrinks by the
+        // same fraction — keeping W's net zero.
+        dropAmount.set(i, stillNeeded);
+        queue.push({ vertex: t.from.toLowerCase(), remaining: stillNeeded });
+        stillNeeded = 0n;
+      } else {
+        // Full drop: this edge funded only bypass-bound flow (or less than
+        // bypass). Drop the whole edge and continue accumulating.
+        dropAmount.set(i, value);
+        stillNeeded -= value;
+        queue.push({ vertex: t.from.toLowerCase(), remaining: value });
       }
-      drop.add(i);
-      stillNeeded -= value;
-      queue.push({ vertex: t.from.toLowerCase(), remaining: value });
     }
   }
 
-  // Apply the drop set to the *original* (wrapper-keyed) path so wrapped
-  // edge semantics survive.
-  const kept = path.transfers.filter((_, i) => !drop.has(i));
+  // Apply the drop bookkeeping to the *original* (wrapper-keyed) path so
+  // wrapped edge semantics survive. For each edge, subtract the drop amount;
+  // omit entirely when fully dropped, keep with reduced value otherwise.
+  const kept: PathfindingResult['transfers'] = [];
   let maxFlow = 0n;
-  for (const t of kept) {
-    if (t.to.toLowerCase() === sinkLc) maxFlow += BigInt(t.value);
+  for (let i = 0; i < path.transfers.length; i++) {
+    const t = path.transfers[i];
+    const drop = dropAmount.get(i) ?? 0n;
+    const remaining = BigInt(t.value) - drop;
+    if (remaining <= 0n) continue;
+    const kept_t = { ...t, value: remaining };
+    kept.push(kept_t);
+    if (t.to.toLowerCase() === sinkLc) maxFlow += remaining;
   }
   return { path: { maxFlow, transfers: kept }, prunedAmount };
 }
