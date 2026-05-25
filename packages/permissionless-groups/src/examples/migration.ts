@@ -1,18 +1,9 @@
 /**
  * Live migration example — legacy GnosisGroup CRC → ScoreGroup via SinkWrapper.
  *
- * `PermissionlessGroup.migration()` does the heavy lifting:
- *   1. asks the pathfinder for `MAX_FLOW` from `avatar` to the SinkWrapper —
- *      everything the trust graph can route in one shot
- *   2. drops *sink-bypass branches* (edges that deposit group-CRC into the
- *      sink from a non-group address; those revert on-chain) and the
- *      predecessor edges that funded them
- *   3. batch-queries the score-groups backend for each collateral's
- *      `leftToMintEffective` cap
- *   4. uniformly scales the whole path down to the most-binding cap so no
- *      branch can trip `CollateralLimitReached` on-chain
- *   5. hands the (possibly scaled) path to the transfers package to emit the
- *      unwrap + `operateFlowMatrix` + re-wrap batch
+ * `PermissionlessGroup.migration()` asks the pathfinder to route CRC from
+ * `avatar` into the SinkWrapper, then hands the path to the transfers package
+ * to emit the unwrap + `operateFlowMatrix` + re-wrap batch.
  *
  * The script migrates the maximum possible amount by default. Pass
  * `MIGRATION_AMOUNT` only when you want to cap the migration at a specific
@@ -28,7 +19,8 @@
  *   SAFE_ADDRESS       Safe wallet address holding the GnosisGroup CRC
  *
  * Optional env:
- *   MIGRATION_AMOUNT   Atto-CRC to migrate. Omit for max migratable.
+ *   MIGRATION_AMOUNT   Atto-CRC to migrate. Omit for max (MAX_FLOW).
+ *   MAX_EDGES          Cap on flow-matrix edges (default 100).
  *   MIGRATION_DEBUG    When `1`, prints raw signed execTransaction calldata
  *                      (paste into Tenderly) instead of submitting.
  */
@@ -80,12 +72,14 @@ async function main() {
   const SAFE = req('SAFE_ADDRESS') as Address;
   const ENV_AMOUNT = process.env.MIGRATION_AMOUNT;
   const requestedAmount = ENV_AMOUNT ? BigInt(ENV_AMOUNT) : undefined;
+  const maxEdges = process.env.MAX_EDGES ? Number(process.env.MAX_EDGES) : 100;
 
   log('rpc        =', RPC);
   log('safe       =', SAFE);
   log('sink       =', SINK);
   log('scoreGroup =', SCORE_GROUP);
   log('requested  =', requestedAmount ? `${formatCrc(requestedAmount)} CRC` : 'MAX');
+  log('maxEdges   =', maxEdges);
 
   const group = new PermissionlessGroup({
     groupAddress: GROUP,
@@ -96,53 +90,17 @@ async function main() {
     circlesConfig: CONFIG,
   });
 
-  log('\n=== preview migratable amount ===');
-  // `migratableAmount()` runs the same pruning pipeline as `migration()`
-  // but stops before building txs. Useful for showing "you could migrate
-  // up to X CRC" in a UI before committing.
-  const preview = await group.migratableAmount({
+  log('\n=== build migration batch ===');
+  const { txs, amount } = await group.migration({
     avatar: SAFE,
+    maxEdges,
     ...(requestedAmount !== undefined ? { amount: requestedAmount } : {}),
   });
-  log('  probedMaxFlow    =', formatCrc(preview.probedMaxFlow), 'CRC (raw pathfinder headline)');
-  log('  bypass branches  =', formatCrc(preview.bypassPruned), 'CRC removed');
-  log('  → migratable now =', formatCrc(preview.amount), 'CRC');
-  if (preview.collaterals.length) {
-    log('  per-collateral cap report:');
-    for (const c of preview.collaterals) {
-      const capStr = c.cap === null ? 'n/a' : formatCrc(c.cap);
-      const tag = c.capped ? ' [CAPPED]' : '';
-      log(
-        `    ${c.collateral} path=${formatCrc(c.pathAmount)} cap=${capStr} → final=${formatCrc(c.finalAmount)}${tag}`
-      );
-    }
-  }
-
-  if (preview.amount === 0n) {
-    log('\nnothing to migrate after pruning — exiting');
-    return;
-  }
-
-  log('\n=== build migration batch ===');
-  // Re-queries the pathfinder + reapplies pruning, then builds the tx
-  // batch. Numbers may differ slightly from the preview if the chain
-  // moved (typically within the 10 bp pathfinder buffer).
-  const { txs, amount, requestedAmount: pathMax, probedMaxFlow, bypassPruned } =
-    await group.migration({
-      avatar: SAFE,
-      ...(requestedAmount !== undefined ? { amount: requestedAmount } : {}),
-    });
-
-  if (probedMaxFlow !== null) {
-    log('  probedMaxFlow      =', formatCrc(probedMaxFlow), 'CRC (raw MAX_FLOW probe)');
-  }
-  log('  feasible path      =', formatCrc(pathMax), 'CRC');
-  log('  bypass branches    =', formatCrc(bypassPruned), 'CRC removed');
-  log('  after cap pruning  =', formatCrc(amount), 'CRC');
-  log('  txs                =', txs.length);
+  log('  routed =', formatCrc(amount), 'CRC');
+  log('  txs    =', txs.length);
 
   if (amount === 0n) {
-    log('\nnothing to migrate after pruning — exiting');
+    log('\nnothing to migrate — exiting');
     return;
   }
 
