@@ -73,23 +73,6 @@ export interface MintLimitsCellError {
 export type MintLimitsBatchEntry = MintLimitsCell | MintLimitsCellError;
 
 /**
- * Per-collateral diagnostics returned alongside the migration tx batch — one
- * entry per distinct collateral avatar that fed the destination router.
- */
-export interface MigrationCollateralReport {
-  /** Collateral avatar (== token owner — token id is `uint256(uint160(avatar))`). */
-  collateral: Address;
-  /** Amount the original pathfinder result routed through this collateral. */
-  pathAmount: bigint;
-  /** Backend-reported cap (`leftToMintEffective`). `null` when the backend cell errored. */
-  cap: bigint | null;
-  /** Amount actually routed through this collateral after pruning. */
-  finalAmount: bigint;
-  /** True when `pathAmount > cap` and we had to scale this branch down. */
-  capped: boolean;
-}
-
-/**
  * Configuration for a PermissionlessGroup instance.
  *
  * The mint policy is not configured here — it is resolved at runtime from
@@ -174,15 +157,9 @@ export interface MigrationParams {
   /** Avatar holding the legacy GnosisGroup CRC (and the recipient of the wrapped ERC20). */
   avatar: Address;
   /**
-   * Atto-CRC to migrate. Optional — when omitted, the SDK runs a two-stage
-   * pathfinder probe: first `findPath(MAX_FLOW)` to discover the headline
-   * number, then a second `findPath(headline)` for a feasible plan. The
-   * indirection is necessary because the pathfinder over-commits
-   * intermediate balances when given its `MAX_FLOW` sentinel (it doesn't
-   * enforce that intermediates actually hold the routed token in the
-   * required quantity), but is reliable for concrete targets. When
-   * supplied, `amount` is forwarded verbatim to the pathfinder as
-   * `targetFlow`; the pathfinder refuses if it can't be sourced.
+   * Atto-CRC to migrate, forwarded verbatim to the pathfinder as
+   * `targetFlow`. Omit to request the pathfinder's `MAX_FLOW` sentinel
+   * (everything the trust graph can route in one shot).
    */
   amount?: bigint;
   /**
@@ -194,48 +171,20 @@ export interface MigrationParams {
    * `avatar` (except those in `excludeFromTokens`).
    */
   fromTokens?: Address[];
-}
-
-
-/**
- * Result of `PermissionlessGroup.migratableAmount()` — same pruning pipeline
- * as `migration()` but stops short of building the tx batch. Use this to
- * show "you could migrate up to X CRC" in a UI before the user commits.
- *
- * Note these numbers reflect the chain + pathfinder state *at query time*.
- * The actual `migration()` call re-queries the pathfinder; if the chain
- * has moved, the executed amount may differ slightly (typically within the
- * 10 bp pathfinder buffer baked into the SDK).
- */
-export interface MigratableAmountResult {
   /**
-   * Atto-CRC the SDK would route into the SinkWrapper if `migration()` were
-   * called now. Already net of bypass-branch pruning and per-collateral cap
-   * scaling. `0n` when there's nothing migratable.
+   * Cap the number of flow edges in the resulting `operateFlowMatrix`,
+   * forwarded directly to the pathfinder's `maxTransfers`. Lower values give
+   * a smaller, cheaper batch at a marginal cost to the migrated amount.
+   * Omit for the pathfinder's natural plan.
    */
-  amount: bigint;
-  /** Raw pathfinder `MAX_FLOW` probe — the headline before any pruning. */
-  probedMaxFlow: bigint;
-  /** Atto-CRC of sink-bypass branches removed from the pathfinder's plan. */
-  bypassPruned: bigint;
-  /** Per-collateral diagnostics (same shape as `MigrationResult.collaterals`). */
-  collaterals: MigrationCollateralReport[];
+  maxEdges?: number;
 }
+
 
 /**
- * Result of `PermissionlessGroup.migrationRaw()` — pathfinder output handed
- * straight to the flow-matrix builder, no pruning. Use this when you want
- * to debug the pathfinder in isolation or know the path is feasible (e.g.
- * a fixed-amount mint well below caps).
+ * Result of `PermissionlessGroup.migration()` — pathfinder output handed
+ * straight to the flow-matrix builder.
  */
-export interface MigrationRawResult {
-  /** Ordered transaction batch — submit atomically via the runner. */
-  txs: TransactionRequest[];
-  /** Atto-CRC the pathfinder routed into the SinkWrapper. */
-  amount: bigint;
-}
-
-/** Result of `PermissionlessGroup.migration()`. */
 export interface MigrationResult {
   /**
    * Ordered transaction batch — submit atomically via the runner. Built by
@@ -243,90 +192,73 @@ export interface MigrationResult {
    * `operateFlowMatrix`, optional re-wraps).
    */
   txs: TransactionRequest[];
-  /**
-   * Atto-CRC routed into the SinkWrapper after all pruning. May be strictly
-   * less than the pathfinder's reported max because of bypass branches /
-   * per-collateral cap / max-flow factor.
-   */
+  /** Atto-CRC the pathfinder routed into the SinkWrapper. */
   amount: bigint;
-  /**
-   * Atto-CRC the pathfinder produced before any pruning. When the SDK ran
-   * the two-stage probe (max-flow mode), this is the feasible-target path's
-   * `maxFlow` (already after the `maxFlowFactor` shrink), not the headline
-   * MAX_FLOW probe — that's reported separately as `probedMaxFlow`.
-   */
-  requestedAmount: bigint;
-  /**
-   * Only populated in max-flow mode (when `params.amount` was omitted): the
-   * headline number from the initial MAX_FLOW probe, before the
-   * `maxFlowFactor` shrink. `null` otherwise.
-   */
-  probedMaxFlow: bigint | null;
-  /**
-   * Atto-CRC removed from the pathfinder's plan because it would have been
-   * deposited into the SinkWrapper from an avatar OTHER than the score group
-   * (a bypass branch — the sink only accepts group-CRC deposits via the
-   * canonical `router → group → sink` chain). 0n when the path was clean.
-   */
-  bypassPruned: bigint;
-  /**
-   * One entry per distinct collateral avatar that contributed to the path.
-   * `capped: true` flags the collaterals that forced the global scale-down.
-   * Useful for surfacing "you would migrate X CRC, capped to Y because of
-   * collateral Z" in the UI.
-   */
-  collaterals: MigrationCollateralReport[];
 }
 
 /**
- * Parameters for `PermissionlessGroup.transferGCRCAndScore()` — sends a
- * raw `Hub.safeTransferFrom` of the avatar's *own* personal CRC with the
- * score + Merkle proof attached as `data`. The score-gated mint policy
- * decodes this `data` on the receiving side and rejects the transfer if
- * the proof is stale / the avatar isn't in the tree.
+ * A score-attested transaction batch: the txs to submit, the backend proof
+ * encoded into them, and the atto-CRC the batch acts on. Backs {@link MintResult}.
  */
-export interface TransferGCRCAndScoreParams {
-  /**
-   * Sender + proof subject. Token id transferred is
-   * `uint256(uint160(avatar))` (the avatar's personal CRC). Must equal the
-   * runner's signing account — the policy binds the proof to msg.sender.
-   */
-  avatar: Address;
-  /** Recipient of the ERC1155 transfer. */
-  to: Address;
-  /** Atto-CRC to send. Required (the policy enforces non-zero amount). */
-  amount: bigint;
-}
-
-/** Result of `PermissionlessGroup.transferGCRCAndScore()`. */
-export interface TransferGCRCAndScoreResult {
-  /**
-   * Single-transaction batch: `Hub.safeTransferFrom(avatar, to, tokenId,
-   * amount, abi.encode(score, proof))`. Submit through the runner like any
-   * other tx batch.
-   */
+export interface ScoredTxBatchResult {
+  /** Ordered transaction batch — submit atomically via the runner. */
   txs: TransactionRequest[];
   /** Proof fetched from the score-groups backend and encoded into the tx data. */
   proof: ProofResponse;
-  /** Atto-CRC sent — identical to the input `amount`. */
+  /** Atto-CRC the batch acts on. */
   amount: bigint;
 }
 
-export interface MintResult {
+/**
+ * Result of `PermissionlessGroup.mint()`.
+ *
+ * `txs` order: `snapshotIssuance()` → `personalMint()` →
+ * `groupMint(group, [avatar], [amount], abi.encode(score, proof))` →
+ * `wrap(group, amount, CirclesType.Inflation)`. `amount` is the atto-CRC
+ * encoded into `groupMint`/`wrap` (the resolved cap when "mint max").
+ */
+export type MintResult = ScoredTxBatchResult;
+
+/**
+ * Parameters for `PermissionlessGroup.transferGroupCrc()` — moves the group's
+ * CRC (token id `uint256(groupAddress)`) from `avatar` to `to`.
+ */
+export interface TransferGroupCrcParams {
+  /** Holder + sender of the group CRC. */
+  avatar: Address;
+  /** Recipient. If it's a registered Circles organization, the SDK unwraps to
+   *  ERC1155 and sends that; otherwise it sends the inflationary ERC20. */
+  to: Address;
   /**
-   * Ordered transaction batch — submit these atomically (e.g. Safe multisend)
-   * for the mint to succeed. Order:
-   *   1. policy.snapshotIssuance()
-   *   2. Hub.personalMint()
-   *   3. Hub.groupMint(group, [avatar], [amount], abi.encode(score, proof))
-   *   4. Hub.wrap(group, amount, CirclesType.Inflation)
-   */
-  txs: TransactionRequest[];
-  /** Proof used to build the batch. */
-  proof: ProofResponse;
-  /**
-   * Atto-CRC encoded into `groupMint` and `wrap`. Identical to the input
-   * `amount` except `0n`/omitted ("mint max") is replaced with the resolved cap.
+   * Amount to transfer, **in demurraged atto-CRC** (today's value). The SDK
+   * converts to the wrapper's inflationary units for the ERC20 transfer, or
+   * sends the demurraged amount directly when routing as ERC1155.
    */
   amount: bigint;
+}
+
+/** How `transferGroupCrc()` delivered the group CRC. */
+export type TransferGroupCrcMode = 'erc20-inflationary' | 'erc1155-after-unwrap';
+
+/** Result of `PermissionlessGroup.transferGroupCrc()`. */
+export interface TransferGroupCrcResult {
+  /**
+   * Ordered transaction batch — submit atomically via the runner.
+   * - `erc20-inflationary`: `[ inflationaryWrapper.transfer(to, inflationaryAmount) ]`
+   * - `erc1155-after-unwrap`: `[ inflationaryWrapper.unwrap(inflationaryAmount),
+   *                              Hub.safeTransferFrom(avatar, to, groupTokenId,
+   *                                demurragedAmount, abi.encode(score, proof)) ]`
+   */
+  txs: TransactionRequest[];
+  /** Which delivery path was chosen (based on whether `to` is an organization). */
+  mode: TransferGroupCrcMode;
+  /** Demurraged atto-CRC transferred (== input `amount`). */
+  demurragedAmount: bigint;
+  /** Inflationary atto-CRC moved/unwrapped on the ERC20 wrapper. */
+  inflationaryAmount: bigint;
+  /**
+   * The score proof attached to the ERC1155 transfer — present only for the
+   * `erc1155-after-unwrap` (organization) path; `undefined` for ERC20.
+   */
+  proof?: ProofResponse;
 }
