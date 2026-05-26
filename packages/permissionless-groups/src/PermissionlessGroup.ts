@@ -8,9 +8,12 @@ import {
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
+import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
 import {
   PERMISSIONLESS_GROUPS_MIGRATION,
   SCORE_GROUPS_STAGING_RPC_URL,
+  isZeroAddress,
+  hexEq,
 } from '@aboutcircles/sdk-utils';
 import { MAX_FLOW } from '@aboutcircles/sdk-utils/constants';
 import { CirclesType } from '@aboutcircles/sdk-types';
@@ -29,8 +32,8 @@ import type {
   MintResult,
   MigrationParams,
   MigrationResult,
-  TransferGCRCAndScoreParams,
-  TransferGCRCAndScoreResult,
+  TransferGroupCrcParams,
+  TransferGroupCrcResult,
   ProofResponse,
   BalanceResult,
 } from './types.js';
@@ -198,76 +201,119 @@ export class PermissionlessGroup {
   }
 
   /**
-   * Send the avatar's *own* personal CRC via `Hub.safeTransferFrom`, with
-   * the avatar's score + Merkle proof encoded as the ERC1155 `data` field.
+   * Transfer the **group's** CRC (token id `uint256(groupAddress)`) from
+   * `avatar` to `to`.
    *
-   * The proof is fetched from the score-groups backend
-   * (`GET /groups/{group}/proof/{avatar}`) and abi-encoded as
-   * `(uint256 score, bytes proof)` — the exact format the score-gated mint
-   * policy decodes when this CRC lands in a contract that runs the policy
-   * inside `onERC1155Received`. Recipients that aren't policy-aware just
-   * ignore the `data` (standard ERC1155 behavior).
+   * `amount` is given in **demurraged** atto-CRC (today's value) — the unit
+   * the caller reasons about. The delivery format depends on the recipient:
    *
-   * Single-tx batch: no snapshot/personalMint/wrap pre-steps — this is a
-   * plain transfer with score-attestation data, NOT a mint flow. For
-   * minting against the score group call `mint()` instead.
+   *   - **`to` is a registered Circles organization** → organizations hold the
+   *     ERC1155, not the ERC20 wrapper. Unwrap the inflationary ERC20 back to
+   *     ERC1155, then `Hub.safeTransferFrom` the *demurraged* amount with the
+   *     avatar's **score + Merkle proof** attached as the ERC1155 `data`
+   *     (`abi.encode(uint256 score, bytes proof)`) — the format the
+   *     score-gated policy decodes inside `onERC1155Received`:
+   *       `[ inflationaryWrapper.unwrap(inflationaryAmount),
+   *          Hub.safeTransferFrom(avatar, to, groupTokenId, demurragedAmount,
+   *                               abi.encode(score, proof)) ]`
+   *     The proof is fetched from the score-groups backend and validated
+   *     against `policy.merkleRoots(group)` (throws `notEligible` for score 0,
+   *     `proofStale` on root mismatch).
    *
-   *  1. fetch (score, proof) from the score-groups backend
-   *  2. throw if `scoreRaw === "0"` (avatar not eligible; the transfer
-   *     would still execute but the recipient can't act on the proof)
-   *  3. compare backend proof.root vs `policy.merkleRoots(group)` — throw
-   *     `proofStale` on mismatch so callers know to refetch
-   *  4. emit tx: Hub.safeTransferFrom(avatar, to, uint256(avatar), amount,
-   *                                   abi.encode(score, proof))
+   *   - **otherwise** → send the inflationary ERC20 directly, no proof data
+   *     (ERC20 transfers carry none):
+   *       `[ inflationaryWrapper.transfer(to, inflationaryAmount) ]`
+   *
+   * The demurraged→inflationary conversion uses `CirclesConverter`
+   * (bit-identical with the wrapper's on-chain conversion up to sub-wei
+   * truncation). Submission is the caller's job — the returned `txs` (1 for
+   * ERC20, 2 for the org path) must be sent atomically.
    */
-  async transferGCRCAndScore(
-    params: TransferGCRCAndScoreParams
-  ): Promise<TransferGCRCAndScoreResult> {
+  async transferGroupCrc(
+    params: TransferGroupCrcParams
+  ): Promise<TransferGroupCrcResult> {
     if (!params.avatar) {
-      throw PermissionlessGroupError.invalidInput(
-        'transferGCRCAndScore() requires `avatar`'
-      );
+      throw PermissionlessGroupError.invalidInput('transferGroupCrc() requires `avatar`');
     }
     if (!params.to) {
-      throw PermissionlessGroupError.invalidInput(
-        'transferGCRCAndScore() requires `to`'
-      );
+      throw PermissionlessGroupError.invalidInput('transferGroupCrc() requires `to`');
     }
     if (params.amount === undefined || params.amount <= 0n) {
       throw PermissionlessGroupError.invalidInput(
-        'transferGCRCAndScore() requires `amount > 0`',
+        'transferGroupCrc() requires `amount > 0`',
         { amount: params.amount?.toString() }
       );
     }
 
-    const proof = await this.client.getProof(this.config.groupAddress, params.avatar);
-    if (proof.scoreRaw === '0') {
-      throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
-    }
-
-    // Match the proof root against the on-chain root — refetching usually
-    // resolves transient mismatches (publisher cadence ~minutes).
-    const policy = await this.policy();
-    const chainRoot = await policy.merkleRoots(this.config.groupAddress);
-    if (!hexEq(chainRoot, proof.root)) {
-      throw PermissionlessGroupError.proofStale(
-        'policy.merkleRoots disagrees with backend proof root',
-        { chainRoot, backendRoot: proof.root }
+    const group = this.config.groupAddress;
+    const inflationaryWrapperAddress = await this.lift.erc20Circles(
+      CirclesType.Inflation,
+      group
+    );
+    if (isZeroAddress(inflationaryWrapperAddress)) {
+      throw PermissionlessGroupError.invalidInput(
+        'group has no inflationary ERC20 wrapper deployed — nothing to transfer',
+        { group }
       );
     }
+    const wrapper = new InflationaryCirclesContract({
+      address: inflationaryWrapperAddress,
+      rpcUrl: this.config.rpcUrl,
+    });
 
-    const score = BigInt(proof.scoreRaw);
-    const data = encodePolicyData(score, proof.proof);
-    const tokenId = BigInt(params.avatar); // ERC1155 id of avatar's own CRC
-    const tx = this.hub.safeTransferFrom(
-      params.avatar,
-      params.to,
-      tokenId,
-      params.amount,
-      data
-    );
+    // demurraged → inflationary via the SDK converter (64.64 path — bit-
+    // identical with the wrapper's on-chain `convertDemurrageToInflationaryValue`
+    // up to sub-wei truncation), so no extra RPC round-trips.
+    const demurragedAmount = params.amount;
+    const inflationaryAmount =
+      CirclesConverter.attoCirclesToAttoStaticCircles(demurragedAmount);
 
-    return { txs: [tx], proof, amount: params.amount };
+    const isOrg = await this.hub.isOrganization(params.to);
+    if (isOrg) {
+      // Orgs can't hold the ERC20 wrapper — unwrap to ERC1155, then send the
+      // demurraged group CRC via the Hub, attaching the avatar's score proof
+      // as the ERC1155 `data` so a policy-aware org can act on it.
+      const proof = await this.client.getProof(group, params.avatar);
+      if (proof.scoreRaw === '0') {
+        throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
+      }
+      const policy = await this.policy();
+      const chainRoot = await policy.merkleRoots(group);
+      if (!hexEq(chainRoot, proof.root)) {
+        throw PermissionlessGroupError.proofStale(
+          'policy.merkleRoots disagrees with backend proof root',
+          { chainRoot, backendRoot: proof.root }
+        );
+      }
+
+      const data = encodePolicyData(BigInt(proof.scoreRaw), proof.proof);
+      const groupTokenId = await this.hub.toTokenId(group);
+      const txs: TransactionRequest[] = [
+        wrapper.unwrap(inflationaryAmount),
+        this.hub.safeTransferFrom(
+          params.avatar,
+          params.to,
+          groupTokenId,
+          demurragedAmount,
+          data
+        ),
+      ];
+      return {
+        txs,
+        mode: 'erc1155-after-unwrap',
+        demurragedAmount,
+        inflationaryAmount,
+        proof,
+      };
+    }
+
+    // Default: send the inflationary ERC20 directly (no proof data).
+    return {
+      txs: [wrapper.transfer(params.to, inflationaryAmount)],
+      mode: 'erc20-inflationary',
+      demurragedAmount,
+      inflationaryAmount,
+    };
   }
 
   /**
@@ -463,10 +509,3 @@ function isSameRpcUrl(a: string, b: string): boolean {
   return a.replace(/\/+$/, '').toLowerCase() === b.replace(/\/+$/, '').toLowerCase();
 }
 
-function isZeroAddress(a: Address): boolean {
-  return a.toLowerCase() === '0x0000000000000000000000000000000000000000';
-}
-
-function hexEq(a: Hex, b: Hex): boolean {
-  return a.toLowerCase() === b.toLowerCase();
-}

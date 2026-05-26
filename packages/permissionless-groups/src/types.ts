@@ -197,30 +197,8 @@ export interface MigrationResult {
 }
 
 /**
- * Parameters for `PermissionlessGroup.transferGCRCAndScore()` — sends a
- * raw `Hub.safeTransferFrom` of the avatar's *own* personal CRC with the
- * score + Merkle proof attached as `data`. The score-gated mint policy
- * decodes this `data` on the receiving side and rejects the transfer if
- * the proof is stale / the avatar isn't in the tree.
- */
-export interface TransferGCRCAndScoreParams {
-  /**
-   * Sender + proof subject. Token id transferred is
-   * `uint256(uint160(avatar))` (the avatar's personal CRC). Must equal the
-   * runner's signing account — the policy binds the proof to msg.sender.
-   */
-  avatar: Address;
-  /** Recipient of the ERC1155 transfer. */
-  to: Address;
-  /** Atto-CRC to send. Required (the policy enforces non-zero amount). */
-  amount: bigint;
-}
-
-/**
  * A score-attested transaction batch: the txs to submit, the backend proof
- * encoded into them, and the atto-CRC the batch acts on. Shared shape behind
- * both {@link MintResult} and {@link TransferGCRCAndScoreResult} — they were
- * structurally identical, so they're two named views of one contract.
+ * encoded into them, and the atto-CRC the batch acts on. Backs {@link MintResult}.
  */
 export interface ScoredTxBatchResult {
   /** Ordered transaction batch — submit atomically via the runner. */
@@ -232,14 +210,6 @@ export interface ScoredTxBatchResult {
 }
 
 /**
- * Result of `PermissionlessGroup.transferGCRCAndScore()`.
- *
- * `txs` is a single `Hub.safeTransferFrom(avatar, to, tokenId, amount,
- * abi.encode(score, proof))`; `amount` is the atto-CRC sent (== input).
- */
-export type TransferGCRCAndScoreResult = ScoredTxBatchResult;
-
-/**
  * Result of `PermissionlessGroup.mint()`.
  *
  * `txs` order: `snapshotIssuance()` → `personalMint()` →
@@ -248,3 +218,47 @@ export type TransferGCRCAndScoreResult = ScoredTxBatchResult;
  * encoded into `groupMint`/`wrap` (the resolved cap when "mint max").
  */
 export type MintResult = ScoredTxBatchResult;
+
+/**
+ * Parameters for `PermissionlessGroup.transferGroupCrc()` — moves the group's
+ * CRC (token id `uint256(groupAddress)`) from `avatar` to `to`.
+ */
+export interface TransferGroupCrcParams {
+  /** Holder + sender of the group CRC. */
+  avatar: Address;
+  /** Recipient. If it's a registered Circles organization, the SDK unwraps to
+   *  ERC1155 and sends that; otherwise it sends the inflationary ERC20. */
+  to: Address;
+  /**
+   * Amount to transfer, **in demurraged atto-CRC** (today's value). The SDK
+   * converts to the wrapper's inflationary units for the ERC20 transfer, or
+   * sends the demurraged amount directly when routing as ERC1155.
+   */
+  amount: bigint;
+}
+
+/** How `transferGroupCrc()` delivered the group CRC. */
+export type TransferGroupCrcMode = 'erc20-inflationary' | 'erc1155-after-unwrap';
+
+/** Result of `PermissionlessGroup.transferGroupCrc()`. */
+export interface TransferGroupCrcResult {
+  /**
+   * Ordered transaction batch — submit atomically via the runner.
+   * - `erc20-inflationary`: `[ inflationaryWrapper.transfer(to, inflationaryAmount) ]`
+   * - `erc1155-after-unwrap`: `[ inflationaryWrapper.unwrap(inflationaryAmount),
+   *                              Hub.safeTransferFrom(avatar, to, groupTokenId,
+   *                                demurragedAmount, abi.encode(score, proof)) ]`
+   */
+  txs: TransactionRequest[];
+  /** Which delivery path was chosen (based on whether `to` is an organization). */
+  mode: TransferGroupCrcMode;
+  /** Demurraged atto-CRC transferred (== input `amount`). */
+  demurragedAmount: bigint;
+  /** Inflationary atto-CRC moved/unwrapped on the ERC20 wrapper. */
+  inflationaryAmount: bigint;
+  /**
+   * The score proof attached to the ERC1155 transfer — present only for the
+   * `erc1155-after-unwrap` (organization) path; `undefined` for ERC20.
+   */
+  proof?: ProofResponse;
+}
