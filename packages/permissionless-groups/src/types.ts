@@ -123,12 +123,13 @@ export interface MintParams {
 }
 
 /**
- * Result of `PermissionlessGroup.balance()` — an avatar's holdings of the
- * group's token in all three forms.
+ * Result of `PermissionlessGroup.balanceBreakdown()` — an avatar's holdings of
+ * the group's token in all three forms, plus the resolved wrapper addresses.
  *
  * Note: `erc1155` and `demurrageWrapper` share the same demurraged unit, while
  * `inflationary` is in inflationary atto-CRC (different time-units). Don't
- * blindly sum them — convert via `CirclesConverter` first if you need a total.
+ * blindly sum them — convert via `CirclesConverter` first if you need a total
+ * (or use `PermissionlessGroup.balance()` ({@link GroupCrcBalance})).
  */
 export interface BalanceResult {
   /** ERC1155 group-CRC balance held by the avatar (demurraged atto-CRC). */
@@ -147,6 +148,29 @@ export interface BalanceResult {
   demurrageWrapperAddress: Address;
   /** Resolved inflationary wrapper address (zero when not deployed). */
   inflationaryWrapperAddress: Address;
+}
+
+/**
+ * Result of `PermissionlessGroup.balance()` — the avatar's current group CRC
+ * across all three forms PLUS the amount still migratable from legacy CRC, all
+ * normalized to **demurraged** atto-CRC so the figures are summable.
+ *
+ * For the raw per-form breakdown + wrapper addresses, see
+ * `PermissionlessGroup.balanceBreakdown()` ({@link BalanceResult}).
+ */
+export interface GroupCrcBalance {
+  /** ERC1155 group-CRC the avatar holds (demurraged). */
+  erc1155: bigint;
+  /** Demurrage-wrapper ERC20 balance (demurraged). */
+  demurrageErc20: bigint;
+  /** Inflationary-wrapper ERC20 balance, converted to demurraged for summing. */
+  inflationaryErc20: bigint;
+  /** Sum of the three held forms (demurraged) — what the avatar holds right now. */
+  heldTotal: bigint;
+  /** Amount still migratable from legacy CRC (pathfinder, maxEdges 100; demurraged). */
+  migratable: bigint;
+  /** `heldTotal + migratable` (demurraged) — the avatar's full reachable group CRC. */
+  total: bigint;
 }
 
 /**
@@ -243,22 +267,15 @@ export type TransferGroupCrcMode = 'erc20-inflationary' | 'erc1155-after-unwrap'
 /** Result of `PermissionlessGroup.transferGroupCrc()`. */
 export interface TransferGroupCrcResult {
   /**
-   * Ordered transaction batch — submit atomically via the runner.
-   * - `erc20-inflationary`: `[ inflationaryWrapper.transfer(to, inflationaryAmount) ]`
-   * - `erc1155-after-unwrap`: `[ inflationaryWrapper.unwrap(inflationaryAmount),
+   * Ordered transaction batch — submit atomically via the runner. Begins with
+   * any consolidation steps (wrap ERC1155 → inflationary; unwrap demurrage
+   * ERC20 → wrap → inflationary), then the delivery:
+   * - `erc20-inflationary`: `… inflationaryWrapper.transfer(to, inflationaryAmount)`
+   * - `erc1155-after-unwrap`: `… inflationaryWrapper.unwrap(inflationaryAmount),
    *                              Hub.safeTransferFrom(avatar, to, groupTokenId,
-   *                                demurragedAmount, abi.encode(score, proof)) ]`
+   *                                demurragedAmount, abi.encode(score, proof))`
    */
   txs: TransactionRequest[];
   /** Which delivery path was chosen (based on whether `to` is an organization). */
   mode: TransferGroupCrcMode;
-  /** Demurraged atto-CRC transferred (== input `amount`). */
-  demurragedAmount: bigint;
-  /** Inflationary atto-CRC moved/unwrapped on the ERC20 wrapper. */
-  inflationaryAmount: bigint;
-  /**
-   * The score proof attached to the ERC1155 transfer — present only for the
-   * `erc1155-after-unwrap` (organization) path; `undefined` for ERC20.
-   */
-  proof?: ProofResponse;
 }
