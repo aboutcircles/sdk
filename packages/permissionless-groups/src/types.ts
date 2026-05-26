@@ -259,6 +259,16 @@ export interface TransferGroupCrcParams {
    * sends the demurraged amount directly when routing as ERC1155.
    */
   amount: bigint;
+  /**
+   * Only relevant when `to` is an organization (the ERC1155 path). When `true`,
+   * the avatar's score + Merkle proof is fetched, validated, and attached as
+   * the ERC1155 `data` (`abi.encode(score, proof)`) so a policy-aware org can
+   * act on it — this requires the avatar to be score-eligible (throws
+   * `notEligible` for score 0, `proofStale` on root mismatch). When `false`
+   * (default), the ERC1155 transfer carries empty `data` and no proof is
+   * fetched. Ignored for non-org (ERC20) transfers, which never carry data.
+   */
+  includeProof?: boolean;
 }
 
 /** How `transferGroupCrc()` delivered the group CRC. */
