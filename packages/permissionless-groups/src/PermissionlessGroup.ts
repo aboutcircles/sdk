@@ -288,20 +288,28 @@ export class PermissionlessGroup {
     // 3) Org recipients hold ERC1155, not the ERC20 wrapper → deliver ERC1155.
     //    Use the avatar's existing ERC1155 first; only unwrap ERC20 (demurrage
     //    first, then inflationary) to cover any shortfall — no wrap→unwrap
-    //    round-trip. Then `Hub.safeTransferFrom` the demurraged amount with the
-    //    avatar's score proof attached as `data`.
+    //    round-trip. Then `Hub.safeTransferFrom` the demurraged amount; the
+    //    avatar's score proof is attached as `data` only when `includeProof`
+    //    is set (default: false → empty `data`, no backend fetch).
     if (isOrg) {
-      const proof = await this.client.getProof(group, params.avatar);
-      if (proof.scoreRaw === '0') {
-        throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
-      }
-      const policy = await this.policy();
-      const chainRoot = await policy.merkleRoots(group);
-      if (!hexEq(chainRoot, proof.root)) {
-        throw PermissionlessGroupError.proofStale(
-          'policy.merkleRoots disagrees with backend proof root',
-          { chainRoot, backendRoot: proof.root }
-        );
+      const includeProof = params.includeProof ?? false;
+
+      // Fetch + validate the score proof only when we're attaching it.
+      let data: Hex = '0x';
+      if (includeProof) {
+        const proof = await this.client.getProof(group, params.avatar);
+        if (proof.scoreRaw === '0') {
+          throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
+        }
+        const policy = await this.policy();
+        const chainRoot = await policy.merkleRoots(group);
+        if (!hexEq(chainRoot, proof.root)) {
+          throw PermissionlessGroupError.proofStale(
+            'policy.merkleRoots disagrees with backend proof root',
+            { chainRoot, backendRoot: proof.root }
+          );
+        }
+        data = encodePolicyData(BigInt(proof.scoreRaw), proof.proof);
       }
 
       const txs: TransactionRequest[] = [];
@@ -324,7 +332,6 @@ export class PermissionlessGroup {
         txs.push(wrapper.unwrap(inflToUnwrap));
       }
 
-      const data = encodePolicyData(BigInt(proof.scoreRaw), proof.proof);
       const groupTokenId = await this.hub.toTokenId(group);
       txs.push(
         this.hub.safeTransferFrom(
