@@ -17,6 +17,7 @@ import { CirclesType } from '@aboutcircles/sdk-types';
 import type {
   Address,
   Hex,
+  PathfindingResult,
   TransactionRequest,
 } from '@aboutcircles/sdk-types';
 
@@ -285,6 +286,47 @@ export class PermissionlessGroup {
    * the returned `txs` are meant to be sent atomically through a Safe runner.
    */
   async migration(params: MigrationParams): Promise<MigrationResult> {
+    const path = await this.migrationPath(params);
+
+    const scoreGroup = PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress;
+    const builder = new TransferBuilder(this.config.circlesConfig);
+    const txs = await builder.buildFlowMatrixTx(
+      params.avatar,
+      PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
+      path,
+      {
+        excludeFromTokens: [scoreGroup],
+        toTokens: [scoreGroup],
+        ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
+        useWrappedBalances: true,
+      }
+    );
+    return { txs: txs as TransactionRequest[], amount: path.maxFlow };
+  }
+
+  /**
+   * Preview how much `avatar` could migrate right now — the same pathfinder
+   * calculation as {@link migration} (identical params, same
+   * `toTokens=[scoreGroup]` / `excludeFromTokens=[scoreGroup]` constraints and
+   * `maxEdges` cap), but it stops before building the tx batch.
+   *
+   * Returns the migratable atto-CRC (`0n` when nothing is migratable). The
+   * number reflects chain + pathfinder state at query time; `migration()`
+   * re-queries, so the executed amount may differ slightly if the chain moved.
+   */
+  async migratableAmount(params: MigrationParams): Promise<bigint> {
+    const path = await this.migrationPath(params);
+    return path.maxFlow;
+  }
+
+  /**
+   * Shared pathfinder lookup behind {@link migration} and
+   * {@link migratableAmount}: routes `avatar`'s CRC into the SinkWrapper with
+   * the migration constraints (destination = score group only, never sourcing
+   * the score group token, optional edge cap). Validates params and throws if
+   * no path is found.
+   */
+  private async migrationPath(params: MigrationParams): Promise<PathfindingResult> {
     if (!params.avatar) {
       throw PermissionlessGroupError.invalidInput('migration() requires `avatar`');
     }
@@ -323,20 +365,7 @@ export class PermissionlessGroup {
         { amount: params.amount?.toString() ?? 'max' }
       );
     }
-
-    const builder = new TransferBuilder(this.config.circlesConfig);
-    const txs = await builder.buildFlowMatrixTx(
-      params.avatar,
-      PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
-      path,
-      {
-        excludeFromTokens: [scoreGroup],
-        toTokens: [scoreGroup],
-        ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
-        useWrappedBalances: true,
-      }
-    );
-    return { txs: txs as TransactionRequest[], amount: path.maxFlow };
+    return path;
   }
 
   private async buildMintBatch(
