@@ -16,6 +16,7 @@ export type {
   MintLimitsCell,
   MintLimitsCellError,
   BalanceResult,
+  GroupCrcBalance,
   ProofResponse,
 } from './types.js';
 

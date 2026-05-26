@@ -36,6 +36,7 @@ import type {
   TransferGroupCrcResult,
   ProofResponse,
   BalanceResult,
+  GroupCrcBalance,
 } from './types.js';
 
 /** Score scale used by the policy: max score == 100. */
@@ -118,14 +119,16 @@ export class PermissionlessGroup {
   }
 
   /**
-   * Read the avatar's holdings of this group's token across all three forms:
+   * Read the avatar's holdings of this group's token broken down by form:
    * ERC1155 group-CRC (unwrapped), ERC20 demurrage wrapper, and ERC20
-   * inflationary wrapper. Wrappers that haven't been deployed yet return 0n
-   * with `address = 0x0…0` — that's the chain state, not an error.
+   * inflationary wrapper, plus the resolved wrapper addresses. Wrappers that
+   * haven't been deployed yet return 0n with `address = 0x0…0` — that's the
+   * chain state, not an error.
    *
+   * For the headline summable total (incl. migratable), use {@link balance}.
    * Four `eth_call`s total, no transactions.
    */
-  async balance(avatar: Address): Promise<BalanceResult> {
+  async balanceBreakdown(avatar: Address): Promise<BalanceResult> {
     const group = this.config.groupAddress;
 
     const [tokenId, demurrageWrapperAddress, inflationaryWrapperAddress] =
@@ -246,33 +249,48 @@ export class PermissionlessGroup {
     }
 
     const group = this.config.groupAddress;
-    const inflationaryWrapperAddress = await this.lift.erc20Circles(
-      CirclesType.Inflation,
-      group
-    );
-    if (isZeroAddress(inflationaryWrapperAddress)) {
+    const demurragedAmount = params.amount;
+
+    // 1) Read the avatar's group CRC across all three forms.
+    const bal = await this.balanceBreakdown(params.avatar);
+    if (isZeroAddress(bal.inflationaryWrapperAddress)) {
       throw PermissionlessGroupError.invalidInput(
         'group has no inflationary ERC20 wrapper deployed — nothing to transfer',
         { group }
       );
     }
     const wrapper = new InflationaryCirclesContract({
-      address: inflationaryWrapperAddress,
+      address: bal.inflationaryWrapperAddress,
       rpcUrl: this.config.rpcUrl,
     });
 
-    // demurraged → inflationary via the SDK converter (64.64 path — bit-
-    // identical with the wrapper's on-chain `convertDemurrageToInflationaryValue`
-    // up to sub-wei truncation), so no extra RPC round-trips.
-    const demurragedAmount = params.amount;
-    const inflationaryAmount =
-      CirclesConverter.attoCirclesToAttoStaticCircles(demurragedAmount);
+    // 2) Sum availability in *demurraged* terms (the inflationary balance is
+    //    in inflationary units, so convert it down to compare apples to apples).
+    const inflAsDemurrage = CirclesConverter.attoStaticCirclesToAttoCircles(
+      bal.inflationaryWrapper
+    );
+    const totalDemurraged = bal.erc1155 + bal.demurrageWrapper + inflAsDemurrage;
+    if (totalDemurraged < demurragedAmount) {
+      throw PermissionlessGroupError.invalidInput(
+        'insufficient group CRC balance for the requested transfer',
+        {
+          requested: demurragedAmount.toString(),
+          available: totalDemurraged.toString(),
+          erc1155: bal.erc1155.toString(),
+          demurrageErc20: bal.demurrageWrapper.toString(),
+          inflationaryErc20Demurraged: inflAsDemurrage.toString(),
+        }
+      );
+    }
 
     const isOrg = await this.hub.isOrganization(params.to);
+
+    // 3) Org recipients hold ERC1155, not the ERC20 wrapper → deliver ERC1155.
+    //    Use the avatar's existing ERC1155 first; only unwrap ERC20 (demurrage
+    //    first, then inflationary) to cover any shortfall — no wrap→unwrap
+    //    round-trip. Then `Hub.safeTransferFrom` the demurraged amount with the
+    //    avatar's score proof attached as `data`.
     if (isOrg) {
-      // Orgs can't hold the ERC20 wrapper — unwrap to ERC1155, then send the
-      // demurraged group CRC via the Hub, attaching the avatar's score proof
-      // as the ERC1155 `data` so a policy-aware org can act on it.
       const proof = await this.client.getProof(group, params.avatar);
       if (proof.scoreRaw === '0') {
         throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
@@ -286,33 +304,64 @@ export class PermissionlessGroup {
         );
       }
 
+      const txs: TransactionRequest[] = [];
+      // shortfall of ERC1155 to cover the demurraged amount.
+      let need = demurragedAmount > bal.erc1155 ? demurragedAmount - bal.erc1155 : 0n;
+      // cover from the demurrage wrapper (1:1 demurraged units).
+      if (need > 0n && bal.demurrageWrapper > 0n) {
+        const take = need < bal.demurrageWrapper ? need : bal.demurrageWrapper;
+        const demurrageWrapper = new DemurrageCirclesContract({
+          address: bal.demurrageWrapperAddress,
+          rpcUrl: this.config.rpcUrl,
+        });
+        txs.push(demurrageWrapper.unwrap(take));
+        need -= take;
+      }
+      // cover the rest from the inflationary wrapper (convert the demurraged
+      // shortfall to inflationary for the unwrap call).
+      if (need > 0n) {
+        const inflToUnwrap = CirclesConverter.attoCirclesToAttoStaticCircles(need);
+        txs.push(wrapper.unwrap(inflToUnwrap));
+      }
+
       const data = encodePolicyData(BigInt(proof.scoreRaw), proof.proof);
       const groupTokenId = await this.hub.toTokenId(group);
-      const txs: TransactionRequest[] = [
-        wrapper.unwrap(inflationaryAmount),
+      txs.push(
         this.hub.safeTransferFrom(
           params.avatar,
           params.to,
           groupTokenId,
           demurragedAmount,
           data
-        ),
-      ];
-      return {
-        txs,
-        mode: 'erc1155-after-unwrap',
-        demurragedAmount,
-        inflationaryAmount,
-        proof,
-      };
+        )
+      );
+      return { txs, mode: 'erc1155-after-unwrap' };
     }
 
-    // Default: send the inflationary ERC20 directly (no proof data).
+    // 4) Non-org recipients → deliver inflationary ERC20. Consolidate the
+    //    avatar's other forms into the inflationary wrapper first:
+    //    demurrage ERC20 → unwrap → ERC1155, then all ERC1155 → wrap inflationary.
+    const consolidation: TransactionRequest[] = [];
+    if (bal.demurrageWrapper > 0n) {
+      const demurrageWrapper = new DemurrageCirclesContract({
+        address: bal.demurrageWrapperAddress,
+        rpcUrl: this.config.rpcUrl,
+      });
+      consolidation.push(demurrageWrapper.unwrap(bal.demurrageWrapper));
+    }
+    const erc1155ToWrap = bal.erc1155 + bal.demurrageWrapper;
+    if (erc1155ToWrap > 0n) {
+      consolidation.push(this.hub.wrap(group, erc1155ToWrap, CirclesType.Inflation));
+    }
+
+    // delivery amount: demurraged → inflationary (64.64, bit-identical with the
+    // wrapper's on-chain conversion up to sub-wei truncation).
+    const inflationaryAmount =
+      CirclesConverter.attoCirclesToAttoStaticCircles(demurragedAmount);
+
     return {
-      txs: [wrapper.transfer(params.to, inflationaryAmount)],
+      txs: [...consolidation, wrapper.transfer(params.to, inflationaryAmount)],
       mode: 'erc20-inflationary',
-      demurragedAmount,
-      inflationaryAmount,
     };
   }
 
@@ -363,6 +412,40 @@ export class PermissionlessGroup {
   async migratableAmount(params: MigrationParams): Promise<bigint> {
     const path = await this.migrationPath(params);
     return path.maxFlow;
+  }
+
+  /**
+   * The avatar's full reachable group CRC balance: its current holdings across
+   * all three forms (ERC1155, demurrage ERC20, inflationary ERC20) PLUS the
+   * amount still migratable from legacy CRC ({@link migratableAmount} with
+   * `maxEdges: 100`). Everything is normalized to **demurraged** atto-CRC so
+   * the figures are summable.
+   *
+   * Reads `balanceBreakdown(avatar)` and runs the migration pathfinder probe
+   * in parallel. "Nothing migratable" (no path) counts as `0`, not an error.
+   * For the raw per-form breakdown + wrapper addresses, use
+   * {@link balanceBreakdown}.
+   */
+  async balance(avatar: Address): Promise<GroupCrcBalance> {
+    const [bal, migratable] = await Promise.all([
+      this.balanceBreakdown(avatar),
+      this.migratableAmount({ avatar, maxEdges: 100 }).catch(() => 0n),
+    ]);
+
+    // inflationary balance is in inflationary units — convert down to demurraged.
+    const inflationaryErc20 = CirclesConverter.attoStaticCirclesToAttoCircles(
+      bal.inflationaryWrapper
+    );
+    const heldTotal = bal.erc1155 + bal.demurrageWrapper + inflationaryErc20;
+
+    return {
+      erc1155: bal.erc1155,
+      demurrageErc20: bal.demurrageWrapper,
+      inflationaryErc20,
+      heldTotal,
+      migratable,
+      total: heldTotal + migratable,
+    };
   }
 
   /**
@@ -508,4 +591,3 @@ export function encodePolicyData(score: bigint, proof: Hex): Hex {
 function isSameRpcUrl(a: string, b: string): boolean {
   return a.replace(/\/+$/, '').toLowerCase() === b.replace(/\/+$/, '').toLowerCase();
 }
-
