@@ -45,3 +45,19 @@ export const GNOSIS_GROUP_ADDRESS: Address = '0xc19bc204eb1c1d5b3fe500e5e5dfabab
  * Send 96 CRC here via transitive transfer to earn quota on the InvitationFarm
  */
 export const FARM_DESTINATION: Address = '0x9Eb51E6A39B3F17bB1883B80748b56170039ff1d';
+
+/**
+ * AffiliateGroupRegistry contract address. Held by the ReferralsModule only as
+ * an `internal constant` (no public getter — calling it reverts), so the SDK
+ * carries the address directly.
+ */
+export const AFFILIATE_GROUP_REGISTRY: Address = '0xca8222e780d046707083f51377B5Fd85E2866014';
+
+/**
+ * Sentinel group used to represent "no affiliate group" in the
+ * AffiliateGroupRegistry. The registry's `setAffiliateGroup` reverts on the
+ * zero address (it requires a Hub-registered group), so the SDK substitutes
+ * this group when a caller wants to clear their affiliate group, and maps it
+ * back to the zero address when reading.
+ */
+export const AFFILIATE_GROUP_NONE_SENTINEL: Address = '0x6CF165a39263984827d8C13829C60bd047B089E6';
