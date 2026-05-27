@@ -41,6 +41,13 @@ export interface CirclesConfig {
   /** Invitation Module contract address */
   invitationModuleAddress: Address;
   /**
+   * GnosisPayInviteQuotaGrantee contract address (optional). When set, the
+   * invitation flow checks `claimableFreeInvites(inviter)` first and, if the
+   * inviter is an eligible Gnosis Pay user, claims a free invite to fund the
+   * invitation instead of using proxy inviters or buying farm quota.
+   */
+  gnosisPayInviteQuotaGranteeAddress?: Address;
+  /**
    * Base URL of the score-groups backend (permissionless / score-gated groups).
    * Example: `https://<host>/score-groups`. No trailing slash.
    */

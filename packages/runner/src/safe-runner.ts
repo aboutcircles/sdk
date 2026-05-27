@@ -295,8 +295,13 @@ export class SafeContractRunner implements ContractRunner {
       transactions: metaTransactions,
     });
 
+    // Sign before executing. Without an explicit owner signature, protocol-kit
+    // falls back to a pre-validated (approved-hash) signature, which the Safe's
+    // checkSignatures rejects during gas estimation (GS013).
+    const signed = await safe.signTransaction(safeTransaction);
+
     // Execute the batched transaction
-    const txResult = await safe.executeTransaction(safeTransaction);
+    const txResult = await safe.executeTransaction(signed);
 
     if (!txResult.hash) {
       throw RunnerError.executionFailed('No transaction hash returned from Safe execution');

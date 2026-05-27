@@ -94,6 +94,16 @@ export class HumanAvatar extends CommonAvatar {
     },
 
     /**
+     * Number of free invites this avatar can claim as an eligible Gnosis Pay user.
+     * Returns 0 when not eligible (or the grantee contract is not configured).
+     * When > 0, `invite()` / `getReferralCode()` automatically use the free-invite
+     * path instead of proxy inviters or farm quota.
+     */
+    getClaimableFreeInvites: async (): Promise<bigint> => {
+      return this._invitations.getClaimableFreeInvites(this.address);
+    },
+
+    /**
      * Find a path from this avatar to the invitation module.
      * @param proxyInviterAddress Optional specific proxy inviter to route through
      */

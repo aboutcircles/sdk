@@ -20,6 +20,7 @@ export const circlesConfig: { [chainId: number]: CirclesConfig } = {
     liftERC20Address: "0x5F99a795dD2743C36D63511f0D4bc667e6d3cDB5",
     invitationFarmAddress: "0x0000000000000000000000000000000000000000",
     referralsModuleAddress: "0x12105a9B291aF2ABb0591001155A75949b062CE5",
-    invitationModuleAddress: "0x00738aca013B7B2e6cfE1690F0021C3182Fa40B5"
+    invitationModuleAddress: "0x00738aca013B7B2e6cfE1690F0021C3182Fa40B5",
+    gnosisPayInviteQuotaGranteeAddress: "0x5fF9293B9062d2741DD8bFDd2cB6ffd50BdBe587"
   }
 };
