@@ -11,3 +11,4 @@ export { liftERC20Abi } from './liftERC20.js';
 export { invitationFarmAbi } from './invitationFarm.js';
 export { referralsModuleAbi } from './referralsModule.js';
 export { scoreGatedMintPolicyAbi } from './scoreGatedMintPolicy.js';
+export { affiliateGroupRegistryAbi } from './affiliateGroupRegistry.js';
