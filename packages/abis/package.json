@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-abis",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "Circles Contract ABIs",
   "type": "module",
   "main": "./dist/index.js",
