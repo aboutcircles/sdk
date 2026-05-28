@@ -9,3 +9,6 @@ export { InvitationFarmContractMinimal } from './invitationFarm.js';
 export { SafeContractMinimal } from './safe.js';
 export { InvitationModuleContractMinimal } from './invitationModule.js';
 export { GnosisPayInviteQuotaGranteeContractMinimal } from './gnosisPayInviteQuotaGrantee.js';
+export { ScoreGroupContractMinimal } from './scoreGroup.js';
+export { OffchainScoreMintPolicyContractMinimal } from './offchainScoreMintPolicy.js';
+export { MerkleTreeRegistryContractMinimal } from './merkleTreeRegistry.js';
