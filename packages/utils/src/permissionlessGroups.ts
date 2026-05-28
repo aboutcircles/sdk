@@ -13,13 +13,23 @@ import type { Address, CirclesConfig } from '@aboutcircles/sdk-types';
  */
 export const PERMISSIONLESS_GROUPS_STAGING = {
   /** Score-gated group avatar served by the staging backend. */
-  groupAddress: '0x7CadB2E92295F3E4fA65D3d4E7265E2e05d7a783' as Address,
+  groupAddress: '0x93eD5A96347927ff6fF6b790F8Cf5258240c321f' as Address,
 
-  /** Treasury holding collateral routed from low-score (below threshold) minters. */
-  lowScoreTreasuryAddress: '0xe7Dc5Fae0b2d6f3392d45fCA03F58DC224c63e6F' as Address,
+  /**
+   * Parent ScoreTreasury (collateral custodian). Verifies and forwards every
+   * Hub-initiated receipt to a sub-treasury. Only this parent exposes
+   * `balanceOfCollateral(id)` — the aggregate across both sub-treasuries.
+   */
+  treasuryAddress: '0xE445f8b377f7689D2987920D51B8bBa21B6241Ce' as Address,
 
-  /** Treasury holding collateral routed from high-score (above threshold) minters. */
-  highScoreTreasuryAddress: '0x4b767D106F4e552Ffdb7Ce6547eB0398E208fc96' as Address,
+  /** Sub-treasury holding collateral routed from low-score (below threshold) minters. */
+  lowScoreTreasuryAddress: '0xd9fa2f4A35899f7d1e5ADb79592fbf51DC0806a4' as Address,
+
+  /** Sub-treasury holding collateral routed from high-score (above threshold) minters. */
+  highScoreTreasuryAddress: '0x516ADcF32be9576AefE2176C059d8abaB4f3C2D4' as Address,
+
+  /** MerkleTreeRegistry — registry of published score Merkle trees. */
+  merkleTreeRegistryAddress: '0xB4bfedaD42a14c30Bd9C1FdBf3e11916Fc719E6C' as Address,
 } as const;
 
 // The ScoreGatedMintPolicy address is intentionally NOT in this constant —
@@ -53,21 +63,23 @@ export const PERMISSIONLESS_GROUPS_MIGRATION = {
   gnosisGroupTreasuryAddress: '0x61CC0D966A97d716Ec5Cbe02095d45aA22B28b1d' as Address,
 
   /**
-   * ScoreRouter — receives collateral from the source treasury and forwards
-   * it to the destination ScoreGroup along the trusted path. Admin operations:
-   *   - `enableCRCForRouting(address[])`
-   *   - `setApprovalForCRC(address[])`
+   * ScoreRouter (ScoreGroupMintRouter) — an org on the trust graph between
+   * curated personal CRCs and the group, so flow paths can route through it.
+   * Admin operations:
+   *   - `enableCRCForRouting(address[])` / `disableCRCForRouting(address[])`
+   *   - `setApprovalForCRC(address[])` (permissionless; grants operator rights
+   *     for `HUB.operateFlowMatrix`, not revocable from this contract)
    */
-  scoreRouterAddress: '0xA60Cd6ddbB4eBa93246D6f80ff4504476c8117D1' as Address,
+  scoreRouterAddress: '0xE171a76De6B645A28b3767f84B177a4f6659a3D7' as Address,
 
   /** Destination ScoreGroup of the migration. Same as PERMISSIONLESS_GROUPS_STAGING.groupAddress. */
-  scoreGroupAddress: '0x7CadB2E92295F3E4fA65D3d4E7265E2e05d7a783' as Address,
+  scoreGroupAddress: '0x93eD5A96347927ff6fF6b790F8Cf5258240c321f' as Address,
 
   /** Treasury of the destination ScoreGroup, low-score branch. */
-  scoreGroupLowScoreTreasuryAddress: '0xe7Dc5Fae0b2d6f3392d45fCA03F58DC224c63e6F' as Address,
+  scoreGroupLowScoreTreasuryAddress: '0xd9fa2f4A35899f7d1e5ADb79592fbf51DC0806a4' as Address,
 
   /** Treasury of the destination ScoreGroup, high-score branch. */
-  scoreGroupHighScoreTreasuryAddress: '0x4b767D106F4e552Ffdb7Ce6547eB0398E208fc96' as Address,
+  scoreGroupHighScoreTreasuryAddress: '0x516ADcF32be9576AefE2176C059d8abaB4f3C2D4' as Address,
 } as const;
 
 /**
