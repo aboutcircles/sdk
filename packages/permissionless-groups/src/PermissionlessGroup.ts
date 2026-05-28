@@ -5,11 +5,16 @@ import {
   DemurrageCirclesContract,
   InflationaryCirclesContract,
 } from '@aboutcircles/sdk-core';
+import {
+  ScoreGroupContractMinimal,
+  MerkleTreeRegistryContractMinimal,
+} from '@aboutcircles/sdk-core/minimal';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
 import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
 import {
+  PERMISSIONLESS_GROUPS_STAGING,
   PERMISSIONLESS_GROUPS_MIGRATION,
   SCORE_GROUPS_STAGING_RPC_URL,
   isZeroAddress,
@@ -119,6 +124,37 @@ export class PermissionlessGroup {
   }
 
   /**
+   * Verify a backend score proof on-chain, used as a mint/transfer pre-flight.
+   *
+   * Defers entirely to the MerkleTreeRegistry's `verifyWithGracePeriod`: one
+   * view call that resolves the manager's current/previous root, applies the
+   * grace window (~2 blocks), and checks the full proof — so the SDK never has
+   * to mirror the registry's freshness rule or compare roots client-side.
+   *
+   * The OffchainScoreBasedMintPolicy keeps roots in the registry keyed by the
+   * group's merkle-tree manager, so we resolve that first via the policy.
+   *
+   * @param avatar - The proof subject (leaf key)
+   * @param proof - The backend `/proof` response (provides `value` + `proof`)
+   * @returns Whether the proof verifies against a currently-valid root
+   */
+  private async verifyProofOnChain(avatar: Address, proof: ProofResponse): Promise<boolean> {
+    // The group exposes its own merkle-tree manager (wired at deploy), and the
+    // registry address is a known constant — so no Hub/policy lookups are
+    // needed. One read (the manager) + the verify call.
+    const scoreGroup = new ScoreGroupContractMinimal({
+      address: this.config.groupAddress,
+      rpcUrl: this.config.rpcUrl,
+    });
+    const manager = await scoreGroup.merkleTreeManager();
+    const registry = new MerkleTreeRegistryContractMinimal({
+      address: PERMISSIONLESS_GROUPS_STAGING.merkleTreeRegistryAddress,
+      rpcUrl: this.config.rpcUrl,
+    });
+    return registry.verifyWithGracePeriod(manager, avatar, proof.value, proof.proof);
+  }
+
+  /**
    * Read the avatar's holdings of this group's token broken down by form:
    * ERC1155 group-CRC (unwrapped), ERC20 demurrage wrapper, and ERC20
    * inflationary wrapper, plus the resolved wrapper addresses. Wrappers that
@@ -191,12 +227,10 @@ export class PermissionlessGroup {
       return { txs: [this.hub.personalMint()], proof, amount: 0n };
     }
 
-    const policy = await this.policy();
-    const chainRoot = await policy.merkleRoots(this.config.groupAddress);
-    if (!hexEq(chainRoot, proof.root)) {
+    if (!(await this.verifyProofOnChain(params.avatar, proof))) {
       throw PermissionlessGroupError.proofStale(
-        'policy.merkleRoots disagrees with backend proof root',
-        { chainRoot, backendRoot: proof.root }
+        'backend proof failed on-chain verification (stale root or invalid proof)',
+        { backendRoot: proof.root }
       );
     }
 
@@ -301,12 +335,10 @@ export class PermissionlessGroup {
         if (proof.scoreRaw === '0') {
           throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
         }
-        const policy = await this.policy();
-        const chainRoot = await policy.merkleRoots(group);
-        if (!hexEq(chainRoot, proof.root)) {
+        if (!(await this.verifyProofOnChain(params.avatar, proof))) {
           throw PermissionlessGroupError.proofStale(
-            'policy.merkleRoots disagrees with backend proof root',
-            { chainRoot, backendRoot: proof.root }
+            'backend proof failed on-chain verification (stale root or invalid proof)',
+            { backendRoot: proof.root }
           );
         }
         data = encodePolicyData(BigInt(proof.scoreRaw), proof.proof);
@@ -488,6 +520,7 @@ export class PermissionlessGroup {
       to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
       targetFlow: params.amount ?? MAX_FLOW,
       excludeFromTokens: [scoreGroup],
+      // The migration must arrive at the sink as the ScoreGroup's CRC.
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
       // `maxEdges` is forwarded straight to the pathfinder's `maxTransfers`,
@@ -504,6 +537,29 @@ export class PermissionlessGroup {
     return path;
   }
 
+  /**
+   * `Hub.groupMint` requires the group to trust the collateral avatar. The
+   * ScoreGroup's `trust(address)` is permissionless — anyone may call it to make
+   * the group trust a Hub human (and a self-call also clears a prior opt-out).
+   * So when the group doesn't already trust the avatar, we prepend a
+   * `group.trust(avatar)` tx to the batch; otherwise nothing is added.
+   *
+   * Scoped to the known ScoreGroup deployment: only that contract exposes the
+   * permissionless `trust(address)`. For any other configured group we add
+   * nothing (an arbitrary group may not expose this function, and onboarding is
+   * its own concern).
+   *
+   * @param avatar - The collateral avatar to be trusted by the group
+   * @returns `[group.trust(avatar)]` when applicable and not yet trusted, else `[]`
+   */
+  private async buildGroupTrustTxIfNeeded(avatar: Address): Promise<TransactionRequest[]> {
+    const group = this.config.groupAddress;
+    if (!hexEq(group, PERMISSIONLESS_GROUPS_STAGING.groupAddress)) return [];
+    if (await this.hub.isTrusted(group, avatar)) return [];
+    const scoreGroup = new ScoreGroupContractMinimal({ address: group, rpcUrl: this.config.rpcUrl });
+    return [scoreGroup.trust(avatar)];
+  }
+
   private async buildMintBatch(
     params: MintParams,
     proof: ProofResponse
@@ -514,6 +570,9 @@ export class PermissionlessGroup {
     const policy = await this.policy();
 
     const txs: TransactionRequest[] = [
+      // Step 0: group.trust(avatar) — only when the group doesn't already trust
+      // the collateral avatar (groupMint reverts otherwise). Permissionless.
+      ...(await this.buildGroupTrustTxIfNeeded(params.avatar)),
       // Step 3: policy.snapshotIssuance()
       policy.snapshotIssuance(),
       // Step 4: Hub.personalMint() — must come after snapshot (the policy
@@ -589,6 +648,7 @@ export class PermissionlessGroup {
 export function encodePolicyData(score: bigint, proof: Hex): Hex {
   return encodeAbiParameters(['uint256', 'bytes'], [score, proof]);
 }
+
 
 /**
  * Loose URL match — ignores trailing slashes and case. Good enough for
