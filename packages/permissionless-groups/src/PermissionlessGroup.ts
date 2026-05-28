@@ -392,12 +392,17 @@ export class PermissionlessGroup {
    * in one shot). `params.maxEdges` caps the number of flow edges (forwarded
    * to the pathfinder's `maxTransfers`).
    *
-   * Single attempt: if `findPath` returns nothing or `buildFlowMatrixTx`
-   * throws, the error bubbles straight up. Submission is the caller's job —
-   * the returned `txs` are meant to be sent atomically through a Safe runner.
+   * When nothing can be migrated (the pathfinder finds no route), this returns
+   * an empty batch `{ txs: [], amount: 0n }` rather than throwing — migration
+   * being impossible is a normal state, so callers can simply check
+   * `txs.length`/`amount`. Submission is the caller's job; the returned `txs`
+   * are meant to be sent atomically through a Safe runner.
    */
   async migration(params: MigrationParams): Promise<MigrationResult> {
     const path = await this.migrationPath(params);
+    if (!path.transfers || path.transfers.length === 0) {
+      return { txs: [], amount: 0n };
+    }
 
     const scoreGroup = PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress;
     const builder = new TransferBuilder(this.config.circlesConfig);
@@ -505,12 +510,7 @@ export class PermissionlessGroup {
       ...(params.maxEdges !== undefined ? { maxTransfers: params.maxEdges } : {}),
       useWrappedBalances: true,
     });
-    if (!path.transfers || path.transfers.length === 0) {
-      throw PermissionlessGroupError.invalidInput(
-        'pathfinder returned no transfers for the requested migration amount',
-        { amount: params.amount?.toString() ?? 'max' }
-      );
-    }
+
     return path;
   }
 
