@@ -16,7 +16,6 @@ import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
 import {
   PERMISSIONLESS_GROUPS_STAGING,
   PERMISSIONLESS_GROUPS_MIGRATION,
-  SCORE_GROUPS_STAGING_RPC_URL,
   isZeroAddress,
   hexEq,
 } from '@aboutcircles/sdk-utils';
@@ -68,32 +67,10 @@ export class PermissionlessGroup {
   private policyPromise: Promise<ScoreGatedMintPolicyContract> | null = null;
 
   constructor(config: PermissionlessGroupConfig) {
-    // The score-groups migration stack (sinkWrapper, scoreRouter, score-gated
-    // trust) only lives in the staging Circles indexer. Pointing the
-    // pathfinder at any other RPC silently returns paths that don't route
-    // through the score router and revert at the sink. Force both
-    // `rpcUrl` and `circlesConfig.circlesRpcUrl` to the staging URL,
-    // warning the caller if they passed something else so misconfiguration
-    // is visible instead of silently broken.
-    const stagingRpc = SCORE_GROUPS_STAGING_RPC_URL;
-    const rpcUrlMatches = isSameRpcUrl(config.rpcUrl, stagingRpc);
-    const circlesRpcMatches = isSameRpcUrl(
-      config.circlesConfig.circlesRpcUrl,
-      stagingRpc
-    );
-    if (!rpcUrlMatches || !circlesRpcMatches) {
-      console.warn(
-        `[PermissionlessGroup] overriding rpcUrl(s) to ${stagingRpc} — ` +
-        `the score-groups pathfinder + indexer only exist on staging. ` +
-        `Caller passed rpcUrl=${config.rpcUrl}, ` +
-        `circlesConfig.circlesRpcUrl=${config.circlesConfig.circlesRpcUrl}.`
-      );
-    }
-    this.config = {
-      ...config,
-      rpcUrl: stagingRpc,
-      circlesConfig: { ...config.circlesConfig, circlesRpcUrl: stagingRpc },
-    };
+    // Use the caller-supplied RPC as-is. The pathfinder (`circlesV2_findPath`)
+    // is served by the main Circles RPC (`circlesConfig.circlesRpcUrl`), so the
+    // SDK never pins a specific pathfinder endpoint — it flows from config.
+    this.config = config;
     this.client = new ScoreGroupsClient(config.backendBaseUrl);
     this.hub = new HubV2Contract({ address: config.hubAddress, rpcUrl: this.config.rpcUrl });
     this.lift = new LiftERC20Contract({
@@ -647,14 +624,4 @@ export class PermissionlessGroup {
  */
 export function encodePolicyData(score: bigint, proof: Hex): Hex {
   return encodeAbiParameters(['uint256', 'bytes'], [score, proof]);
-}
-
-
-/**
- * Loose URL match — ignores trailing slashes and case. Good enough for
- * detecting "did the caller hand us the staging RPC under a slightly
- * different spelling".
- */
-function isSameRpcUrl(a: string, b: string): boolean {
-  return a.replace(/\/+$/, '').toLowerCase() === b.replace(/\/+$/, '').toLowerCase();
 }
