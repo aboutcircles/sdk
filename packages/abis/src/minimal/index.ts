@@ -8,6 +8,7 @@ export { referralsModuleMinimalAbi } from './referralsModule.js';
 export { invitationFarmMinimalAbi } from './invitationFarm.js';
 export { safeMinimalAbi } from './safe.js';
 export { invitationModuleMinimalAbi } from './invitationModule.js';
+export { gnosisPayInviteQuotaGranteeMinimalAbi } from './gnosisPayInviteQuotaGrantee.js';
 export { scoreGroupMinimalAbi } from './scoreGroup.js';
 export { offchainScoreMintPolicyMinimalAbi } from './offchainScoreMintPolicy.js';
 export { merkleTreeRegistryMinimalAbi } from './merkleTreeRegistry.js';

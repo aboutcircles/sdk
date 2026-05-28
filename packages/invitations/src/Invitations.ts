@@ -1,11 +1,12 @@
-import type { Address, TransactionRequest, CirclesConfig, Hex } from '@aboutcircles/sdk-types';
+import type { Address, TransactionRequest, CirclesConfig } from '@aboutcircles/sdk-types';
 import { RpcClient, PathfinderMethods, TrustMethods, TokenMethods } from '@aboutcircles/sdk-rpc';
 import {
   HubV2ContractMinimal,
   ReferralsModuleContractMinimal,
   InvitationFarmContractMinimal,
   SafeContractMinimal,
-  InvitationModuleContractMinimal
+  InvitationModuleContractMinimal,
+  GnosisPayInviteQuotaGranteeContractMinimal
 } from '@aboutcircles/sdk-core/minimal';
 import { InvitationError } from './errors.js';
 import type { ReferralPreviewList } from './types.js';
@@ -37,6 +38,15 @@ export interface ProxyInviter {
 const FARM_TO_TOKEN = GNOSIS_GROUP_ADDRESS;
 
 /**
+ * An address with standing farm quota, used purely to simulate `claimInvite`
+ * and read which bot id the farm would allocate next. The id is derived from
+ * the farm's global round-robin cursor (`uint256(uint160(bot))`), independent
+ * of the caller — so a simulation from this holder yields the same id the real
+ * claim will use, without the actual inviter needing quota at build time.
+ */
+const QUOTA_HOLDER = '0x20EcD8bDeb2F48d8a7c94E542aA4feC5790D9676' as Address;
+
+/**
  * Invitations handles invitation operations for Circles
  * Supports both referral invitations (new users) and direct invitations (existing Safe wallets)
  */
@@ -50,6 +60,7 @@ export class Invitations {
   private referralsModule: ReferralsModuleContractMinimal;
   private invitationFarm: InvitationFarmContractMinimal;
   private invitationModuleContract: InvitationModuleContractMinimal;
+  private gnosisPayGrantee?: GnosisPayInviteQuotaGranteeContractMinimal;
 
   constructor(config: CirclesConfig) {
     if (!config.referralsServiceUrl) {
@@ -80,6 +91,12 @@ export class Invitations {
       address: config.invitationModuleAddress,
       rpcUrl: config.circlesRpcUrl,
     });
+    if (config.gnosisPayInviteQuotaGranteeAddress) {
+      this.gnosisPayGrantee = new GnosisPayInviteQuotaGranteeContractMinimal({
+        address: config.gnosisPayInviteQuotaGranteeAddress,
+        rpcUrl: config.circlesRpcUrl,
+      });
+    }
   }
 
   /**
@@ -114,6 +131,50 @@ export class Invitations {
     }
 
     return setupTxs;
+  }
+
+  /**
+   * Check whether the inviter is an eligible Gnosis Pay user with unclaimed
+   * free invites. Returns 0 when the grantee contract is not configured or the
+   * inviter is not eligible.
+   *
+   * @param inviter - Address of the inviter
+   * @returns Number of free invites the inviter can still claim
+   */
+  async getClaimableFreeInvites(inviter: Address): Promise<bigint> {
+    if (!this.gnosisPayGrantee) return 0n;
+    return this.gnosisPayGrantee.claimableFreeInvites(inviter.toLowerCase() as Address);
+  }
+
+  /**
+   * Build the free-invite transaction batch for a single invitation.
+   *
+   * Claiming a free invite grants the inviter +1 quota in the InvitationFarm,
+   * which the subsequent `claimInvite()` consumes — all in one atomic batch, so
+   * the inviter needs neither proxy inviters nor 96 CRC to fund the invite.
+   *
+   * @param inviter - Address of the inviter (lowercased)
+   * @param transferData - Encoded data for the invitation transfer (invitee
+   *   address for direct invites, or ReferralsModule + createAccount calldata
+   *   for referrals)
+   * @returns `[claimFreeInvite, claimInvite, safeTransferFrom]`
+   */
+  private async buildFreeInviteTransactions(
+    inviter: Address,
+    transferData: `0x${string}`
+  ): Promise<TransactionRequest[]> {
+    // Read the bot id the farm would allocate (caller-independent — uses the
+    // farm's global round-robin cursor). The inviter has no quota yet, so we
+    // simulate from a standing quota holder.
+    const claimedId = await this.invitationFarm.read('claimInvite', [], { from: QUOTA_HOLDER }) as bigint;
+
+    const invitationModule = await this.invitationFarm.invitationModule();
+
+    return [
+      this.gnosisPayGrantee!.claimFreeInvite(),
+      this.invitationFarm.claimInvite(),
+      this.hubV2.safeTransferFrom(inviter, invitationModule, claimedId, INVITATION_FEE, transferData),
+    ];
   }
 
   /**
@@ -267,6 +328,7 @@ export class Invitations {
     const realInviters = await this.getRealInviters(inviterLower);
 
     const transactions: TransactionRequest[] = [...setupTxs];
+    const transferData = encodeAbiParameters(['address'], [inviteeLower]);
 
     if (realInviters.length > 0) {
       // Standard path: use proxy inviters
@@ -275,7 +337,6 @@ export class Invitations {
 
       const path = await this.findInvitePath(inviterLower, realInviterAddress);
 
-      const transferData = await this.generateInviteData([inviteeLower], false);
       const transferBuilder = new TransferBuilder(this.config);
 
       const transferTransactions = await transferBuilder.buildFlowMatrixTx(
@@ -291,52 +352,69 @@ export class Invitations {
       );
       transactions.push(...transferTransactions);
     } else {
-      // Fallback: farm-based invitation
-      // 1. Send 96 CRC to the farm destination (invitation market) to increase quota
-      // 2. claimInvite() to claim a token ID from the farm
-      // 3. safeTransferFrom() to transfer the claimed token to the invitation module
-      //    with the invitee address encoded as data
-      console.log('[generateInvite] Using FARM FALLBACK PATH (no proxy inviters available)');
-
-      // Farm Step 1: Send 96 CRC to farm destination to increase quota
-      const transferBuilder = new TransferBuilder(this.config);
-      const farmPath = await this.findFarmInvitePath(inviterLower);
-
-      const quotaTransactions = await transferBuilder.buildFlowMatrixTx(
-        inviterLower,
-        FARM_DESTINATION,
-        farmPath,
-        {
-          toTokens: [GNOSIS_GROUP_ADDRESS],
-          useWrappedBalances: true
-        },
-        true
+      // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
+      // inviter can't afford it, fall back to a Gnosis Pay free invite.
+      transactions.push(
+        ...(await this.buildFarmOrFreeInviteTransactions(inviterLower, transferData))
       );
-      transactions.push(...quotaTransactions);
-
-      // Farm Step 2: Simulate claim to get the token ID (use an address with existing quota for simulation)
-      const QUOTA_HOLDER = '0x20EcD8bDeb2F48d8a7c94E542aA4feC5790D9676' as Address;
-      const claimedId = await this.invitationFarm.read('claimInvite', [], { from: QUOTA_HOLDER }) as bigint;
-
-      const claimTx = this.invitationFarm.claimInvite();
-      transactions.push(claimTx);
-
-      // Farm Step 3: Transfer claimed token to invitation module with invitee address
-      const invitationModule = await this.invitationFarm.invitationModule();
-      const transferData = encodeAbiParameters(['address'], [inviteeLower]);
-
-      const safeTransferTx = this.hubV2.safeTransferFrom(
-        inviterLower,
-        invitationModule,
-        claimedId,
-        INVITATION_FEE,
-        transferData
-      );
-      transactions.push(safeTransferTx);
-
     }
 
     return transactions;
+  }
+
+  /**
+   * Build the funding + claim + transfer txs when the inviter has no proxy
+   * inviters. Prefers the farm fallback (pay 96 CRC for quota); only when that
+   * isn't affordable (insufficient balance / no path) does it fall back to a
+   * Gnosis Pay free invite, if the inviter is eligible. Rethrows the original
+   * farm error when no fallback applies.
+   *
+   * @param inviter - Address of the inviter (lowercased)
+   * @param transferData - Encoded invitation transfer data
+   * @returns The funding/claim/transfer transactions
+   */
+  private async buildFarmOrFreeInviteTransactions(
+    inviter: Address,
+    transferData: `0x${string}`
+  ): Promise<TransactionRequest[]> {
+    try {
+      // Farm fallback: send 96 CRC to the farm destination to earn quota, then
+      // claim + transfer the invite token.
+      console.log('[invitations] Using FARM FALLBACK PATH (no proxy inviters available)');
+      const transferBuilder = new TransferBuilder(this.config);
+      const farmPath = await this.findFarmInvitePath(inviter);
+
+      const quotaTransactions = await transferBuilder.buildFlowMatrixTx(
+        inviter,
+        FARM_DESTINATION,
+        farmPath,
+        { toTokens: [GNOSIS_GROUP_ADDRESS], useWrappedBalances: true },
+        true
+      );
+
+      const claimedId = await this.invitationFarm.read('claimInvite', [], { from: QUOTA_HOLDER }) as bigint;
+      const invitationModule = await this.invitationFarm.invitationModule();
+
+      return [
+        ...quotaTransactions,
+        this.invitationFarm.claimInvite(),
+        this.hubV2.safeTransferFrom(inviter, invitationModule, claimedId, INVITATION_FEE, transferData),
+      ];
+    } catch (error) {
+      const cannotAfford =
+        error instanceof InvitationError &&
+        (error.code === 'INVITATION_INSUFFICIENT_BALANCE' || error.code === 'INVITATION_NO_PATH');
+      if (!cannotAfford) throw error;
+
+      // Last resort: a Gnosis Pay free invite (claiming grants the quota the
+      // farm fallback couldn't fund). Only if the inviter is eligible.
+      if (await this.getClaimableFreeInvites(inviter) > 0n) {
+        console.log('[invitations] Using FREE INVITE PATH (Gnosis Pay)');
+        return this.buildFreeInviteTransactions(inviter, transferData);
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -600,12 +678,12 @@ export class Invitations {
     const realInviters = await this.getRealInviters(inviterLower);
 
     const transactions: TransactionRequest[] = [...setupTxs];
+    const transferData = await this.generateInviteData([signerAddress], true);
 
     if (realInviters.length > 0) {
       // Standard path: use proxy inviters
       console.log('[generateReferral] Using STANDARD PATH (proxy inviters available)');
       const transferBuilder = new TransferBuilder(this.config);
-      const transferData = await this.generateInviteData([signerAddress], true);
 
       const realInviterAddress = realInviters[0].address;
       const path = await this.findInvitePath(inviterLower, realInviterAddress);
@@ -623,53 +701,11 @@ export class Invitations {
       );
       transactions.push(...transferTransactions);
     } else {
-      // Fallback: use farm-based invitation path
-      // 1. Send 96 CRC to the dispatcher to increase quota on the farm
-      // 2. claimInvite() to claim a token ID from the farm (uses the quota)
-      // 3. safeTransferFrom() to transfer the claimed token to the invitation module
-      //    with createAccount calldata for the new signer
-      console.log('[generateReferral] Using FARM FALLBACK PATH (no proxy inviters available)');
-
-      // Farm Step 1: Send 96 CRC to dispatcher to increase quota
-      const transferBuilder = new TransferBuilder(this.config);
-      const farmPath = await this.findFarmInvitePath(inviterLower);
-
-      const quotaTransactions = await transferBuilder.buildFlowMatrixTx(
-        inviterLower,
-        FARM_DESTINATION,
-        farmPath,
-        {
-          toTokens: [FARM_TO_TOKEN],
-          useWrappedBalances: true
-        },
-        true
+      // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
+      // inviter can't afford it, fall back to a Gnosis Pay free invite.
+      transactions.push(
+        ...(await this.buildFarmOrFreeInviteTransactions(inviterLower, transferData))
       );
-      transactions.push(...quotaTransactions);
-
-      // Farm Step 2: Simulate claim to get the token ID, then build claim tx
-      const QUOTA_HOLDER = '0x20EcD8bDeb2F48d8a7c94E542aA4feC5790D9676' as Address;
-      const claimedId = await this.invitationFarm.read('claimInvite', [], { from: QUOTA_HOLDER }) as bigint;
-
-      const claimTx = this.invitationFarm.claimInvite();
-      transactions.push(claimTx);
-
-      // Farm Step 3: Transfer claimed token to invitation module with createAccount calldata
-      const invitationModule = await this.invitationFarm.invitationModule();
-      const createAccountCalldata = this.referralsModule.createAccount(signerAddress).data as Hex;
-      const transferData = encodeAbiParameters(
-        ['address', 'bytes'],
-        [this.config.referralsModuleAddress, createAccountCalldata]
-      );
-
-      const safeTransferTx = this.hubV2.safeTransferFrom(
-        inviterLower,
-        invitationModule,
-        claimedId,
-        INVITATION_FEE,
-        transferData
-      );
-      transactions.push(safeTransferTx);
-
     }
 
     return { transactions, privateKey };

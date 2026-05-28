@@ -12,4 +12,5 @@ export { CirclesType } from '@aboutcircles/sdk-types';
 export { InvitationFarmContract } from './invitationFarm.js';
 export { ReferralsModuleContract } from './referralsModule.js';
 export { ScoreGatedMintPolicyContract } from './scoreGatedMintPolicy.js';
+export { AffiliateGroupRegistryContract } from './affiliateGroupRegistry.js';
 export { Contract } from './contract.js';
