@@ -47,6 +47,21 @@ import type {
 const MAX_SCORE = 100n;
 
 /**
+ * Clamp a raw score to the policy's 0–100 scale. The backend may report a raw
+ * value above 100; the policy treats anything at or above the ceiling as the
+ * maximum, so we recognise it as {@link MAX_SCORE} rather than letting it
+ * inflate the mintable amount.
+ */
+const clampScore = (raw: bigint): bigint => (raw > MAX_SCORE ? MAX_SCORE : raw);
+
+/**
+ * Default number of flow edges (`maxTransfers`) we ask the pathfinder for in
+ * every migration probe. Migration routes can fan out across many hops, so we
+ * always request a generous cap unless the caller overrides it via `maxEdges`.
+ */
+const DEFAULT_MAX_EDGES = 100;
+
+/**
  * High-level entrypoint for minting from a score-gated permissionless group.
  *
  * The mint flow batches: (optional) `Hub.personalMint`, `policy.snapshotIssuance`,
@@ -450,7 +465,7 @@ export class PermissionlessGroup {
   async balance(avatar: Address): Promise<GroupCrcBalance> {
     const [bal, migratable] = await Promise.all([
       this.balanceBreakdown(avatar),
-      this.migratableAmount({ avatar, maxEdges: 100 }).catch(() => 0n),
+      this.migratableAmount({ avatar, maxEdges: DEFAULT_MAX_EDGES }).catch(() => 0n),
     ]);
 
     // inflationary balance is in inflationary units — convert down to demurraged.
@@ -473,8 +488,8 @@ export class PermissionlessGroup {
    * Shared pathfinder lookup behind {@link migration} and
    * {@link migratableAmount}: routes `avatar`'s CRC into the SinkWrapper with
    * the migration constraints (destination = score group only, never sourcing
-   * the score group token, optional edge cap). Validates params and throws if
-   * no path is found.
+   * the score group token, edge cap defaulting to 100). Validates params and
+   * throws if no path is found.
    */
   private async migrationPath(params: MigrationParams): Promise<PathfindingResult> {
     if (!params.avatar) {
@@ -506,8 +521,9 @@ export class PermissionlessGroup {
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
       // `maxEdges` is forwarded straight to the pathfinder's `maxTransfers`,
-      // which caps the number of flow edges it returns.
-      ...(params.maxEdges !== undefined ? { maxTransfers: params.maxEdges } : {}),
+      // which caps the number of flow edges it returns. Default to 100 so every
+      // migration probe asks for the same generous cap unless overridden.
+      maxTransfers: params.maxEdges ?? DEFAULT_MAX_EDGES,
       useWrappedBalances: true,
     });
 
@@ -541,9 +557,12 @@ export class PermissionlessGroup {
     params: MintParams,
     proof: ProofResponse
   ): Promise<MintResult> {
-    const score = BigInt(proof.scoreRaw);
-    const policyData = encodePolicyData(score, proof.proof);
-    const amount = await this.resolveAmount(params, score);
+    // The encoded proof payload must carry the raw score (it's the SMT leaf the
+    // policy verifies on-chain), but everything that interprets the score on the
+    // 0–100 scale — the mintable-amount calc — uses the clamped value.
+    const rawScore = BigInt(proof.scoreRaw);
+    const policyData = encodePolicyData(rawScore, proof.proof);
+    const amount = await this.resolveAmount(params, clampScore(rawScore));
     const policy = await this.policy();
 
     const txs: TransactionRequest[] = [
@@ -574,7 +593,9 @@ export class PermissionlessGroup {
    *
    * No on-chain calls, no transactions — just one HTTP request to
    * `/groups/{group}/proof/{address}`. Useful for UIs showing
-   * "you have X / Y required" before the user attempts a mint.
+   * "you have X / Y required" before the user attempts a mint. Returns the
+   * real, uncapped score — the 0–100 cap only applies to the minting math
+   * (see {@link clampScore}).
    */
   async getScore(avatar: Address): Promise<bigint> {
     const proof = await this.client.getProof(this.config.groupAddress, avatar);
