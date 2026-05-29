@@ -59,7 +59,7 @@ const clampScore = (raw: bigint): bigint => (raw > MAX_SCORE ? MAX_SCORE : raw);
  * every migration probe. Migration routes can fan out across many hops, so we
  * always request a generous cap unless the caller overrides it via `maxEdges`.
  */
-const DEFAULT_MAX_EDGES = 100;
+const DEFAULT_MAX_EDGES = 40;
 
 /**
  * High-level entrypoint for minting from a score-gated permissionless group.
