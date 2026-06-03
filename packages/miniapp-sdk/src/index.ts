@@ -16,6 +16,12 @@ export interface SignResult {
   verified: boolean;
 }
 
+export interface AuthResult {
+  authenticated: boolean;
+  /** The connected/created account address. */
+  address: string;
+}
+
 /**
  * Controls how the host hashes the message before signing:
  *
@@ -88,6 +94,27 @@ if (typeof window !== 'undefined') {
         _pending[d.requestId as string]?.reject(new Error((d.error ?? d.reason ?? 'Rejected') as string));
         delete _pending[d.requestId as string];
         break;
+
+      case 'auth_success': {
+        // The host created/connected an account — update local wallet state and
+        // notify listeners, then resolve the pending requestCreateAccount() call.
+        const addr = d.address as string;
+        if (addr) {
+          _address = addr;
+          _listeners.forEach((fn) => fn(_address));
+        }
+        (_pending[d.requestId as string] as PendingRequest<AuthResult>)?.resolve({
+          authenticated: true,
+          address: addr,
+        });
+        delete _pending[d.requestId as string];
+        break;
+      }
+
+      case 'auth_rejected':
+        _pending[d.requestId as string]?.reject(new Error((d.error ?? d.reason ?? 'Cancelled') as string));
+        delete _pending[d.requestId as string];
+        break;
     }
   });
 
@@ -150,5 +177,30 @@ export function signMessage(message: string, signatureType: SignatureType = 'erc
     const requestId = 'req_' + ++_requestCounter;
     _pending[requestId] = { resolve: resolve as (value: unknown) => void, reject };
     window.parent.postMessage({ type: 'sign_message', requestId, message, signatureType }, '*');
+  });
+}
+
+/**
+ * Ask the host to open its "create account / log in" flow so the user can create
+ * (or connect) a Circles account without leaving the mini app. The host shows its
+ * passkey account-creation popup; this resolves once the user has an account.
+ *
+ * If the user is already connected, resolves immediately with the current address.
+ * Rejects if the user cancels.
+ *
+ * `onWalletChange` listeners also fire on success, so apps that only need the
+ * connection state can rely on those instead of awaiting this directly.
+ *
+ * @returns `{ authenticated, address }` on success.
+ */
+export function requestCreateAccount(): Promise<AuthResult> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || window.parent === window) {
+      reject(new Error('Not running inside the miniapps host'));
+      return;
+    }
+    const requestId = 'req_' + ++_requestCounter;
+    _pending[requestId] = { resolve: resolve as (value: unknown) => void, reject };
+    window.parent.postMessage({ type: 'request_create_account', requestId }, '*');
   });
 }
