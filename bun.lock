@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "devDependencies": {
@@ -11,7 +12,7 @@
     },
     "packages/abis": {
       "name": "@aboutcircles/sdk-abis",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "abitype": "^1.1.1",
       },
@@ -21,7 +22,7 @@
     },
     "packages/core": {
       "name": "@aboutcircles/sdk-core",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-abis": "*",
         "@aboutcircles/sdk-types": "*",
@@ -37,7 +38,7 @@
     },
     "packages/pathfinder": {
       "name": "@aboutcircles/sdk-pathfinder",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-rpc": "*",
         "@aboutcircles/sdk-types": "*",
@@ -50,7 +51,7 @@
     },
     "packages/profiles": {
       "name": "@aboutcircles/sdk-profiles",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
       },
@@ -60,7 +61,7 @@
     },
     "packages/rpc": {
       "name": "@aboutcircles/sdk-rpc",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
         "@aboutcircles/sdk-utils": "*",
@@ -74,7 +75,7 @@
     },
     "packages/runner": {
       "name": "@aboutcircles/sdk-runner",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
         "@safe-global/protocol-kit": "^5.1.1",
@@ -87,7 +88,7 @@
     },
     "packages/sdk": {
       "name": "@aboutcircles/sdk",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-core": "*",
         "@aboutcircles/sdk-pathfinder": "*",
@@ -103,9 +104,16 @@
         "typescript": "^5.0.4",
       },
     },
+    "packages/test-env-client": {
+      "name": "@aboutcircles/sdk-test-env-client",
+      "version": "0.1.5",
+      "devDependencies": {
+        "typescript": "^5.0.4",
+      },
+    },
     "packages/transfers": {
       "name": "@aboutcircles/sdk-transfers",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-core": "*",
         "@aboutcircles/sdk-pathfinder": "*",
@@ -120,7 +128,7 @@
     },
     "packages/types": {
       "name": "@aboutcircles/sdk-types",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "abitype": "^1.1.1",
       },
@@ -130,7 +138,7 @@
     },
     "packages/utils": {
       "name": "@aboutcircles/sdk-utils",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "dependencies": {
         "@aboutcircles/sdk-types": "*",
         "multiformats": "^13.4.1",
@@ -151,6 +159,8 @@
     "@aboutcircles/sdk-rpc": ["@aboutcircles/sdk-rpc@workspace:packages/rpc"],
 
     "@aboutcircles/sdk-runner": ["@aboutcircles/sdk-runner@workspace:packages/runner"],
+
+    "@aboutcircles/sdk-test-env-client": ["@aboutcircles/sdk-test-env-client@workspace:packages/test-env-client"],
 
     "@aboutcircles/sdk-transfers": ["@aboutcircles/sdk-transfers@workspace:packages/transfers"],
 

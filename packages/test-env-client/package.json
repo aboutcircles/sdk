@@ -1,0 +1,41 @@
+{
+  "name": "@aboutcircles/sdk-test-env-client",
+  "version": "0.1.5",
+  "description": "Client for the Circles Test Environment session orchestration API",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm && tsc --emitDeclarationOnly",
+    "dev": "tsc --build --watch",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "test:integration": "bun test test/"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "circles",
+    "test-environment",
+    "session",
+    "anvil",
+    "pathfinder"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@aboutcircles/sdk-rpc": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}

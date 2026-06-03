@@ -1,0 +1,43 @@
+{
+  "_comment": [
+    "Block-pinned regression fixtures for the Circles test environment.",
+    "ONLY planes that are genuinely block-pinned are asserted here:",
+    "  - Anvil  : real fork at --fork-block-number N (state is exact at block N)",
+    "  - Pathfinder findPath / findMaxFlow : honor X-Max-Block-Number via HistoricalGraphCache",
+    "DB and RPC data-query counts are DELIBERATELY ABSENT: those planes are NOT",
+    "block-pinned. `SET circles.max_block_number` is set on the connection but no",
+    "view reads it, so counts return live state regardless of session block",
+    "(proven: identical V_CrcV2_Avatars/V_CrcV2_TrustRelations counts across 2.4M",
+    "blocks). Do not add count assertions until the views honor the session var.",
+    "Values captured 2026-06-01 against a hosted test environment."
+  ],
+  "hub": "0xc12C1E50ABB450d6205Ea2C3Fa861b3B834d13e8",
+  "blocks": [
+    {
+      "block": 46400000,
+      "anvil": {
+        "chainId": "0x64",
+        "balanceOf": [
+          {
+            "label": "source holds its own personal token",
+            "account": "0x549fb6186affc15b370e230ce51fc3414bf7ba2d",
+            "tokenOwner": "0x549fb6186affc15b370e230ce51fc3414bf7ba2d",
+            "expectedWei": "3081151175847833371487"
+          }
+        ]
+      },
+      "pathfinder": {
+        "findPath": [
+          {
+            "label": "sink trusts source's token directly (1 hop)",
+            "source": "0x549fb6186affc15b370e230ce51fc3414bf7ba2d",
+            "sink": "0x000e23fb756aeac403494c22ce4fce8bb96b077d",
+            "amountWei": "1000000000000000000",
+            "expectTransfers": 1,
+            "expectMaxFlowWei": "1000000000000000000"
+          }
+        ]
+      }
+    }
+  ]
+}

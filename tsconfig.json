@@ -24,6 +24,7 @@
     { "path": "./packages/pathfinder" },
     { "path": "./packages/transfers" },
     { "path": "./packages/sdk" },
-    { "path": "./packages/runner" }
+    { "path": "./packages/runner" },
+    { "path": "./packages/test-env-client" }
   ]
 }
