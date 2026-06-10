@@ -196,6 +196,16 @@ export interface MigrationParams {
    */
   fromTokens?: Address[];
   /**
+   * Source CRC token(s) the pathfinder must NOT draw from, merged with the
+   * built-in exclusion of the destination ScoreGroup's own token. Accepts
+   * avatar addresses and ERC20 wrapper addresses (the pathfinder excludes the
+   * exact balance row either way). Use this to keep the migration disjoint
+   * from another flow matrix built against the same chain state — e.g. pass
+   * the source tokens of an invitation path when batching both atomically,
+   * so the two legs can't double-spend the same balance.
+   */
+  excludeFromTokens?: Address[];
+  /**
    * Cap the number of flow edges in the resulting `operateFlowMatrix`,
    * forwarded directly to the pathfinder's `maxTransfers`. Lower values give
    * a smaller, cheaper batch at a marginal cost to the migrated amount.

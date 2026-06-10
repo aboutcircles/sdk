@@ -1,7 +1,36 @@
+import type { Address, TransactionRequest } from '@aboutcircles/sdk-types';
+
 /**
  * Referral status lifecycle
  */
 export type ReferralStatus = "pending" | "stale" | "confirmed" | "claimed" | "expired";
+
+/**
+ * Structural interface for the legacy-CRC migration builder used by the
+ * `…WithMigration` invitation variants — satisfied by `PermissionlessGroup`
+ * from `@aboutcircles/sdk-permissionless-groups`. Declared structurally so
+ * this package doesn't depend on that one.
+ */
+export interface MigrationTxsBuilder {
+  migration(params: {
+    avatar: Address;
+    maxEdges?: number;
+    excludeFromTokens?: Address[];
+  }): Promise<{ txs: TransactionRequest[]; amount: bigint }>;
+}
+
+/**
+ * Migration knobs for the `…WithMigration` invitation variants. The migration
+ * `avatar` is always the inviter, and `excludeFromTokens` always includes the
+ * invitation path's source tokens (that's the point); these options only
+ * extend that.
+ */
+export interface InviteMigrationOptions {
+  /** Edge cap forwarded to the migration pathfinder (`maxTransfers`). */
+  maxEdges?: number;
+  /** Extra exclusions merged with the invitation path's source tokens. */
+  excludeFromTokens?: Address[];
+}
 
 /**
  * Referral info returned from retrieve endpoint
