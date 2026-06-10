@@ -53,6 +53,32 @@ export function getWrappedTokensFromPath(
   return wrappedTokensInPath;
 }
 
+/**
+ * Collect the distinct token owners (avatars) that `avatar` spends in `path`.
+ * Wrapped-token entries are resolved to their underlying avatar, so the result
+ * can be passed to the pathfinder's `excludeFromTokens` (the server expands an
+ * avatar to its wrapped forms). Use this to keep a second, independently built
+ * leg of the same batch from drawing on balances this path already consumes.
+ */
+export function getSourcedTokenOwnersFromPath(
+  avatar: Address,
+  path: PathfindingResult,
+  tokenInfoMap: Map<string, TokenInfo>
+): Address[] {
+  const avatarLower = avatar.toLowerCase();
+  const owners = new Set<string>();
+
+  path.transfers.forEach((t) => {
+    if (t.from.toLowerCase() !== avatarLower) return;
+    const ownerLower = t.tokenOwner.toLowerCase();
+    const info = tokenInfoMap.get(ownerLower);
+    const isWrapper = info && info.tokenType.startsWith('CrcV2_ERC20WrapperDeployed');
+    owners.add(isWrapper ? info!.tokenOwner.toLowerCase() : ownerLower);
+  });
+
+  return Array.from(owners) as Address[];
+}
+
 export function getExpectedUnwrappedTokenTotals(
   wrappedTotals: Record<string, [bigint, string]>,
   tokenInfoMap: Map<string, TokenInfo>

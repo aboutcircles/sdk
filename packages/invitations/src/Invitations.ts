@@ -309,7 +309,11 @@ export class Invitations {
    * Note: The invitee MUST have a Safe wallet but MUST NOT be registered in Circles Hub yet.
    * If they are already registered, an error will be thrown.
    */
-  async generateInvite(inviter: Address, invitee: Address): Promise<TransactionRequest[]> {
+  async generateInvite(
+    inviter: Address,
+    invitee: Address,
+    options?: { excludeFromTokens?: Address[] }
+  ): Promise<TransactionRequest[]> {
 
     const inviterLower = inviter.toLowerCase() as Address;
     const inviteeLower = invitee.toLowerCase() as Address;
@@ -335,7 +339,11 @@ export class Invitations {
       console.log('[generateInvite] Using STANDARD PATH (proxy inviters available)');
       const realInviterAddress = realInviters[0].address;
 
-      const path = await this.findInvitePath(inviterLower, realInviterAddress);
+      const path = await this.findInvitePath(
+        inviterLower,
+        realInviterAddress,
+        options?.excludeFromTokens
+      );
 
       const transferBuilder = new TransferBuilder(this.config);
 
@@ -355,7 +363,11 @@ export class Invitations {
       // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
       // inviter can't afford it, fall back to a Gnosis Pay free invite.
       transactions.push(
-        ...(await this.buildFarmOrFreeInviteTransactions(inviterLower, transferData))
+        ...(await this.buildFarmOrFreeInviteTransactions(
+          inviterLower,
+          transferData,
+          options?.excludeFromTokens
+        ))
       );
     }
 
@@ -371,18 +383,20 @@ export class Invitations {
    *
    * @param inviter - Address of the inviter (lowercased)
    * @param transferData - Encoded invitation transfer data
+   * @param excludeFromTokens - Token owners other legs of the same batch already spend
    * @returns The funding/claim/transfer transactions
    */
   private async buildFarmOrFreeInviteTransactions(
     inviter: Address,
-    transferData: `0x${string}`
+    transferData: `0x${string}`,
+    excludeFromTokens?: Address[]
   ): Promise<TransactionRequest[]> {
     try {
       // Farm fallback: send 96 CRC to the farm destination to earn quota, then
       // claim + transfer the invite token.
       console.log('[invitations] Using FARM FALLBACK PATH (no proxy inviters available)');
       const transferBuilder = new TransferBuilder(this.config);
-      const farmPath = await this.findFarmInvitePath(inviter);
+      const farmPath = await this.findFarmInvitePath(inviter, excludeFromTokens);
 
       const quotaTransactions = await transferBuilder.buildFlowMatrixTx(
         inviter,
@@ -422,6 +436,8 @@ export class Invitations {
    *
    * @param inviter - Address of the inviter
    * @param proxyInviterAddress - Optional specific proxy inviter address to use for the path
+   * @param excludeFromTokens - Token owners other legs of the same batch already spend;
+   *   excluded here so two independently built legs cannot double-spend one balance
    * @returns PathfindingResult containing the transfer path
    *
    * @description
@@ -429,7 +445,11 @@ export class Invitations {
    * If proxyInviterAddress is provided, it will find a path using that specific token.
    * Otherwise, it will use the first available proxy inviter.
    */
-  async findInvitePath(inviter: Address, proxyInviterAddress?: Address) {
+  async findInvitePath(
+    inviter: Address,
+    proxyInviterAddress?: Address,
+    excludeFromTokens?: Address[]
+  ) {
 
     const inviterLower = inviter.toLowerCase() as Address;
 
@@ -457,6 +477,7 @@ export class Invitations {
       toTokens: [tokenToUse],
       useWrappedBalances: true,
       simulatedTrusts: [{ truster: this.config.invitationModuleAddress, trustee: inviterLower }],
+      ...(excludeFromTokens?.length ? { excludeFromTokens } : {}),
     });
 
 
@@ -490,7 +511,7 @@ export class Invitations {
    * This function finds a path from the inviter to the farm destination (0x9Eb51E6A39B3F17bB1883B80748b56170039ff1d)
    * using FARM_TO_TOKEN as the target token. Used when no standard proxy inviters are available.
    */
-  async findFarmInvitePath(inviter: Address) {
+  async findFarmInvitePath(inviter: Address, excludeFromTokens?: Address[]) {
 
     const inviterLower = inviter.toLowerCase() as Address;
 
@@ -500,7 +521,8 @@ export class Invitations {
       to: FARM_DESTINATION,
       targetFlow: INVITATION_FEE,
       toTokens: [FARM_TO_TOKEN],
-      useWrappedBalances: true
+      useWrappedBalances: true,
+      ...(excludeFromTokens?.length ? { excludeFromTokens } : {}),
     });
 
 
@@ -662,7 +684,8 @@ export class Invitations {
    * 7. Returns transactions and the generated private key
    */
   async generateReferral(
-    inviter: Address
+    inviter: Address,
+    options?: { excludeFromTokens?: Address[] }
   ): Promise<{ transactions: TransactionRequest[]; privateKey: `0x${string}` }> {
 
     const inviterLower = inviter.toLowerCase() as Address;
@@ -686,7 +709,11 @@ export class Invitations {
       const transferBuilder = new TransferBuilder(this.config);
 
       const realInviterAddress = realInviters[0].address;
-      const path = await this.findInvitePath(inviterLower, realInviterAddress);
+      const path = await this.findInvitePath(
+        inviterLower,
+        realInviterAddress,
+        options?.excludeFromTokens
+      );
 
       const transferTransactions = await transferBuilder.buildFlowMatrixTx(
         inviterLower,
@@ -704,7 +731,11 @@ export class Invitations {
       // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
       // inviter can't afford it, fall back to a Gnosis Pay free invite.
       transactions.push(
-        ...(await this.buildFarmOrFreeInviteTransactions(inviterLower, transferData))
+        ...(await this.buildFarmOrFreeInviteTransactions(
+          inviterLower,
+          transferData,
+          options?.excludeFromTokens
+        ))
       );
     }
 

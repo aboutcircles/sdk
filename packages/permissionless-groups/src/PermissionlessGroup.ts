@@ -10,6 +10,10 @@ import {
   MerkleTreeRegistryContractMinimal,
 } from '@aboutcircles/sdk-core/minimal';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
+import {
+  getTokenInfoMapFromPath,
+  getSourcedTokenOwnersFromPath,
+} from '@aboutcircles/sdk-pathfinder';
 import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
 import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
 import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
@@ -408,7 +412,7 @@ export class PermissionlessGroup {
    * to the pathfinder's `maxTransfers`).
    *
    * When nothing can be migrated (the pathfinder finds no route), this returns
-   * an empty batch `{ txs: [], amount: 0n }` rather than throwing — migration
+   * an empty batch `{ txs: [], amount: 0n, sourcedTokens: [] }` rather than throwing — migration
    * being impossible is a normal state, so callers can simply check
    * `txs.length`/`amount`. Submission is the caller's job; the returned `txs`
    * are meant to be sent atomically through a Safe runner.
@@ -416,7 +420,7 @@ export class PermissionlessGroup {
   async migration(params: MigrationParams): Promise<MigrationResult> {
     const path = await this.migrationPath(params);
     if (!path.transfers || path.transfers.length === 0) {
-      return { txs: [], amount: 0n };
+      return { txs: [], amount: 0n, sourcedTokens: [] };
     }
 
     const scoreGroup = PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress;
@@ -432,7 +436,18 @@ export class PermissionlessGroup {
         useWrappedBalances: true,
       }
     );
-    return { txs: txs as TransactionRequest[], amount: path.maxFlow };
+
+    // Report which of the avatar's tokens this batch spends, so callers
+    // composing further pathfinder legs into the same Safe batch can exclude
+    // them and not plan a second spend of the same balance.
+    const tokenInfoMap = await getTokenInfoMapFromPath(
+      params.avatar,
+      this.config.circlesConfig.circlesRpcUrl,
+      path
+    );
+    const sourcedTokens = getSourcedTokenOwnersFromPath(params.avatar, path, tokenInfoMap);
+
+    return { txs: txs as TransactionRequest[], amount: path.maxFlow, sourcedTokens };
   }
 
   /**
