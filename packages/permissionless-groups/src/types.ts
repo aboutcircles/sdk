@@ -218,6 +218,13 @@ export interface MigrationResult {
   txs: TransactionRequest[];
   /** Atto-CRC the pathfinder routed into the SinkWrapper. */
   amount: bigint;
+  /**
+   * Token owners (avatars) the migration path spends from `avatar`, wrapped
+   * entries resolved to their underlying avatar. Pass these as
+   * `excludeFromTokens` to any further pathfinder leg built for the same
+   * batch, so the two legs cannot double-spend the same balance.
+   */
+  sourcedTokens: Address[];
 }
 
 /**
