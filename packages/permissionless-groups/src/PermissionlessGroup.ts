@@ -426,7 +426,7 @@ export class PermissionlessGroup {
       PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
       path,
       {
-        excludeFromTokens: [scoreGroup],
+        excludeFromTokens: [scoreGroup, ...(params.excludeFromTokens ?? [])],
         toTokens: [scoreGroup],
         ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
         useWrappedBalances: true,
@@ -516,7 +516,10 @@ export class PermissionlessGroup {
       from: params.avatar,
       to: PERMISSIONLESS_GROUPS_MIGRATION.sinkWrapperAddress,
       targetFlow: params.amount ?? MAX_FLOW,
-      excludeFromTokens: [scoreGroup],
+      // The group's own token is never a migration source; callers may extend
+      // the exclusion (e.g. with an invitation path's source tokens) to keep
+      // two same-state flow matrices disjoint in one atomic batch.
+      excludeFromTokens: [scoreGroup, ...(params.excludeFromTokens ?? [])],
       // The migration must arrive at the sink as the ScoreGroup's CRC.
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),

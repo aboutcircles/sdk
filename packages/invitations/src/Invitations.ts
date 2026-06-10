@@ -1,4 +1,4 @@
-import type { Address, TransactionRequest, CirclesConfig } from '@aboutcircles/sdk-types';
+import type { Address, TransactionRequest, CirclesConfig, PathfindingResult } from '@aboutcircles/sdk-types';
 import { RpcClient, PathfinderMethods, TrustMethods, TokenMethods } from '@aboutcircles/sdk-rpc';
 import {
   HubV2ContractMinimal,
@@ -9,7 +9,7 @@ import {
   GnosisPayInviteQuotaGranteeContractMinimal
 } from '@aboutcircles/sdk-core/minimal';
 import { InvitationError } from './errors.js';
-import type { ReferralPreviewList } from './types.js';
+import type { ReferralPreviewList, MigrationTxsBuilder, InviteMigrationOptions } from './types.js';
 import { TransferBuilder } from '@aboutcircles/sdk-transfers';
 import {
   hexToBytes,
@@ -45,6 +45,18 @@ const FARM_TO_TOKEN = GNOSIS_GROUP_ADDRESS;
  * claim will use, without the actual inviter needing quota at build time.
  */
 const QUOTA_HOLDER = '0x20EcD8bDeb2F48d8a7c94E542aA4feC5790D9676' as Address;
+
+/**
+ * Unique source tokens of a pathfinder result — the raw `tokenOwner` of every
+ * transfer edge, exactly as the pathfinder reported it (so ERC20 wrapper
+ * addresses stay wrapper addresses). This is the balance set a flow matrix
+ * built from `path` consumes; any other flow matrix meant to run in the same
+ * atomic batch must exclude these tokens from its own pathfinding, or the two
+ * legs double-spend the same balances and the batch reverts on-chain.
+ */
+function sourceTokensOfPath(path: PathfindingResult): Address[] {
+  return [...new Set((path.transfers ?? []).map(t => t.tokenOwner.toLowerCase() as Address))];
+}
 
 /**
  * Invitations handles invitation operations for Circles
@@ -324,22 +336,92 @@ export class Invitations {
     // Step 2: Ensure inviter has module enabled and is trusted
     const setupTxs = await this.ensureInviterSetup(inviterLower);
 
-    // Step 3: Try to find proxy inviters
-    const realInviters = await this.getRealInviters(inviterLower);
-
-    const transactions: TransactionRequest[] = [...setupTxs];
     const transferData = encodeAbiParameters(['address'], [inviteeLower]);
+    const { transactions } = await this.buildInviteTransactions(
+      inviterLower,
+      transferData,
+      '[generateInvite]'
+    );
+
+    return [...setupTxs, ...transactions];
+  }
+
+  /**
+   * Like {@link generateInvite}, but additionally builds the inviter's legacy
+   * CRC migration into the same batch, token-disjoint by construction: the
+   * migration pathfinder excludes every source token of the invitation path,
+   * so the two flow matrices can run atomically without double-spending any
+   * balance. The invitation legs come first (the invite has a hard 96 CRC
+   * requirement; the migration takes whatever is left). A migration failure
+   * never blocks the invite — it is skipped with `migrationAmount: 0n`.
+   *
+   * @param inviter - Address of the inviter
+   * @param invitee - Address of the invitee (existing Safe, not yet registered)
+   * @param migrationBuilder - The migration tx builder (a configured
+   *   `PermissionlessGroup` from `@aboutcircles/sdk-permissionless-groups`)
+   * @param options - Optional migration knobs (`maxEdges`, extra exclusions)
+   * @returns The combined invite + migration batch and the migrated amount
+   */
+  async generateInviteWithMigration(
+    inviter: Address,
+    invitee: Address,
+    migrationBuilder: MigrationTxsBuilder,
+    options?: InviteMigrationOptions
+  ): Promise<{ transactions: TransactionRequest[]; migrationAmount: bigint }> {
+    const inviterLower = inviter.toLowerCase() as Address;
+    const inviteeLower = invitee.toLowerCase() as Address;
+
+    const isHuman = await this.hubV2.isHuman(inviteeLower);
+    if (isHuman) {
+      throw InvitationError.inviteeAlreadyRegistered(inviterLower, inviteeLower);
+    }
+
+    const setupTxs = await this.ensureInviterSetup(inviterLower);
+
+    const transferData = encodeAbiParameters(['address'], [inviteeLower]);
+    const { transactions, usedTokens } = await this.buildInviteTransactions(
+      inviterLower,
+      transferData,
+      '[generateInviteWithMigration]'
+    );
+
+    const migration = await this.buildDisjointMigration(
+      inviterLower,
+      usedTokens,
+      migrationBuilder,
+      options
+    );
+
+    return {
+      transactions: [...setupTxs, ...transactions, ...migration.txs],
+      migrationAmount: migration.amount,
+    };
+  }
+
+  /**
+   * Build the invite transfer transactions for an already-encoded
+   * `transferData`, via the standard proxy-inviter path when available, else
+   * the farm / Gnosis Pay fallback. Also reports `usedTokens` — the source
+   * tokens of the underlying pathfinder path (empty for the free-invite path,
+   * which moves no inviter CRC) — so callers can keep any additional flow
+   * matrix in the same batch disjoint from the invite.
+   */
+  private async buildInviteTransactions(
+    inviterLower: Address,
+    transferData: `0x${string}`,
+    logTag: string
+  ): Promise<{ transactions: TransactionRequest[]; usedTokens: Address[] }> {
+    const realInviters = await this.getRealInviters(inviterLower);
 
     if (realInviters.length > 0) {
       // Standard path: use proxy inviters
-      console.log('[generateInvite] Using STANDARD PATH (proxy inviters available)');
+      console.log(`${logTag} Using STANDARD PATH (proxy inviters available)`);
       const realInviterAddress = realInviters[0].address;
 
       const path = await this.findInvitePath(inviterLower, realInviterAddress);
 
       const transferBuilder = new TransferBuilder(this.config);
-
-      const transferTransactions = await transferBuilder.buildFlowMatrixTx(
+      const transactions = await transferBuilder.buildFlowMatrixTx(
         inviterLower,
         this.config.invitationModuleAddress,
         path,
@@ -350,16 +432,39 @@ export class Invitations {
         },
         true
       );
-      transactions.push(...transferTransactions);
-    } else {
-      // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
-      // inviter can't afford it, fall back to a Gnosis Pay free invite.
-      transactions.push(
-        ...(await this.buildFarmOrFreeInviteTransactions(inviterLower, transferData))
-      );
+      return { transactions, usedTokens: sourceTokensOfPath(path) };
     }
 
-    return transactions;
+    // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
+    // inviter can't afford it, fall back to a Gnosis Pay free invite.
+    return this.buildFarmOrFreeInviteTransactions(inviterLower, transferData);
+  }
+
+  /**
+   * Build the inviter's legacy-CRC migration excluding the invitation path's
+   * source tokens, so both legs can run in one atomic batch without
+   * double-spending any balance. The migration is opportunistic: any failure
+   * is logged and swallowed so it never blocks the invitation itself.
+   */
+  private async buildDisjointMigration(
+    inviterLower: Address,
+    usedTokens: Address[],
+    migrationBuilder: MigrationTxsBuilder,
+    options?: InviteMigrationOptions
+  ): Promise<{ txs: TransactionRequest[]; amount: bigint }> {
+    try {
+      return await migrationBuilder.migration({
+        avatar: inviterLower,
+        ...(options?.maxEdges !== undefined ? { maxEdges: options.maxEdges } : {}),
+        excludeFromTokens: [...usedTokens, ...(options?.excludeFromTokens ?? [])],
+      });
+    } catch (error) {
+      console.warn(
+        '[invitations] migration build failed — proceeding with the invitation only:',
+        error
+      );
+      return { txs: [], amount: 0n };
+    }
   }
 
   /**
@@ -371,12 +476,13 @@ export class Invitations {
    *
    * @param inviter - Address of the inviter (lowercased)
    * @param transferData - Encoded invitation transfer data
-   * @returns The funding/claim/transfer transactions
+   * @returns The funding/claim/transfer transactions plus the source tokens of
+   *   the quota path (empty for the free-invite path, which moves no inviter CRC)
    */
   private async buildFarmOrFreeInviteTransactions(
     inviter: Address,
     transferData: `0x${string}`
-  ): Promise<TransactionRequest[]> {
+  ): Promise<{ transactions: TransactionRequest[]; usedTokens: Address[] }> {
     try {
       // Farm fallback: send 96 CRC to the farm destination to earn quota, then
       // claim + transfer the invite token.
@@ -395,11 +501,14 @@ export class Invitations {
       const claimedId = await this.invitationFarm.read('claimInvite', [], { from: QUOTA_HOLDER }) as bigint;
       const invitationModule = await this.invitationFarm.invitationModule();
 
-      return [
-        ...quotaTransactions,
-        this.invitationFarm.claimInvite(),
-        this.hubV2.safeTransferFrom(inviter, invitationModule, claimedId, INVITATION_FEE, transferData),
-      ];
+      return {
+        transactions: [
+          ...quotaTransactions,
+          this.invitationFarm.claimInvite(),
+          this.hubV2.safeTransferFrom(inviter, invitationModule, claimedId, INVITATION_FEE, transferData),
+        ],
+        usedTokens: sourceTokensOfPath(farmPath),
+      };
     } catch (error) {
       const cannotAfford =
         error instanceof InvitationError &&
@@ -407,10 +516,14 @@ export class Invitations {
       if (!cannotAfford) throw error;
 
       // Last resort: a Gnosis Pay free invite (claiming grants the quota the
-      // farm fallback couldn't fund). Only if the inviter is eligible.
+      // farm fallback couldn't fund). Only if the inviter is eligible. It moves
+      // no inviter CRC, so it has no source tokens to exclude.
       if (await this.getClaimableFreeInvites(inviter) > 0n) {
         console.log('[invitations] Using FREE INVITE PATH (Gnosis Pay)');
-        return this.buildFreeInviteTransactions(inviter, transferData);
+        return {
+          transactions: await this.buildFreeInviteTransactions(inviter, transferData),
+          usedTokens: [],
+        };
       }
 
       throw error;
@@ -674,41 +787,73 @@ export class Invitations {
     // Step 2: Ensure inviter has module enabled and is trusted
     const setupTxs = await this.ensureInviterSetup(inviterLower);
 
-    // Step 3: Get real inviters (filtered by gnosis group)
-    const realInviters = await this.getRealInviters(inviterLower);
-
-    const transactions: TransactionRequest[] = [...setupTxs];
     const transferData = await this.generateInviteData([signerAddress], true);
+    const { transactions } = await this.buildInviteTransactions(
+      inviterLower,
+      transferData,
+      '[generateReferral]'
+    );
 
-    if (realInviters.length > 0) {
-      // Standard path: use proxy inviters
-      console.log('[generateReferral] Using STANDARD PATH (proxy inviters available)');
-      const transferBuilder = new TransferBuilder(this.config);
+    return { transactions: [...setupTxs, ...transactions], privateKey };
+  }
 
-      const realInviterAddress = realInviters[0].address;
-      const path = await this.findInvitePath(inviterLower, realInviterAddress);
+  /**
+   * Like {@link generateReferral}, but additionally builds the inviter's
+   * legacy CRC migration into the same batch, token-disjoint by construction:
+   * the migration pathfinder excludes every source token of the referral
+   * path, so the two flow matrices can run atomically without double-spending
+   * any balance. The referral legs come first (the invite has a hard 96 CRC
+   * requirement; the migration takes whatever is left). A migration failure
+   * never blocks the referral — it is skipped with `migrationAmount: 0n`.
+   *
+   * This replaces the broken pattern of concatenating independently built
+   * `migration().txs` and `generateReferral().transactions`: both pathfinder
+   * runs see the same chain state, so they source the same tokens and the
+   * second unwrap/flow-matrix reverts on-chain (`ERC20InsufficientBalance` /
+   * `ERC1155InsufficientBalance`).
+   *
+   * @param inviter - Address of the inviter
+   * @param migrationBuilder - The migration tx builder (a configured
+   *   `PermissionlessGroup` from `@aboutcircles/sdk-permissionless-groups`)
+   * @param options - Optional migration knobs (`maxEdges`, extra exclusions)
+   * @returns The combined referral + migration batch, the generated private
+   *   key, and the migrated amount
+   */
+  async generateReferralWithMigration(
+    inviter: Address,
+    migrationBuilder: MigrationTxsBuilder,
+    options?: InviteMigrationOptions
+  ): Promise<{
+    transactions: TransactionRequest[];
+    privateKey: `0x${string}`;
+    migrationAmount: bigint;
+  }> {
+    const inviterLower = inviter.toLowerCase() as Address;
 
-      const transferTransactions = await transferBuilder.buildFlowMatrixTx(
-        inviterLower,
-        this.config.invitationModuleAddress,
-        path,
-        {
-          toTokens: [realInviterAddress],
-          useWrappedBalances: true,
-          txData: hexToBytes(transferData)
-        },
-        true
-      );
-      transactions.push(...transferTransactions);
-    } else {
-      // No proxy inviters. Try the farm fallback (pay 96 CRC for quota); if the
-      // inviter can't afford it, fall back to a Gnosis Pay free invite.
-      transactions.push(
-        ...(await this.buildFarmOrFreeInviteTransactions(inviterLower, transferData))
-      );
-    }
+    const privateKey = generatePrivateKey();
+    const signerAddress = privateKeyToAddress(privateKey);
 
-    return { transactions, privateKey };
+    const setupTxs = await this.ensureInviterSetup(inviterLower);
+
+    const transferData = await this.generateInviteData([signerAddress], true);
+    const { transactions, usedTokens } = await this.buildInviteTransactions(
+      inviterLower,
+      transferData,
+      '[generateReferralWithMigration]'
+    );
+
+    const migration = await this.buildDisjointMigration(
+      inviterLower,
+      usedTokens,
+      migrationBuilder,
+      options
+    );
+
+    return {
+      transactions: [...setupTxs, ...transactions, ...migration.txs],
+      privateKey,
+      migrationAmount: migration.amount,
+    };
   }
 
   /**
