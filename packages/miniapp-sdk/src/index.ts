@@ -180,6 +180,14 @@ export function signMessage(message: string, signatureType: SignatureType = 'erc
   });
 }
 
+export interface CreateAccountOptions {
+  /**
+   * Name for the Circles account to create. When provided, the host uses it
+   * instead of asking the user through its name input dialog.
+   */
+  name?: string;
+}
+
 /**
  * Ask the host to open its "create account / log in" flow so the user can create
  * (or connect) a Circles account without leaving the mini app. The host shows its
@@ -191,9 +199,11 @@ export function signMessage(message: string, signatureType: SignatureType = 'erc
  * `onWalletChange` listeners also fire on success, so apps that only need the
  * connection state can rely on those instead of awaiting this directly.
  *
+ * @param options - Optional settings, e.g. a pre-chosen account name so the host
+ *   skips its name input dialog. See {@link CreateAccountOptions}.
  * @returns `{ authenticated, address }` on success.
  */
-export function requestCreateAccount(): Promise<AuthResult> {
+export function requestCreateAccount(options?: CreateAccountOptions): Promise<AuthResult> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined' || window.parent === window) {
       reject(new Error('Not running inside the miniapps host'));
@@ -201,6 +211,9 @@ export function requestCreateAccount(): Promise<AuthResult> {
     }
     const requestId = 'req_' + ++_requestCounter;
     _pending[requestId] = { resolve: resolve as (value: unknown) => void, reject };
-    window.parent.postMessage({ type: 'request_create_account', requestId }, '*');
+    window.parent.postMessage(
+      { type: 'request_create_account', requestId, ...(options?.name ? { name: options.name } : {}) },
+      '*'
+    );
   });
 }
