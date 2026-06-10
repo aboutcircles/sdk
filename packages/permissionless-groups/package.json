@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-permissionless-groups",
-  "version": "0.1.45",
+  "version": "0.1.46",
   "description": "Circles SDK — permissionless (score-gated) groups",
   "type": "module",
   "main": "./dist/index.js",

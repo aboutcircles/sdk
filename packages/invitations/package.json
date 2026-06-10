@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-invitations",
-  "version": "0.1.45",
+  "version": "0.1.46",
   "description": "Circles Invitations Module SDK",
   "type": "module",
   "main": "./dist/index.js",
