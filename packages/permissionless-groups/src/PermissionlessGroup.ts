@@ -62,6 +62,15 @@ const clampScore = (raw: bigint): bigint => (raw > MAX_SCORE ? MAX_SCORE : raw);
 const DEFAULT_MAX_EDGES = 40;
 
 /**
+ * Extra inflationary atto-CRC unwrapped on top of the exact converted amount
+ * in {@link PermissionlessGroup.transferGroupCrc}. The wrapper's on-chain
+ * inflationary→demurraged conversion may round a few wei differently than
+ * `CirclesConverter`, so we over-unwrap by this margin; the excess stays in
+ * the avatar's own ERC1155 balance.
+ */
+const UNWRAP_ROUNDING_BUFFER = 1_000n;
+
+/**
  * High-level entrypoint for minting from a score-gated permissionless group.
  *
  * The mint flow batches: (optional) `Hub.personalMint`, `policy.snapshotIssuance`,
@@ -350,9 +359,24 @@ export class PermissionlessGroup {
         need -= take;
       }
       // cover the rest from the inflationary wrapper (convert the demurraged
-      // shortfall to inflationary for the unwrap call).
+      // shortfall to inflationary for the unwrap call). unwrap() floors the
+      // inflationary→demurraged conversion on-chain, so the exact converted
+      // amount round-trips to a few hundred wei *less* than `need` and the
+      // safeTransferFrom below would revert — top up until the round trip
+      // covers the shortfall, plus a buffer for wei-level rounding drift,
+      // capped at the wrapper balance. Excess stays as the avatar's ERC1155.
       if (need > 0n) {
-        const inflToUnwrap = CirclesConverter.attoCirclesToAttoStaticCircles(need);
+        let inflToUnwrap = CirclesConverter.attoCirclesToAttoStaticCircles(need);
+        let back = CirclesConverter.attoStaticCirclesToAttoCircles(inflToUnwrap);
+        while (back < need) {
+          inflToUnwrap +=
+            CirclesConverter.attoCirclesToAttoStaticCircles(need - back) + 1n;
+          back = CirclesConverter.attoStaticCirclesToAttoCircles(inflToUnwrap);
+        }
+        inflToUnwrap += UNWRAP_ROUNDING_BUFFER;
+        if (inflToUnwrap > bal.inflationaryWrapper) {
+          inflToUnwrap = bal.inflationaryWrapper;
+        }
         txs.push(wrapper.unwrap(inflToUnwrap));
       }
 
