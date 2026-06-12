@@ -62,6 +62,16 @@ const clampScore = (raw: bigint): bigint => (raw > MAX_SCORE ? MAX_SCORE : raw);
 const DEFAULT_MAX_EDGES = 40;
 
 /**
+ * Below this migratable amount we treat the legacy CRC as dust and skip the
+ * migration entirely: 0.1 CRC (in atto-CRC). Routing a few micro-CRC through a
+ * multi-edge `operateFlowMatrix` costs far more gas than the dust is worth and
+ * only bloats the mint batch, so `migration()` returns an empty batch and
+ * `migratableAmount()` reports `0n` under this floor. Override per-call via
+ * {@link MigrationParams.dustThreshold} (pass `0n` to migrate any amount).
+ */
+const DEFAULT_MIGRATION_DUST_THRESHOLD = 100_000_000_000_000_000n; // 0.1 CRC
+
+/**
  * Extra inflationary atto-CRC unwrapped on top of the exact converted amount
  * in {@link PermissionlessGroup.transferGroupCrc}. The wrapper's on-chain
  * inflationary→demurraged conversion may round a few wei differently than
@@ -431,15 +441,22 @@ export class PermissionlessGroup {
    * in one shot). `params.maxEdges` caps the number of flow edges (forwarded
    * to the pathfinder's `maxTransfers`).
    *
-   * When nothing can be migrated (the pathfinder finds no route), this returns
-   * an empty batch `{ txs: [], amount: 0n }` rather than throwing — migration
-   * being impossible is a normal state, so callers can simply check
-   * `txs.length`/`amount`. Submission is the caller's job; the returned `txs`
-   * are meant to be sent atomically through a Safe runner.
+   * When nothing can be migrated (the pathfinder finds no route) — or only a
+   * dust amount below {@link MigrationParams.dustThreshold} (default 0.1 CRC) —
+   * this returns an empty batch `{ txs: [], amount: 0n }` rather than throwing.
+   * Migration being impossible (or not worth the gas) is a normal state, so
+   * callers can simply check `txs.length`/`amount`. Submission is the caller's
+   * job; the returned `txs` are meant to be sent atomically through a Safe runner.
    */
   async migration(params: MigrationParams): Promise<MigrationResult> {
     const path = await this.migrationPath(params);
     if (!path.transfers || path.transfers.length === 0) {
+      return { txs: [], amount: 0n };
+    }
+    // Skip dust: routing a sub-threshold amount through operateFlowMatrix costs
+    // more gas than it's worth and only bloats the batch.
+    const dustThreshold = params.dustThreshold ?? DEFAULT_MIGRATION_DUST_THRESHOLD;
+    if (path.maxFlow < dustThreshold) {
       return { txs: [], amount: 0n };
     }
 
@@ -465,9 +482,12 @@ export class PermissionlessGroup {
    * `toTokens=[scoreGroup]` / `excludeFromTokens=[scoreGroup]` constraints and
    * `maxEdges` cap), but it stops before building the tx batch.
    *
-   * Returns the migratable atto-CRC (`0n` when nothing is migratable). The
-   * number reflects chain + pathfinder state at query time; `migration()`
-   * re-queries, so the executed amount may differ slightly if the chain moved.
+   * Returns the migratable atto-CRC (`0n` when nothing is migratable). This is
+   * the true reachable amount — the {@link MigrationParams.dustThreshold} skip
+   * applies only when {@link migration} actually builds a batch, so this value
+   * always reflects what's there. The number reflects chain + pathfinder state
+   * at query time; `migration()` re-queries, so the executed amount may differ
+   * slightly if the chain moved.
    */
   async migratableAmount(params: MigrationParams): Promise<bigint> {
     const path = await this.migrationPath(params);
