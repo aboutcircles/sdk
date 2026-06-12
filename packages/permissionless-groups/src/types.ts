@@ -212,6 +212,15 @@ export interface MigrationParams {
    * Defaults to 100 when omitted.
    */
   maxEdges?: number;
+  /**
+   * Minimum migratable atto-CRC worth building a migration for. When the
+   * pathfinder finds less than this, `migration()` returns an empty batch —
+   * avoiding a multi-edge `operateFlowMatrix` whose gas dwarfs the dust it
+   * moves. Only affects `migration()`; `migratableAmount()` always reports the
+   * true reachable amount. Defaults to 0.1 CRC (`10^17`). Pass `0n` to migrate
+   * any non-zero amount.
+   */
+  dustThreshold?: bigint;
 }
 
 
