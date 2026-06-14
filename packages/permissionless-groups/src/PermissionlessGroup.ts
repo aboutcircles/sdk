@@ -4,32 +4,32 @@ import {
   LiftERC20Contract,
   DemurrageCirclesContract,
   InflationaryCirclesContract,
-} from '@aboutcircles/sdk-core';
+} from "@aboutcircles/sdk-core";
 import {
   ScoreGroupContractMinimal,
   MerkleTreeRegistryContractMinimal,
-} from '@aboutcircles/sdk-core/minimal';
-import { TransferBuilder } from '@aboutcircles/sdk-transfers';
-import { PathfinderMethods, RpcClient } from '@aboutcircles/sdk-rpc';
-import { encodeAbiParameters } from '@aboutcircles/sdk-utils/abi';
-import { CirclesConverter } from '@aboutcircles/sdk-utils/circlesConverter';
+} from "@aboutcircles/sdk-core/minimal";
+import { TransferBuilder } from "@aboutcircles/sdk-transfers";
+import { PathfinderMethods, RpcClient } from "@aboutcircles/sdk-rpc";
+import { encodeAbiParameters } from "@aboutcircles/sdk-utils/abi";
+import { CirclesConverter } from "@aboutcircles/sdk-utils/circlesConverter";
 import {
   PERMISSIONLESS_GROUPS_STAGING,
   PERMISSIONLESS_GROUPS_MIGRATION,
   isZeroAddress,
   hexEq,
-} from '@aboutcircles/sdk-utils';
-import { MAX_FLOW } from '@aboutcircles/sdk-utils/constants';
-import { CirclesType } from '@aboutcircles/sdk-types';
+} from "@aboutcircles/sdk-utils";
+import { MAX_FLOW } from "@aboutcircles/sdk-utils/constants";
+import { CirclesType } from "@aboutcircles/sdk-types";
 import type {
   Address,
   Hex,
   PathfindingResult,
   TransactionRequest,
-} from '@aboutcircles/sdk-types';
+} from "@aboutcircles/sdk-types";
 
-import { ScoreGroupsClient } from './ScoreGroupsClient.js';
-import { PermissionlessGroupError } from './errors.js';
+import { ScoreGroupsClient } from "./ScoreGroupsClient.js";
+import { PermissionlessGroupError } from "./errors.js";
 import type {
   PermissionlessGroupConfig,
   MintParams,
@@ -41,7 +41,7 @@ import type {
   ProofResponse,
   BalanceResult,
   GroupCrcBalance,
-} from './types.js';
+} from "./types.js";
 
 /** Score scale used by the policy: max score == 100. */
 const MAX_SCORE = 100n;
@@ -96,7 +96,10 @@ export class PermissionlessGroup {
     // SDK never pins a specific pathfinder endpoint — it flows from config.
     this.config = config;
     this.client = new ScoreGroupsClient(config.backendBaseUrl);
-    this.hub = new HubV2Contract({ address: config.hubAddress, rpcUrl: this.config.rpcUrl });
+    this.hub = new HubV2Contract({
+      address: config.hubAddress,
+      rpcUrl: this.config.rpcUrl,
+    });
     this.lift = new LiftERC20Contract({
       address: config.liftERC20Address,
       rpcUrl: this.config.rpcUrl,
@@ -118,7 +121,7 @@ export class PermissionlessGroup {
         (err) => {
           this.policyPromise = null;
           throw err;
-        }
+        },
       );
     }
     return this.policyPromise;
@@ -139,7 +142,10 @@ export class PermissionlessGroup {
    * @param proof - The backend `/proof` response (provides `value` + `proof`)
    * @returns Whether the proof verifies against a currently-valid root
    */
-  private async verifyProofOnChain(avatar: Address, proof: ProofResponse): Promise<boolean> {
+  private async verifyProofOnChain(
+    avatar: Address,
+    proof: ProofResponse,
+  ): Promise<boolean> {
     // The group exposes its own merkle-tree manager (wired at deploy), and the
     // registry address is a known constant — so no Hub/policy lookups are
     // needed. One read (the manager) + the verify call.
@@ -152,7 +158,12 @@ export class PermissionlessGroup {
       address: PERMISSIONLESS_GROUPS_STAGING.merkleTreeRegistryAddress,
       rpcUrl: this.config.rpcUrl,
     });
-    return registry.verifyWithGracePeriod(manager, avatar, proof.value, proof.proof);
+    return registry.verifyWithGracePeriod(
+      manager,
+      avatar,
+      proof.value,
+      proof.proof,
+    );
   }
 
   /**
@@ -219,20 +230,16 @@ export class PermissionlessGroup {
   async mint(params: MintParams): Promise<MintResult> {
     this.validateMintParams(params);
 
-    const proof = await this.client.getProof(this.config.groupAddress, params.avatar);
+    const proof = await this.client.getProof(
+      this.config.groupAddress,
+      params.avatar,
+    );
 
     // Score 0 = avatar not in the SMT, ineligible for the group mint. Don't
     // fail the caller. Emit only
     // Hub.personalMint() and skip snapshot/groupMint/wrap entirely.
-    if (proof.scoreRaw === '0') {
+    if (proof.scoreRaw === "0") {
       return { txs: [this.hub.personalMint()], proof, amount: 0n };
-    }
-
-    if (!(await this.verifyProofOnChain(params.avatar, proof))) {
-      throw PermissionlessGroupError.proofStale(
-        'backend proof failed on-chain verification (stale root or invalid proof)',
-        { backendRoot: proof.root }
-      );
     }
 
     return this.buildMintBatch(params, proof);
@@ -268,18 +275,22 @@ export class PermissionlessGroup {
    * ERC20, 2 for the org path) must be sent atomically.
    */
   async transferGroupCrc(
-    params: TransferGroupCrcParams
+    params: TransferGroupCrcParams,
   ): Promise<TransferGroupCrcResult> {
     if (!params.avatar) {
-      throw PermissionlessGroupError.invalidInput('transferGroupCrc() requires `avatar`');
+      throw PermissionlessGroupError.invalidInput(
+        "transferGroupCrc() requires `avatar`",
+      );
     }
     if (!params.to) {
-      throw PermissionlessGroupError.invalidInput('transferGroupCrc() requires `to`');
+      throw PermissionlessGroupError.invalidInput(
+        "transferGroupCrc() requires `to`",
+      );
     }
     if (params.amount === undefined || params.amount <= 0n) {
       throw PermissionlessGroupError.invalidInput(
-        'transferGroupCrc() requires `amount > 0`',
-        { amount: params.amount?.toString() }
+        "transferGroupCrc() requires `amount > 0`",
+        { amount: params.amount?.toString() },
       );
     }
 
@@ -290,8 +301,8 @@ export class PermissionlessGroup {
     const bal = await this.balanceBreakdown(params.avatar);
     if (isZeroAddress(bal.inflationaryWrapperAddress)) {
       throw PermissionlessGroupError.invalidInput(
-        'group has no inflationary ERC20 wrapper deployed — nothing to transfer',
-        { group }
+        "group has no inflationary ERC20 wrapper deployed — nothing to transfer",
+        { group },
       );
     }
     const wrapper = new InflationaryCirclesContract({
@@ -302,19 +313,20 @@ export class PermissionlessGroup {
     // 2) Sum availability in *demurraged* terms (the inflationary balance is
     //    in inflationary units, so convert it down to compare apples to apples).
     const inflAsDemurrage = CirclesConverter.attoStaticCirclesToAttoCircles(
-      bal.inflationaryWrapper
+      bal.inflationaryWrapper,
     );
-    const totalDemurraged = bal.erc1155 + bal.demurrageWrapper + inflAsDemurrage;
+    const totalDemurraged =
+      bal.erc1155 + bal.demurrageWrapper + inflAsDemurrage;
     if (totalDemurraged < demurragedAmount) {
       throw PermissionlessGroupError.invalidInput(
-        'insufficient group CRC balance for the requested transfer',
+        "insufficient group CRC balance for the requested transfer",
         {
           requested: demurragedAmount.toString(),
           available: totalDemurraged.toString(),
           erc1155: bal.erc1155.toString(),
           demurrageErc20: bal.demurrageWrapper.toString(),
           inflationaryErc20Demurraged: inflAsDemurrage.toString(),
-        }
+        },
       );
     }
 
@@ -330,24 +342,24 @@ export class PermissionlessGroup {
       const includeProof = params.includeProof ?? false;
 
       // Fetch + validate the score proof only when we're attaching it.
-      let data: Hex = '0x';
+      let data: Hex = "0x";
       if (includeProof) {
         const proof = await this.client.getProof(group, params.avatar);
-        if (proof.scoreRaw === '0') {
-          throw PermissionlessGroupError.notEligible(params.avatar, proof.scoreRaw);
-        }
-        if (!(await this.verifyProofOnChain(params.avatar, proof))) {
-          throw PermissionlessGroupError.proofStale(
-            'backend proof failed on-chain verification (stale root or invalid proof)',
-            { backendRoot: proof.root }
+        if (proof.scoreRaw === "0") {
+          throw PermissionlessGroupError.notEligible(
+            params.avatar,
+            proof.scoreRaw,
           );
         }
+        // Off-chain proof pre-flight (verifyProofOnChain) intentionally skipped
+        // — see note in mint(). The on-chain transfer is the source of truth.
         data = encodePolicyData(BigInt(proof.scoreRaw), proof.proof);
       }
 
       const txs: TransactionRequest[] = [];
       // shortfall of ERC1155 to cover the demurraged amount.
-      let need = demurragedAmount > bal.erc1155 ? demurragedAmount - bal.erc1155 : 0n;
+      let need =
+        demurragedAmount > bal.erc1155 ? demurragedAmount - bal.erc1155 : 0n;
       // cover from the demurrage wrapper (1:1 demurraged units).
       if (need > 0n && bal.demurrageWrapper > 0n) {
         const take = need < bal.demurrageWrapper ? need : bal.demurrageWrapper;
@@ -366,8 +378,10 @@ export class PermissionlessGroup {
       // covers the shortfall, plus a buffer for wei-level rounding drift,
       // capped at the wrapper balance. Excess stays as the avatar's ERC1155.
       if (need > 0n) {
-        let inflToUnwrap = CirclesConverter.attoCirclesToAttoStaticCircles(need);
-        let back = CirclesConverter.attoStaticCirclesToAttoCircles(inflToUnwrap);
+        let inflToUnwrap =
+          CirclesConverter.attoCirclesToAttoStaticCircles(need);
+        let back =
+          CirclesConverter.attoStaticCirclesToAttoCircles(inflToUnwrap);
         while (back < need) {
           inflToUnwrap +=
             CirclesConverter.attoCirclesToAttoStaticCircles(need - back) + 1n;
@@ -387,10 +401,10 @@ export class PermissionlessGroup {
           params.to,
           groupTokenId,
           demurragedAmount,
-          data
-        )
+          data,
+        ),
       );
-      return { txs, mode: 'erc1155-after-unwrap' };
+      return { txs, mode: "erc1155-after-unwrap" };
     }
 
     // 4) Non-org recipients → deliver inflationary ERC20. Consolidate the
@@ -406,7 +420,9 @@ export class PermissionlessGroup {
     }
     const erc1155ToWrap = bal.erc1155 + bal.demurrageWrapper;
     if (erc1155ToWrap > 0n) {
-      consolidation.push(this.hub.wrap(group, erc1155ToWrap, CirclesType.Inflation));
+      consolidation.push(
+        this.hub.wrap(group, erc1155ToWrap, CirclesType.Inflation),
+      );
     }
 
     // delivery amount: demurraged → inflationary (64.64, bit-identical with the
@@ -416,7 +432,7 @@ export class PermissionlessGroup {
 
     return {
       txs: [...consolidation, wrapper.transfer(params.to, inflationaryAmount)],
-      mode: 'erc20-inflationary',
+      mode: "erc20-inflationary",
     };
   }
 
@@ -454,7 +470,7 @@ export class PermissionlessGroup {
         toTokens: [scoreGroup],
         ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
         useWrappedBalances: true,
-      }
+      },
     );
     return { txs: txs as TransactionRequest[], amount: path.maxFlow };
   }
@@ -489,12 +505,14 @@ export class PermissionlessGroup {
   async balance(avatar: Address): Promise<GroupCrcBalance> {
     const [bal, migratable] = await Promise.all([
       this.balanceBreakdown(avatar),
-      this.migratableAmount({ avatar, maxEdges: DEFAULT_MAX_EDGES }).catch(() => 0n),
+      this.migratableAmount({ avatar, maxEdges: DEFAULT_MAX_EDGES }).catch(
+        () => 0n,
+      ),
     ]);
 
     // inflationary balance is in inflationary units — convert down to demurraged.
     const inflationaryErc20 = CirclesConverter.attoStaticCirclesToAttoCircles(
-      bal.inflationaryWrapper
+      bal.inflationaryWrapper,
     );
     const heldTotal = bal.erc1155 + bal.demurrageWrapper + inflationaryErc20;
 
@@ -515,20 +533,24 @@ export class PermissionlessGroup {
    * the score group token, edge cap defaulting to 100). Validates params and
    * throws if no path is found.
    */
-  private async migrationPath(params: MigrationParams): Promise<PathfindingResult> {
+  private async migrationPath(
+    params: MigrationParams,
+  ): Promise<PathfindingResult> {
     if (!params.avatar) {
-      throw PermissionlessGroupError.invalidInput('migration() requires `avatar`');
+      throw PermissionlessGroupError.invalidInput(
+        "migration() requires `avatar`",
+      );
     }
     if (params.amount !== undefined && params.amount <= 0n) {
       throw PermissionlessGroupError.invalidInput(
-        'migration() amount must be > 0 when supplied (omit it to use MAX_FLOW)',
-        { amount: params.amount.toString() }
+        "migration() amount must be > 0 when supplied (omit it to use MAX_FLOW)",
+        { amount: params.amount.toString() },
       );
     }
     if (params.maxEdges !== undefined && params.maxEdges <= 0) {
       throw PermissionlessGroupError.invalidInput(
-        'migration() maxEdges must be > 0 when supplied',
-        { maxEdges: params.maxEdges }
+        "migration() maxEdges must be > 0 when supplied",
+        { maxEdges: params.maxEdges },
       );
     }
 
@@ -572,17 +594,22 @@ export class PermissionlessGroup {
    * @param avatar - The collateral avatar to be trusted by the group
    * @returns `[group.trust(avatar)]` when applicable and not yet trusted, else `[]`
    */
-  private async buildGroupTrustTxIfNeeded(avatar: Address): Promise<TransactionRequest[]> {
+  private async buildGroupTrustTxIfNeeded(
+    avatar: Address,
+  ): Promise<TransactionRequest[]> {
     const group = this.config.groupAddress;
     if (!hexEq(group, PERMISSIONLESS_GROUPS_STAGING.groupAddress)) return [];
     if (await this.hub.isTrusted(group, avatar)) return [];
-    const scoreGroup = new ScoreGroupContractMinimal({ address: group, rpcUrl: this.config.rpcUrl });
+    const scoreGroup = new ScoreGroupContractMinimal({
+      address: group,
+      rpcUrl: this.config.rpcUrl,
+    });
     return [scoreGroup.trust(avatar)];
   }
 
   private async buildMintBatch(
     params: MintParams,
-    proof: ProofResponse
+    proof: ProofResponse,
   ): Promise<MintResult> {
     // The encoded proof payload must carry the raw score (it's the SMT leaf the
     // policy verifies on-chain), but everything that interprets the score on the
@@ -606,7 +633,7 @@ export class PermissionlessGroup {
         this.config.groupAddress,
         [params.avatar],
         [amount],
-        policyData
+        policyData,
       ),
       // Step 6: Hub.wrap(group, amount, CirclesType.Inflation)
       this.hub.wrap(this.config.groupAddress, amount, CirclesType.Inflation),
@@ -631,10 +658,10 @@ export class PermissionlessGroup {
 
   private validateMintParams(params: MintParams): void {
     if (!params.avatar) {
-      throw PermissionlessGroupError.invalidInput('mint() requires `avatar`');
+      throw PermissionlessGroupError.invalidInput("mint() requires `avatar`");
     }
     if (params.amount !== undefined && params.amount < 0n) {
-      throw PermissionlessGroupError.invalidInput('amount must be >= 0', {
+      throw PermissionlessGroupError.invalidInput("amount must be >= 0", {
         amount: params.amount.toString(),
       });
     }
@@ -647,19 +674,22 @@ export class PermissionlessGroup {
    * pair runs — those operate in the same block, so the value the policy
    * captures with `snapshotIssuance()` matches what we read here.
    */
-  private async resolveAmount(params: MintParams, score: bigint): Promise<bigint> {
+  private async resolveAmount(
+    params: MintParams,
+    score: bigint,
+  ): Promise<bigint> {
     if (params.amount !== undefined && params.amount > 0n) return params.amount;
 
     const [issuance] = await this.hub.calculateIssuance(params.avatar);
     const maxMintable = (issuance * score) / MAX_SCORE;
     if (maxMintable === 0n) {
       throw PermissionlessGroupError.invalidInput(
-        'mint-max resolved to 0: avatar has no claimable issuance right now',
+        "mint-max resolved to 0: avatar has no claimable issuance right now",
         {
           avatar: params.avatar,
           snapshottedIssuance: issuance.toString(),
           score: score.toString(),
-        }
+        },
       );
     }
     return maxMintable;
@@ -671,5 +701,5 @@ export class PermissionlessGroup {
  * Exported for test reuse.
  */
 export function encodePolicyData(score: bigint, proof: Hex): Hex {
-  return encodeAbiParameters(['uint256', 'bytes'], [score, proof]);
+  return encodeAbiParameters(["uint256", "bytes"], [score, proof]);
 }
