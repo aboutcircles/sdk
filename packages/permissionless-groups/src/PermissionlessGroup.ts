@@ -573,6 +573,12 @@ export class PermissionlessGroup {
         { maxEdges: params.maxEdges },
       );
     }
+    if (params.dustThreshold !== undefined && params.dustThreshold < 0n) {
+      throw PermissionlessGroupError.invalidInput(
+        "migration() dustThreshold must be >= 0 when supplied",
+        { dustThreshold: params.dustThreshold.toString() },
+      );
+    }
 
     const scoreGroup = PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress;
     const rpcUrl = this.config.circlesConfig.circlesRpcUrl;
@@ -590,7 +596,7 @@ export class PermissionlessGroup {
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
       // `maxEdges` is forwarded straight to the pathfinder's `maxTransfers`,
-      // which caps the number of flow edges it returns. Default to 100 so every
+      // which caps the number of flow edges it returns. Default to 40 so every
       // migration probe asks for the same generous cap unless overridden.
       maxTransfers: params.maxEdges ?? DEFAULT_MAX_EDGES,
       useWrappedBalances: true,

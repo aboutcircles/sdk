@@ -209,7 +209,7 @@ export interface MigrationParams {
    * Cap the number of flow edges in the resulting `operateFlowMatrix`,
    * forwarded directly to the pathfinder's `maxTransfers`. Lower values give
    * a smaller, cheaper batch at a marginal cost to the migrated amount.
-   * Defaults to 100 when omitted.
+   * Defaults to 40 when omitted.
    */
   maxEdges?: number;
   /**
