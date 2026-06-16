@@ -12,6 +12,7 @@ import {
 import { TransferBuilder } from "@aboutcircles/sdk-transfers";
 import { PathfinderMethods, RpcClient } from "@aboutcircles/sdk-rpc";
 import { encodeAbiParameters } from "@aboutcircles/sdk-utils/abi";
+import { bytesToHex } from "@aboutcircles/sdk-utils/bytes";
 import { CirclesConverter } from "@aboutcircles/sdk-utils/circlesConverter";
 import {
   PERMISSIONLESS_GROUPS_STAGING,
@@ -264,16 +265,19 @@ export class PermissionlessGroup {
    *
    *   - **`to` is a registered Circles organization** → organizations hold the
    *     ERC1155, not the ERC20 wrapper. Unwrap the inflationary ERC20 back to
-   *     ERC1155, then `Hub.safeTransferFrom` the *demurraged* amount with the
-   *     avatar's **score + Merkle proof** attached as the ERC1155 `data`
-   *     (`abi.encode(uint256 score, bytes proof)`) — the format the
-   *     score-gated policy decodes inside `onERC1155Received`:
+   *     ERC1155, then `Hub.safeTransferFrom` the *demurraged* amount, optionally
+   *     attaching bytes to the ERC1155 `data` slot so the recipient's
+   *     `onERC1155Received` hook can act on it:
    *       `[ inflationaryWrapper.unwrap(inflationaryAmount),
    *          Hub.safeTransferFrom(avatar, to, groupTokenId, demurragedAmount,
-   *                               abi.encode(score, proof)) ]`
-   *     The proof is fetched from the score-groups backend and validated
-   *     against `policy.merkleRoots(group)` (throws `notEligible` for score 0,
-   *     `proofStale` on root mismatch).
+   *                               data) ]`
+   *     `data` is, in priority order: caller-supplied `params.txData` (attached
+   *     verbatim); else, when `params.includeProof` is set, the avatar's
+   *     **score + Merkle proof** as `abi.encode(uint256 score, bytes proof)`
+   *     (the format the score-gated policy decodes) — fetched from the
+   *     score-groups backend and validated against `policy.merkleRoots(group)`
+   *     (throws `notEligible` for score 0, `proofStale` on root mismatch); else
+   *     empty. `data` and `includeProof` are mutually exclusive.
    *
    *   - **otherwise** → send the inflationary ERC20 directly, no proof data
    *     (ERC20 transfers carry none):
@@ -350,10 +354,22 @@ export class PermissionlessGroup {
     //    is set (default: false → empty `data`, no backend fetch).
     if (isOrg) {
       const includeProof = params.includeProof ?? false;
+      const customData = params.txData;
+      if (includeProof && customData !== undefined) {
+        throw PermissionlessGroupError.invalidInput(
+          "transferGroupCrc() accepts at most one of `includeProof` and `txData` — both write the ERC1155 `data` slot",
+        );
+      }
 
-      // Fetch + validate the score proof only when we're attaching it.
+      // The ERC1155 `data` slot, in priority order:
+      //   - `txData`: caller-supplied bytes, attached verbatim for the org's hook.
+      //   - `includeProof`: fetch + validate the avatar's score proof and encode
+      //     it (`abi.encode(score, proof)`) for a policy-aware org.
+      //   - otherwise empty.
       let data: Hex = "0x";
-      if (includeProof) {
+      if (customData !== undefined) {
+        data = bytesToHex(customData) as Hex;
+      } else if (includeProof) {
         const proof = await this.client.getProof(group, params.avatar);
         if (proof.scoreRaw === "0") {
           throw PermissionlessGroupError.notEligible(

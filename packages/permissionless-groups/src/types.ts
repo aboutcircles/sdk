@@ -286,8 +286,22 @@ export interface TransferGroupCrcParams {
    * `notEligible` for score 0, `proofStale` on root mismatch). When `false`
    * (default), the ERC1155 transfer carries empty `data` and no proof is
    * fetched. Ignored for non-org (ERC20) transfers, which never carry data.
+   *
+   * Mutually exclusive with {@link txData}: pass at most one.
    */
   includeProof?: boolean;
+  /**
+   * Arbitrary bytes to attach as the ERC1155 `data` argument of the underlying
+   * `Hub.safeTransferFrom` so the recipient's `onERC1155Received` hook can act
+   * on it (e.g. {@link encodeCrcV2TransferData} output). Only applied when `to`
+   * is an organization (the ERC1155 path) — ignored for non-org (ERC20)
+   * transfers, which never carry data. Matches the `txData` convention of the
+   * high-level `avatar.transfer.*` API.
+   *
+   * Mutually exclusive with {@link includeProof}: pass at most one (the SDK
+   * throws if both are set, since both write the same `data` slot).
+   */
+  txData?: Uint8Array;
 }
 
 /** How `transferGroupCrc()` delivered the group CRC. */
