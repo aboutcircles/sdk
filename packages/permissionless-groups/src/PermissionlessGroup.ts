@@ -659,6 +659,17 @@ export class PermissionlessGroup {
     const rawScore = BigInt(proof.scoreRaw);
     const policyData = encodePolicyData(rawScore, proof.proof);
     const amount = await this.resolveAmount(params, clampScore(rawScore));
+
+    // "Mint max" with no claimable issuance right now is a normal empty state,
+    // not an error: issuance accrues over time, so an avatar that just minted
+    // has ~0 and `(issuance × score) / 100` floors to 0. Return an empty batch
+    // so callers branch on `amount`/`txs.length` — mirroring `migration()` and
+    // the `scoreRaw === "0"` path in `mint()`. Building a 0-amount groupMint
+    // would only produce a batch that reverts on-chain.
+    if (amount === 0n) {
+      return { txs: [], proof, amount: 0n };
+    }
+
     const policy = await this.policy();
 
     const txs: TransactionRequest[] = [
@@ -715,6 +726,11 @@ export class PermissionlessGroup {
    * is read from `Hub.calculateIssuance(avatar)` *before* the snapshot/personalMint
    * pair runs — those operate in the same block, so the value the policy
    * captures with `snapshotIssuance()` matches what we read here.
+   *
+   * Returns `0n` when the avatar has no claimable issuance right now (it just
+   * minted, so nothing has accrued yet). That's a normal empty state, not an
+   * error — {@link buildMintBatch} turns a 0 resolve into an empty batch
+   * instead of throwing.
    */
   private async resolveAmount(
     params: MintParams,
@@ -723,18 +739,7 @@ export class PermissionlessGroup {
     if (params.amount !== undefined && params.amount > 0n) return params.amount;
 
     const [issuance] = await this.hub.calculateIssuance(params.avatar);
-    const maxMintable = (issuance * score) / MAX_SCORE;
-    if (maxMintable === 0n) {
-      throw PermissionlessGroupError.invalidInput(
-        "mint-max resolved to 0: avatar has no claimable issuance right now",
-        {
-          avatar: params.avatar,
-          snapshottedIssuance: issuance.toString(),
-          score: score.toString(),
-        },
-      );
-    }
-    return maxMintable;
+    return (issuance * score) / MAX_SCORE;
   }
 }
 
