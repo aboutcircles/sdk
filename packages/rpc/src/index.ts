@@ -28,7 +28,7 @@ export type {
 } from './types.js';
 
 // Re-export shared types from @aboutcircles/sdk-types for convenience
-export type { TrustRelationType, AggregatedTrustRelation } from '@aboutcircles/sdk-types';
+export type { TrustRelationType, AggregatedTrustRelation, TransferDataRow } from '@aboutcircles/sdk-types';
 
 // Error handling
 export { RpcError } from './errors.js';
