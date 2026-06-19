@@ -1,6 +1,15 @@
 import type { RpcClient } from '../client.js';
-import type { FindPathParams, PathfindingResult } from '@aboutcircles/sdk-types';
-import { normalizeFindPathParams, parseStringsToBigInt, checksumAddresses } from '../utils.js';
+import type {
+  FindPathParams,
+  FindScoreGroupRedeemPathParams,
+  PathfindingResult,
+} from '@aboutcircles/sdk-types';
+import {
+  normalizeAddress,
+  normalizeFindPathParams,
+  parseStringsToBigInt,
+  checksumAddresses,
+} from '../utils.js';
 import { MAX_FLOW } from '@aboutcircles/sdk-utils/constants';
 
 /**
@@ -56,5 +65,56 @@ export class PathfinderMethods {
       targetFlow: MAX_FLOW
     });
     return BigInt(path.maxFlow);
+  }
+
+  /**
+   * Compute the redeem capacity of a score group's gCRC back into its backing collateral.
+   *
+   * The holder is both source and sink (a self-redeem): the result decomposes how much of the
+   * holder's gCRC can be converted into each collateral, clamped per collateral by what the
+   * group's on-chain ScoreTreasury actually holds — `MIN(holder entitlement, treasury holding)`.
+   *
+   * The response is a {@link PathfindingResult} (same shape as {@link findPath}): `transfers`
+   * lists one collateral leg (treasury → holder) per allocated collateral and `maxFlow` is the
+   * total redeemable gCRC (== the sum of the collateral legs, 1:1). No gCRC burn leg is emitted —
+   * `maxFlow` already states how much gCRC to redeem.
+   *
+   * Note: no on-chain redeem path is deployed yet, so the per-collateral selection order is a
+   * server-side placeholder (greedy, largest treasury holding first). The amounts and clamping are
+   * final; the executable `from`/`to` legs are finalized once the redeem contract ships.
+   *
+   * @param params - `group` (gCRC being redeemed), `holder` (redeemer), optional `amount` cap
+   * @returns The redeem decomposition with collateral transfers (amounts as bigint)
+   *
+   * @example
+   * ```typescript
+   * const redeem = await rpc.pathfinder.findScoreGroupRedeemPath({
+   *   group: '0x93ed5a96347927ff6ff6b790f8cf5258240c321f',
+   *   holder: '0x665a55a3ab1de41853cf808df40d112824092534',
+   *   // amount omitted → redeem up to the holder's full gCRC balance
+   * });
+   * ```
+   */
+  async findScoreGroupRedeemPath(
+    params: FindScoreGroupRedeemPathParams
+  ): Promise<PathfindingResult> {
+    // The server binds params positionally: [group, holder, amount?]. Omit the trailing `amount`
+    // when undefined so the server applies its default (full balance) — sending null would work
+    // too, but an omitted optional is the cleaner wire form.
+    const wireParams: string[] = [
+      normalizeAddress(params.group),
+      normalizeAddress(params.holder),
+    ];
+    if (params.amount !== undefined) {
+      wireParams.push(params.amount.toString());
+    }
+
+    const result = await this.client.call<string[], Record<string, unknown>>(
+      'circles_findScoreGroupRedeemPath',
+      wireParams
+    );
+
+    const parsed = parseStringsToBigInt(result) as unknown as PathfindingResult;
+    return checksumAddresses(parsed);
   }
 }

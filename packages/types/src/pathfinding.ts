@@ -41,6 +41,29 @@ export interface FindPathParams {
 }
 
 /**
+ * Parameters for circles_findScoreGroupRedeemPath.
+ *
+ * Computes how much of a score group's gCRC `holder` can redeem back into the
+ * backing collateral (source == sink == holder, fromToken == the group's gCRC),
+ * decomposed per collateral. The result is a {@link PathfindingResult} — the same
+ * shape as {@link FindPathParams}'s `findPath` — so it consumes identically.
+ *
+ * Per collateral the redeemable amount is `MIN(holder entitlement, treasury holding)`.
+ * The entitlement is the holder's demurraged gCRC balance, optionally capped by `amount`.
+ */
+export interface FindScoreGroupRedeemPathParams {
+  /** Score group address whose gCRC is being redeemed back into collateral. */
+  group: Address;
+  /** Holder/redeemer address (acts as both source and sink of the redeem). */
+  holder: Address;
+  /**
+   * Optional uint256 cap (CRC wei) on the gCRC to redeem.
+   * Omit to redeem up to the holder's full demurraged balance.
+   */
+  amount?: bigint;
+}
+
+/**
  * A single transfer step in a pathfinding result
  */
 export interface TransferStep {
