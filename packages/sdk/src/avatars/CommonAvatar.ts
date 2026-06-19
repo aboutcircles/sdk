@@ -493,7 +493,10 @@ export abstract class CommonAvatar {
      * @param txData Optional transaction annotation data. For ERC1155 transfers it is
      *   carried in the safeTransferFrom `data` field. ERC20 (gCRC) transfers have no
      *   data field, so it rides on an extra 0-value ERC1155 safeTransferFrom batched
-     *   atomically into the same transaction.
+     *   atomically into the same transaction. Note: because that carrier is an ERC1155
+     *   transfer, annotating a gCRC send requires the recipient to be able to receive
+     *   ERC1155 (an EOA, or an ERC1155-receiver contract such as a Circles Safe avatar);
+     *   annotating a gCRC transfer to a non-receiver contract reverts the whole transfer.
      * @returns Transaction receipt
      *
      * @example
