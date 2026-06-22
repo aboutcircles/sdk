@@ -29,7 +29,7 @@ const FAKE_RECEIPT = { status: 'success', transactionHash: '0xdead' } as unknown
  * batch so we can assert its shape. Mirrors the field-override pattern used in
  * packages/permissionless-groups/src/tests/mint.test.ts.
  */
-function makeAvatar(tokenType: string) {
+function makeAvatar(tokenType: string, tokenOwner: Address = SENDER) {
   let captured: TransactionRequest[] | undefined;
 
   const runner = {
@@ -42,8 +42,9 @@ function makeAvatar(tokenType: string) {
   const avatar = new HumanAvatar(SENDER, new Core(), runner);
 
   // Drive the token-type branch in transfer.direct without hitting the RPC.
+  // tokenOwner is the avatar that issued the (wrapped) token.
   (avatar as unknown as { rpc: unknown }).rpc = {
-    token: { getTokenInfo: async () => ({ tokenType }) },
+    token: { getTokenInfo: async () => ({ tokenType, tokenOwner }) },
   };
 
   // The ERC1155 path resolves the token id via an on-chain read; stub it so the
@@ -137,5 +138,21 @@ describe('CommonAvatar.transfer.direct — gCRC (ERC20) annotation', () => {
     await avatar.transfer.direct(RECIPIENT, 1n, ERC20_TOKEN, new Uint8Array(0));
 
     expect(getCaptured()!).toHaveLength(1);
+  });
+
+  test('(f) carrier id tracks the wrapped token issuer, not the sender', async () => {
+    // A wrapped token the sender holds but did NOT issue: the carrier must point
+    // at the underlying Circles token (tokenOwner), not the sender's avatar id.
+    const OTHER_ISSUER = '0x1111111111111111111111111111111111111111' as Address;
+    const { avatar, getCaptured } = makeAvatar(ERC20_TYPE, OTHER_ISSUER);
+    const txData = hexToBytes(encodeCrcV2TransferData(['hi'], 0x0001));
+
+    await avatar.transfer.direct(RECIPIENT, 100n, ERC20_TOKEN, txData);
+
+    const { from, to, id } = decodeSafeTransferFrom(getCaptured()![1].data as string);
+    expect(from.toLowerCase()).toBe(SENDER.toLowerCase()); // sender still moves the asset
+    expect(to.toLowerCase()).toBe(RECIPIENT.toLowerCase());
+    expect(id).toBe(BigInt(OTHER_ISSUER)); // id = wrapped token issuer, not SENDER
+    expect(id).not.toBe(BigInt(SENDER));
   });
 });
