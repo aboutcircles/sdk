@@ -279,14 +279,19 @@ export class PermissionlessGroup {
    *     (throws `notEligible` for score 0, `proofStale` on root mismatch); else
    *     empty. `data` and `includeProof` are mutually exclusive.
    *
-   *   - **otherwise** → send the inflationary ERC20 directly, no proof data
-   *     (ERC20 transfers carry none):
+   *   - **otherwise** → send the inflationary ERC20. When `params.txData` is
+   *     set, a zero-value `Hub.safeTransferFrom(avatar, to, groupTokenId, 0,
+   *     txData)` is appended in the same batch so the indexer can store the
+   *     annotation (ERC20 has no `data` slot):
    *       `[ inflationaryWrapper.transfer(to, inflationaryAmount) ]`
+   *       or with annotation:
+   *       `[ inflationaryWrapper.transfer(to, inflationaryAmount),
+   *          Hub.safeTransferFrom(avatar, to, groupTokenId, 0, txData) ]`
    *
    * The demurraged→inflationary conversion uses `CirclesConverter`
    * (bit-identical with the wrapper's on-chain conversion up to sub-wei
-   * truncation). Submission is the caller's job — the returned `txs` (1 for
-   * ERC20, 2 for the org path) must be sent atomically.
+   * truncation). Submission is the caller's job — the returned `txs` (1–2 for
+   * ERC20, 2–3 for the org path) must be sent atomically.
    */
   async transferGroupCrc(
     params: TransferGroupCrcParams,
@@ -455,6 +460,21 @@ export class PermissionlessGroup {
     // wrapper's on-chain conversion up to sub-wei truncation).
     const inflationaryAmount =
       CirclesConverter.attoCirclesToAttoStaticCircles(demurragedAmount);
+
+    // When txData is provided, append a zero-value ERC1155 safeTransferFrom so
+    // the indexer can pick up the annotation (ERC20 transfers carry no data slot).
+    if (params.txData !== undefined) {
+      const annotationData = bytesToHex(params.txData) as Hex;
+      const groupTokenId = await this.hub.toTokenId(group);
+      return {
+        txs: [
+          ...consolidation,
+          wrapper.transfer(params.to, inflationaryAmount),
+          this.hub.safeTransferFrom(params.avatar, params.to, groupTokenId, 0n, annotationData),
+        ],
+        mode: "erc20-inflationary-annotated",
+      };
+    }
 
     return {
       txs: [...consolidation, wrapper.transfer(params.to, inflationaryAmount)],
