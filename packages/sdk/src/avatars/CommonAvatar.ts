@@ -490,7 +490,19 @@ export abstract class CommonAvatar {
      * @param to Recipient address
      * @param amount Amount to transfer (in atto-circles)
      * @param tokenAddress Token address to transfer (defaults to sender's personal token)
-     * @param txData Optional transaction data (only used for ERC1155 transfers)
+     * @param txData Optional transaction annotation data. For ERC1155 transfers it is
+     *   carried in the safeTransferFrom `data` field. ERC20 (gCRC) transfers have no
+     *   data field, so it rides on an extra 0-value ERC1155 safeTransferFrom batched
+     *   into the same transaction. The carrier uses the wrapped token's underlying
+     *   Circles token id (its issuer), so it stays aligned with the asset being moved
+     *   even when sending someone else's wrapped token. Note: because that carrier is
+     *   an ERC1155 transfer, annotating a gCRC send requires the recipient to be able
+     *   to receive ERC1155 (an EOA, or an ERC1155-receiver contract such as a Circles
+     *   Safe avatar); annotating a gCRC transfer to a non-receiver contract reverts the
+     *   whole transfer. Atomicity of the batched ERC20 transfer + carrier requires a
+     *   runner that executes the batch as a single transaction (e.g. a Safe MultiSend);
+     *   a runner that submits array entries as independent transactions does not
+     *   guarantee the two land together.
      * @returns Transaction receipt
      *
      * @example
@@ -543,7 +555,7 @@ export abstract class CommonAvatar {
       if (erc1155Types.has(tokenInfo.tokenType)) {
         return await this._transferErc1155(token, to, amount, txData);
       } else if (erc20Types.has(tokenInfo.tokenType)) {
-        return await this._transferErc20(to, amount, token);
+        return await this._transferErc20(to, amount, token, tokenInfo.tokenOwner, txData);
       }
 
       throw SdkError.unsupportedOperation(
@@ -821,7 +833,9 @@ export abstract class CommonAvatar {
   protected async _transferErc20(
     to: Address,
     amount: bigint,
-    tokenAddress: Address
+    tokenAddress: Address,
+    tokenOwner: Address,
+    txData?: Uint8Array
   ): Promise<TransactionReceipt> {
     // Encode the ERC20 transfer function call
     const data = encodeFunctionData({
@@ -839,11 +853,40 @@ export abstract class CommonAvatar {
       args: [to, amount],
     });
 
-    // Create and send the transaction
-    return await this.runner.sendTransaction!([{
+    const erc20Tx = {
       to: tokenAddress,
       data,
       value: 0n,
-    }]);
+    };
+
+    // No annotation: preserve the original single-transfer behavior.
+    if (!txData || txData.length === 0) {
+      return await this.runner.sendTransaction!([erc20Tx]);
+    }
+
+    // ERC20 transfers have no data field, so the annotation cannot ride on the
+    // transfer itself. Carry it via an extra 0-value ERC1155 safeTransferFrom of
+    // the underlying Circles token (the avatar that issued the wrapped ERC20,
+    // i.e. tokenOwner), batched atomically with the transfer. Using the wrapper's
+    // own issuer — rather than this avatar — keeps the carrier's token id aligned
+    // with the asset actually being transferred, even when the sender is moving
+    // someone else's wrapped token.
+    // toTokenId(avatar) === uint256(uint160(avatar)), computed locally as
+    // BigInt(address) (inverse of utils/uint256ToAddress) to avoid an RPC round-trip.
+    //
+    // NOTE: batching the transfer and carrier into one array relies on the runner
+    // executing them as a single atomic transaction (e.g. a Safe MultiSend). This
+    // holds for Safe-based runners; a runner that sends array entries as separate
+    // transactions would break the atomicity guarantee. This mirrors the existing
+    // batching convention used elsewhere (e.g. trust.add).
+    const annotationTx = this.core.hubV2.safeTransferFrom(
+      this.address,
+      to,
+      BigInt(tokenOwner),
+      0n,
+      bytesToHex(txData) as `0x${string}`
+    );
+
+    return await this.runner.sendTransaction!([erc20Tx, annotationTx]);
   }
 }
