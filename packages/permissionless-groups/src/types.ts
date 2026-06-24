@@ -178,6 +178,12 @@ export interface PersonalTokenBalance {
   demurrageErc20: bigint;
   /** Transferable inflationary-wrapper ERC20 balance (inflationary/static): held − outgoing inflationary-ERC20 flow. */
   inflationaryErc20: bigint;
+  /**
+   * Sum of this token's three forms, normalized to **demurraged** atto-CRC
+   * (`inflationaryErc20` converted down first) — the avatar's total transferable
+   * balance of this token in a single comparable unit.
+   */
+  total: bigint;
 }
 
 /**
