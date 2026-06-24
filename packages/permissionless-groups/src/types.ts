@@ -181,43 +181,53 @@ export interface PersonalTokenBalance {
 }
 
 /**
- * Result of `PermissionlessGroup.balance()` — the avatar's current group CRC
- * across all three forms PLUS the amount still migratable from legacy CRC, all
- * normalized to **demurraged** atto-CRC so the figures are summable.
- *
- * For the raw per-form breakdown + wrapper addresses, see
- * `PermissionlessGroup.balanceBreakdown()` ({@link BalanceResult}).
+ * The avatar's held score-group CRC across the three forms, normalized to
+ * **demurraged** atto-CRC so the figures are summable.
  */
-export interface GroupCrcBalance {
+export interface ScoreGroupBreakdown {
   /** ERC1155 group-CRC the avatar holds (demurraged). */
   erc1155: bigint;
   /** Demurrage-wrapper ERC20 balance (demurraged). */
   demurrageErc20: bigint;
   /** Inflationary-wrapper ERC20 balance, converted to demurraged for summing. */
   inflationaryErc20: bigint;
-  /** Sum of the three held forms (demurraged) — what the avatar holds right now. */
-  heldTotal: bigint;
-  /** Amount still migratable from legacy CRC (pathfinder, maxEdges 100; demurraged). */
-  migratable: bigint;
-  /** `heldTotal + migratable` (demurraged) — the avatar's full reachable group CRC. */
-  total: bigint;
+}
+
+/**
+ * Result of `PermissionlessGroup.balance()` — the avatar's current score-group
+ * CRC across all three forms PLUS the amount still migratable from legacy CRC,
+ * all normalized to **demurraged** atto-CRC so the figures are summable;
+ * alongside the avatar's transferable personal CRC.
+ *
+ * For the raw per-form breakdown + wrapper addresses, see
+ * `PermissionlessGroup.balanceBreakdown()` ({@link BalanceResult}).
+ */
+export interface GroupCrcBalance {
+  /** Held score-group CRC per form (demurraged). See {@link ScoreGroupBreakdown}. */
+  scoreGroupBreakdown: ScoreGroupBreakdown;
+  /** Sum of the three held forms (demurraged) — score-group CRC held right now. */
+  scoreGroupHeldTotal: bigint;
+  /** Amount still migratable from legacy CRC (pathfinder, maxEdges {@link DEFAULT_MAX_EDGES}; demurraged). */
+  scoreGroupMigratable: bigint;
+  /** `scoreGroupHeldTotal + scoreGroupMigratable` (demurraged) — full reachable score-group CRC. */
+  scoreGroupTotal: bigint;
   /**
    * Per-token personal-CRC breakdown: every personal CRC the avatar holds
    * (human + non-group-token group/org CRC), with each form's amount reduced
    * by the migration's outgoing flow that spent that form — i.e. what's left
    * transferable after the migration this `balance()` accounts for in
-   * {@link migratable}. One entry per issuing token; forms with a positive
-   * remaining balance only (fully-spent forms are clamped to 0 but the entry
-   * still appears if any form remains). See {@link PersonalTokenBalance}.
+   * {@link scoreGroupMigratable}. One entry per issuing token; forms with a
+   * positive remaining balance only (fully-spent forms are clamped to 0 but the
+   * entry still appears if any form remains). See {@link PersonalTokenBalance}.
    */
   personalBreakdown: PersonalTokenBalance[];
   /**
    * Sum of {@link personalBreakdown} across every token and form, normalized to
    * **demurraged** atto-CRC (inflationary entries converted down first) — the
    * avatar's total transferable personal CRC after the migration's outgoing
-   * flow is subtracted. Excludes the group's own token (counted as gCRC).
+   * flow is subtracted. Excludes the group's own token (counted as score-group CRC).
    */
-  totalPersonal: bigint;
+  personalTotal: bigint;
 }
 
 /**

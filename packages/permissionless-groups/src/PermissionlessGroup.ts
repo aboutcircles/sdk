@@ -570,7 +570,8 @@ export class PermissionlessGroup {
     const inflationaryErc20 = CirclesConverter.attoStaticCirclesToAttoCircles(
       bal.inflationaryWrapper,
     );
-    const heldTotal = bal.erc1155 + bal.demurrageWrapper + inflationaryErc20;
+    const scoreGroupHeldTotal =
+      bal.erc1155 + bal.demurrageWrapper + inflationaryErc20;
 
     const personalBreakdown = this.buildPersonalBreakdown(
       avatar,
@@ -579,7 +580,7 @@ export class PermissionlessGroup {
     );
     // Sum the breakdown in demurraged terms — inflationary entries are in
     // static units, so convert before adding (mirrors `inflationaryErc20`).
-    const totalPersonal = personalBreakdown.reduce(
+    const personalTotal = personalBreakdown.reduce(
       (sum, p) =>
         sum +
         p.erc1155 +
@@ -589,14 +590,16 @@ export class PermissionlessGroup {
     );
 
     return {
-      erc1155: bal.erc1155,
-      demurrageErc20: bal.demurrageWrapper,
-      inflationaryErc20,
-      heldTotal,
-      migratable: path.maxFlow,
-      total: heldTotal + path.maxFlow,
+      scoreGroupBreakdown: {
+        erc1155: bal.erc1155,
+        demurrageErc20: bal.demurrageWrapper,
+        inflationaryErc20,
+      },
+      scoreGroupHeldTotal,
+      scoreGroupMigratable: path.maxFlow,
+      scoreGroupTotal: scoreGroupHeldTotal + path.maxFlow,
       personalBreakdown,
-      totalPersonal,
+      personalTotal,
     };
   }
 
