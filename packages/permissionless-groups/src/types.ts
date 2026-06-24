@@ -151,6 +151,36 @@ export interface BalanceResult {
 }
 
 /**
+ * One personal-CRC token the avatar holds, with the still-**transferable**
+ * amount in each form after the migration's outgoing flow is subtracted.
+ *
+ * Keyed by `tokenOwner` (the issuing avatar/group). The same issuer may hold
+ * balance in more than one form simultaneously (raw ERC1155 + an ERC20
+ * wrapper), so all three are reported on a single entry. Each form's value is
+ * `held − outgoing`, where `outgoing` is the sum of migration pathfinder edges
+ * that spent *that specific form* of this token (see
+ * {@link GroupCrcBalance.personalBreakdown}).
+ *
+ * Units mirror the on-chain balances: `erc1155` and `demurrageErc20` are
+ * **demurraged** atto-CRC, while `inflationaryErc20` is **inflationary/static**
+ * atto-CRC (the unit the inflationary wrapper holds) — don't sum across forms
+ * without converting first.
+ *
+ * Excludes the configured group's own token (that's reported as the held gCRC
+ * on {@link GroupCrcBalance}, not as migration collateral).
+ */
+export interface PersonalTokenBalance {
+  /** Issuing avatar/group of this CRC token (the ERC1155 token id source). */
+  tokenOwner: Address;
+  /** Transferable raw ERC1155 balance (demurraged): held ERC1155 − outgoing ERC1155 flow. */
+  erc1155: bigint;
+  /** Transferable demurrage-wrapper ERC20 balance (demurraged): held − outgoing demurrage-ERC20 flow. */
+  demurrageErc20: bigint;
+  /** Transferable inflationary-wrapper ERC20 balance (inflationary/static): held − outgoing inflationary-ERC20 flow. */
+  inflationaryErc20: bigint;
+}
+
+/**
  * Result of `PermissionlessGroup.balance()` — the avatar's current group CRC
  * across all three forms PLUS the amount still migratable from legacy CRC, all
  * normalized to **demurraged** atto-CRC so the figures are summable.
@@ -171,6 +201,23 @@ export interface GroupCrcBalance {
   migratable: bigint;
   /** `heldTotal + migratable` (demurraged) — the avatar's full reachable group CRC. */
   total: bigint;
+  /**
+   * Per-token personal-CRC breakdown: every personal CRC the avatar holds
+   * (human + non-group-token group/org CRC), with each form's amount reduced
+   * by the migration's outgoing flow that spent that form — i.e. what's left
+   * transferable after the migration this `balance()` accounts for in
+   * {@link migratable}. One entry per issuing token; forms with a positive
+   * remaining balance only (fully-spent forms are clamped to 0 but the entry
+   * still appears if any form remains). See {@link PersonalTokenBalance}.
+   */
+  personalBreakdown: PersonalTokenBalance[];
+  /**
+   * Sum of {@link personalBreakdown} across every token and form, normalized to
+   * **demurraged** atto-CRC (inflationary entries converted down first) — the
+   * avatar's total transferable personal CRC after the migration's outgoing
+   * flow is subtracted. Excludes the group's own token (counted as gCRC).
+   */
+  totalPersonal: bigint;
 }
 
 /**

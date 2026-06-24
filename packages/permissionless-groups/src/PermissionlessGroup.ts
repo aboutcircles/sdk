@@ -10,7 +10,7 @@ import {
   MerkleTreeRegistryContractMinimal,
 } from "@aboutcircles/sdk-core/minimal";
 import { TransferBuilder } from "@aboutcircles/sdk-transfers";
-import { PathfinderMethods, RpcClient } from "@aboutcircles/sdk-rpc";
+import { PathfinderMethods, RpcClient, CirclesRpc } from "@aboutcircles/sdk-rpc";
 import { encodeAbiParameters } from "@aboutcircles/sdk-utils/abi";
 import { bytesToHex } from "@aboutcircles/sdk-utils/bytes";
 import { CirclesConverter } from "@aboutcircles/sdk-utils/circlesConverter";
@@ -26,6 +26,8 @@ import type {
   Address,
   Hex,
   PathfindingResult,
+  TransferStep,
+  TokenBalance,
   TransactionRequest,
 } from "@aboutcircles/sdk-types";
 
@@ -42,6 +44,7 @@ import type {
   ProofResponse,
   BalanceResult,
   GroupCrcBalance,
+  PersonalTokenBalance,
 } from "./types.js";
 
 /** Score scale used by the policy: max score == 100. */
@@ -54,6 +57,9 @@ const MAX_SCORE = 100n;
  * inflate the mintable amount.
  */
 const clampScore = (raw: bigint): bigint => (raw > MAX_SCORE ? MAX_SCORE : raw);
+
+/** `a - b`, floored at 0 — never report a negative transferable balance. */
+const clampSub = (a: bigint, b: bigint): bigint => (a > b ? a - b : 0n);
 
 /**
  * Default number of flow edges (`maxTransfers`) we ask the pathfinder for in
@@ -529,21 +535,35 @@ export class PermissionlessGroup {
   /**
    * The avatar's full reachable group CRC balance: its current holdings across
    * all three forms (ERC1155, demurrage ERC20, inflationary ERC20) PLUS the
-   * amount still migratable from legacy CRC ({@link migratableAmount} with
-   * `maxEdges: 100`). Everything is normalized to **demurraged** atto-CRC so
-   * the figures are summable.
+   * amount still migratable from legacy CRC (migration pathfinder, `maxEdges:
+   * {@link DEFAULT_MAX_EDGES}`). Group-CRC figures are normalized to
+   * **demurraged** atto-CRC so they're summable.
    *
-   * Reads `balanceBreakdown(avatar)` and runs the migration pathfinder probe
-   * in parallel. "Nothing migratable" (no path) counts as `0`, not an error.
-   * For the raw per-form breakdown + wrapper addresses, use
-   * {@link balanceBreakdown}.
+   * Also returns `personalBreakdown`: the avatar's held personal CRC (from
+   * `circles_getTokenBalances`, excluding the group's own token) with each
+   * form's amount reduced by the migration's outgoing flow that spent that
+   * form — i.e. what stays transferable after the migration counted in
+   * `migratable`. See {@link PersonalTokenBalance}.
+   *
+   * Reads `balanceBreakdown(avatar)`, the migration pathfinder probe, and the
+   * personal token balances in parallel. "Nothing migratable" (no path) counts
+   * as `0`, not an error. For the raw per-form group-CRC breakdown + wrapper
+   * addresses, use {@link balanceBreakdown}.
    */
   async balance(avatar: Address): Promise<GroupCrcBalance> {
-    const [bal, migratable] = await Promise.all([
+    // Run the migration probe once and reuse its result for both the headline
+    // `migratable` figure AND the per-token personal breakdown — the path's
+    // outgoing edges (the flow this migration would spend) are exactly what we
+    // subtract from the held personal balances. "No path" is a normal empty
+    // state, not an error: fall back to an empty path.
+    const [bal, path, personalBalances] = await Promise.all([
       this.balanceBreakdown(avatar),
-      this.migratableAmount({ avatar, maxEdges: DEFAULT_MAX_EDGES }).catch(
-        () => 0n,
+      this.migrationPath({ avatar, maxEdges: DEFAULT_MAX_EDGES }).catch(
+        (): PathfindingResult => ({ maxFlow: 0n, transfers: [] }),
       ),
+      new CirclesRpc(this.config.circlesConfig.circlesRpcUrl).balance
+        .getTokenBalances(avatar)
+        .catch((): TokenBalance[] => []),
     ]);
 
     // inflationary balance is in inflationary units — convert down to demurraged.
@@ -552,14 +572,104 @@ export class PermissionlessGroup {
     );
     const heldTotal = bal.erc1155 + bal.demurrageWrapper + inflationaryErc20;
 
+    const personalBreakdown = this.buildPersonalBreakdown(
+      avatar,
+      personalBalances,
+      path.transfers,
+    );
+    // Sum the breakdown in demurraged terms — inflationary entries are in
+    // static units, so convert before adding (mirrors `inflationaryErc20`).
+    const totalPersonal = personalBreakdown.reduce(
+      (sum, p) =>
+        sum +
+        p.erc1155 +
+        p.demurrageErc20 +
+        CirclesConverter.attoStaticCirclesToAttoCircles(p.inflationaryErc20),
+      0n,
+    );
+
     return {
       erc1155: bal.erc1155,
       demurrageErc20: bal.demurrageWrapper,
       inflationaryErc20,
       heldTotal,
-      migratable,
-      total: heldTotal + migratable,
+      migratable: path.maxFlow,
+      total: heldTotal + path.maxFlow,
+      personalBreakdown,
+      totalPersonal,
     };
+  }
+
+  /**
+   * Build the per-token personal-CRC breakdown: the avatar's held personal CRC
+   * (everything except the configured group's own token) minus the migration's
+   * outgoing flow, attributed **per form**.
+   *
+   * Held balances come from `circles_getTokenBalances`, where each row carries
+   * the token's form flags (`isErc20`/`isInflationary`) plus `tokenAddress`
+   * (the wrapper contract for ERC20, the issuer for ERC1155) and `tokenOwner`
+   * (always the issuer). A migration pathfinder edge's `tokenOwner` field is the
+   * spent token's `tokenAddress`, so we key the subtraction on `tokenAddress`:
+   *   - ERC1155 / demurrage-ERC20 rows: subtract the edge `value` directly
+   *     (both are demurraged atto-CRC, same unit as the row).
+   *   - inflationary-ERC20 rows: the row balance is in static units, so convert
+   *     the edge's demurraged `value` to static before subtracting.
+   * Each form is clamped at 0 (the pathfinder figure and the indexer snapshot
+   * can disagree at the margin), and a token is emitted only if some form
+   * remains.
+   */
+  private buildPersonalBreakdown(
+    avatar: Address,
+    held: TokenBalance[],
+    transfers: TransferStep[],
+  ): PersonalTokenBalance[] {
+    const group = this.config.groupAddress;
+
+    // Outgoing flow spent by `avatar`, summed per spent token contract
+    // (`tokenAddress`), in the edge's native demurraged unit.
+    const outgoingByToken = new Map<string, bigint>();
+    for (const t of transfers) {
+      if (!hexEq(t.from, avatar)) continue;
+      const key = t.tokenOwner.toLowerCase();
+      outgoingByToken.set(key, (outgoingByToken.get(key) ?? 0n) + BigInt(t.value));
+    }
+
+    // Accumulate transferable amounts per issuer, bucketed by form.
+    const byOwner = new Map<string, PersonalTokenBalance>();
+    for (const row of held) {
+      // The group's own token is reported as held gCRC, not migration
+      // collateral — exclude it from the personal breakdown.
+      if (hexEq(row.tokenOwner, group)) continue;
+
+      const ownerKey = row.tokenOwner.toLowerCase();
+      const entry =
+        byOwner.get(ownerKey) ??
+        ({
+          tokenOwner: row.tokenOwner,
+          erc1155: 0n,
+          demurrageErc20: 0n,
+          inflationaryErc20: 0n,
+        } satisfies PersonalTokenBalance);
+
+      const outgoing = outgoingByToken.get(row.tokenAddress.toLowerCase()) ?? 0n;
+
+      if (row.isInflationary) {
+        // Row balance is static; the outgoing edge value is demurraged.
+        const outgoingStatic =
+          CirclesConverter.attoCirclesToAttoStaticCircles(outgoing);
+        entry.inflationaryErc20 += clampSub(row.staticAttoCircles, outgoingStatic);
+      } else if (row.isErc20) {
+        entry.demurrageErc20 += clampSub(row.attoCircles, outgoing);
+      } else {
+        entry.erc1155 += clampSub(row.attoCircles, outgoing);
+      }
+
+      byOwner.set(ownerKey, entry);
+    }
+
+    return Array.from(byOwner.values()).filter(
+      (e) => e.erc1155 > 0n || e.demurrageErc20 > 0n || e.inflationaryErc20 > 0n,
+    );
   }
 
   /**
