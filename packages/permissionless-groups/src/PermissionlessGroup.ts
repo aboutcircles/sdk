@@ -578,16 +578,8 @@ export class PermissionlessGroup {
       personalBalances,
       path.transfers,
     );
-    // Sum the breakdown in demurraged terms — inflationary entries are in
-    // static units, so convert before adding (mirrors `inflationaryErc20`).
-    const personalTotal = personalBreakdown.reduce(
-      (sum, p) =>
-        sum +
-        p.erc1155 +
-        p.demurrageErc20 +
-        CirclesConverter.attoStaticCirclesToAttoCircles(p.inflationaryErc20),
-      0n,
-    );
+    // Each entry's `total` is already the demurraged per-token sum.
+    const personalTotal = personalBreakdown.reduce((sum, p) => sum + p.total, 0n);
 
     return {
       scoreGroupBreakdown: {
@@ -652,6 +644,7 @@ export class PermissionlessGroup {
           erc1155: 0n,
           demurrageErc20: 0n,
           inflationaryErc20: 0n,
+          total: 0n,
         } satisfies PersonalTokenBalance);
 
       const outgoing = outgoingByToken.get(row.tokenAddress.toLowerCase()) ?? 0n;
@@ -670,9 +663,19 @@ export class PermissionlessGroup {
       byOwner.set(ownerKey, entry);
     }
 
-    return Array.from(byOwner.values()).filter(
-      (e) => e.erc1155 > 0n || e.demurrageErc20 > 0n || e.inflationaryErc20 > 0n,
-    );
+    // Roll up each token's forms into a single demurraged `total` (the
+    // inflationary form is static, so convert it down before adding).
+    return Array.from(byOwner.values())
+      .map((e) => ({
+        ...e,
+        total:
+          e.erc1155 +
+          e.demurrageErc20 +
+          CirclesConverter.attoStaticCirclesToAttoCircles(e.inflationaryErc20),
+      }))
+      .filter(
+        (e) => e.erc1155 > 0n || e.demurrageErc20 > 0n || e.inflationaryErc20 > 0n,
+      );
   }
 
   /**
