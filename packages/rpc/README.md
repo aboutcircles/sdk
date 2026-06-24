@@ -115,6 +115,10 @@ const events = await rpc.query.events(
   - **params**: `{ from, to, targetFlow, useWrappedBalances?, fromTokens?, toTokens?, excludeFromTokens?, excludeToTokens?, simulatedBalances? }`
   - All amounts are `bigint`, addresses normalized to lowercase
   - Returns path with `flow` and `transfers` (all amounts as `bigint`)
+- `findScoreGroupRedeemPath(params): Promise<PathfindingResult>` - Compute how much of a score group's gCRC a holder can redeem back into the backing collateral (self-redeem: source == sink == holder)
+  - **params**: `{ group, holder, amount? }` — `amount` is an optional `bigint` cap (CRC wei); omit to redeem up to the holder's full gCRC balance
+  - Same `MaxFlowResponse` shape as `findPath` (`{ maxFlow, transfers }`, amounts as `bigint`): one collateral leg (treasury → holder) per allocated collateral, clamped per collateral by `MIN(holder entitlement, treasury holding)`
+  - **Note**: a forward-looking pre-flight — no on-chain redeem path is deployed yet, so the per-collateral selection order is a server-side placeholder; amounts/clamping are final
 
 ### Query Methods
 

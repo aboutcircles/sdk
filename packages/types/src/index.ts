@@ -78,6 +78,7 @@ export type {
   SimulatedBalance,
   SimulatedTrust,
   FindPathParams,
+  FindScoreGroupRedeemPathParams,
   TransferStep,
   PathfindingResult,
   FlowEdgeStruct,
