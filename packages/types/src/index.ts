@@ -40,7 +40,7 @@ export type {
   InvitationsFromResponse,
   AllInvitationsResponse
 } from './rpc-responses.js';
-export type { TransactionHistoryRow } from './rows.js';
+export type { TransactionHistoryRow, TransferDataRow } from './rows.js';
 
 // Query and filter types
 export type {

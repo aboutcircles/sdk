@@ -354,12 +354,13 @@ export interface TransferGroupCrcParams {
    */
   includeProof?: boolean;
   /**
-   * Arbitrary bytes to attach as the ERC1155 `data` argument of the underlying
-   * `Hub.safeTransferFrom` so the recipient's `onERC1155Received` hook can act
-   * on it (e.g. {@link encodeCrcV2TransferData} output). Only applied when `to`
-   * is an organization (the ERC1155 path) — ignored for non-org (ERC20)
-   * transfers, which never carry data. Matches the `txData` convention of the
-   * high-level `avatar.transfer.*` API.
+   * Arbitrary bytes to attach as annotation data for the transfer. For
+   * organization recipients (ERC1155 path) this is passed verbatim as the
+   * `data` argument of `Hub.safeTransferFrom`. For non-org recipients (ERC20
+   * path) ERC20 transfers have no `data` slot, so the SDK appends a
+   * zero-value `Hub.safeTransferFrom(avatar, to, groupTokenId, 0, txData)` in
+   * the same batch so the indexer can pick up the annotation. Encode with
+   * {@link encodeCrcV2TransferData} from `@aboutcircles/sdk-utils`.
    *
    * Mutually exclusive with {@link includeProof}: pass at most one (the SDK
    * throws if both are set, since both write the same `data` slot).
@@ -368,7 +369,10 @@ export interface TransferGroupCrcParams {
 }
 
 /** How `transferGroupCrc()` delivered the group CRC. */
-export type TransferGroupCrcMode = 'erc20-inflationary' | 'erc1155-after-unwrap';
+export type TransferGroupCrcMode =
+  | 'erc20-inflationary'
+  | 'erc20-inflationary-annotated'
+  | 'erc1155-after-unwrap';
 
 /** Result of `PermissionlessGroup.transferGroupCrc()`. */
 export interface TransferGroupCrcResult {
@@ -377,6 +381,8 @@ export interface TransferGroupCrcResult {
    * any consolidation steps (wrap ERC1155 → inflationary; unwrap demurrage
    * ERC20 → wrap → inflationary), then the delivery:
    * - `erc20-inflationary`: `… inflationaryWrapper.transfer(to, inflationaryAmount)`
+   * - `erc20-inflationary-annotated`: `… inflationaryWrapper.transfer(to, inflationaryAmount),
+   *                                       Hub.safeTransferFrom(avatar, to, groupTokenId, 0, txData)`
    * - `erc1155-after-unwrap`: `… inflationaryWrapper.unwrap(inflationaryAmount),
    *                              Hub.safeTransferFrom(avatar, to, groupTokenId,
    *                                demurragedAmount, abi.encode(score, proof))`
