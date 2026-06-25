@@ -631,7 +631,8 @@ export class PermissionlessGroup {
    *     the edge's demurraged `value` to static before subtracting.
    * Each form is clamped at 0 (the pathfinder figure and the indexer snapshot
    * can disagree at the margin), and a token is emitted only if some form
-   * remains.
+   * remains. Circles v1 balances (`version === 1`) are skipped — they're not
+   * migratable into a v2 score group.
    */
   private buildPersonalBreakdown(
     avatar: Address,
@@ -652,6 +653,12 @@ export class PermissionlessGroup {
     // Accumulate transferable amounts per issuer, bucketed by form.
     const byOwner = new Map<string, PersonalTokenBalance>();
     for (const row of held) {
+      // Personal CRC means Circles v2 only. v1 tokens (`version === 1`) live in
+      // the old Hub, can't be migrated into a v2 score group, and aren't
+      // routable by the v2 pathfinder — skip them so they don't inflate the
+      // breakdown with un-migratable balance.
+      if (row.version === 1) continue;
+
       // The group's own token is reported as held gCRC, not migration
       // collateral — exclude it from the personal breakdown.
       if (hexEq(row.tokenOwner, group)) continue;
