@@ -179,11 +179,23 @@ export interface PersonalTokenBalance {
   /** Transferable inflationary-wrapper ERC20 balance (inflationary/static): held − outgoing inflationary-ERC20 flow. */
   inflationaryErc20: bigint;
   /**
-   * Sum of this token's three forms, normalized to **demurraged** atto-CRC
-   * (`inflationaryErc20` converted down first) — the avatar's total transferable
-   * balance of this token in a single comparable unit.
+   * Sum of this token's three forms **after** the migration's outgoing flow is
+   * subtracted, normalized to **demurraged** atto-CRC (`inflationaryErc20`
+   * converted down first) — the transferable balance of this token left over
+   * once the migration in {@link GroupCrcBalance.scoreGroupMigratable} is spent.
+   * This is a **live estimate**: it moves with the pathfinder result (which
+   * tracks the indexer block). For a value that depends only on the avatar's own
+   * holdings, use {@link heldTotal}.
    */
   total: bigint;
+  /**
+   * Sum of this token's three forms **before** any migration subtraction,
+   * normalized to **demurraged** atto-CRC — the raw held balance of this token.
+   * Depends only on the avatar's own holdings, so it is **deterministic** for a
+   * given chain state (unlike {@link total}, which tracks the live pathfinder
+   * result).
+   */
+  heldTotal: bigint;
 }
 
 /**
@@ -203,7 +215,22 @@ export interface ScoreGroupBreakdown {
  * Result of `PermissionlessGroup.balance()` — the avatar's current score-group
  * CRC across all three forms PLUS the amount still migratable from legacy CRC,
  * all normalized to **demurraged** atto-CRC so the figures are summable;
- * alongside the avatar's transferable personal CRC.
+ * alongside the avatar's personal CRC.
+ *
+ * Two classes of figure are returned, and they behave differently:
+ *
+ *   - **Deterministic** (depend only on the avatar's own holdings for a given
+ *     chain state): {@link scoreGroupBreakdown}, {@link scoreGroupHeldTotal},
+ *     {@link personalBreakdown} `heldTotal`s, {@link personalHeldTotal}.
+ *   - **Live estimate** (computed from the migration pathfinder, a network
+ *     max-flow that tracks the indexer block — see {@link migratableAtBlock} —
+ *     and so changes between calls even when the avatar's holdings don't):
+ *     {@link scoreGroupMigratable}, {@link scoreGroupTotal}, the per-token
+ *     `total`s in {@link personalBreakdown}, and {@link personalTotal}.
+ *
+ * The migratable max-flow routes the avatar's CRC through the wider trust graph,
+ * so it is inherently unstable across blocks; prefer the deterministic figures
+ * for anything that must not change without a balance change.
  *
  * For the raw per-form breakdown + wrapper addresses, see
  * `PermissionlessGroup.balanceBreakdown()` ({@link BalanceResult}).
@@ -211,29 +238,78 @@ export interface ScoreGroupBreakdown {
 export interface GroupCrcBalance {
   /** Held score-group CRC per form (demurraged). See {@link ScoreGroupBreakdown}. */
   scoreGroupBreakdown: ScoreGroupBreakdown;
-  /** Sum of the three held forms (demurraged) — score-group CRC held right now. */
+  /**
+   * Sum of the three held forms (demurraged) — score-group CRC held right now.
+   * **Deterministic**: depends only on the avatar's own balances.
+   */
   scoreGroupHeldTotal: bigint;
-  /** Amount still migratable from legacy CRC (pathfinder, maxEdges {@link DEFAULT_MAX_EDGES}; demurraged). */
+  /**
+   * Amount still migratable from legacy CRC into the score group (migration
+   * pathfinder max-flow; demurraged). **Live estimate** — a network max-flow
+   * computed at {@link migratableAtBlock} that moves as the trust graph changes,
+   * independent of the avatar's own holdings.
+   */
   scoreGroupMigratable: bigint;
-  /** `scoreGroupHeldTotal + scoreGroupMigratable` (demurraged) — full reachable score-group CRC. */
+  /**
+   * `scoreGroupHeldTotal + scoreGroupMigratable` (demurraged) — full reachable
+   * score-group CRC. **Live estimate** (inherits the volatility of
+   * {@link scoreGroupMigratable}); use {@link scoreGroupHeldTotal} for a stable
+   * held-only figure.
+   */
   scoreGroupTotal: bigint;
   /**
+   * Indexer block the migration pathfinder computed {@link scoreGroupMigratable}
+   * (and the per-token `total`s in {@link personalBreakdown}) against, when the
+   * RPC reports it. `undefined` if the probe was skipped/failed, no path was
+   * found, or the RPC omitted the block — read {@link migratableProbe} to tell
+   * those apart.
+   */
+  migratableAtBlock?: bigint;
+  /**
+   * Outcome of the migration-pathfinder probe — disambiguates a `0n`
+   * {@link scoreGroupMigratable}:
+   *   - `'ok'`: the pathfinder ran; the migratable/total figures are live & valid.
+   *   - `'skipped'`: `includeMigratable: false` — the probe was not run; the live
+   *     figures equal their held counterparts by construction.
+   *   - `'failed'`: the pathfinder RPC errored; migratable fell back to `0n` and
+   *     `scoreGroupTotal`/`personalTotal` collapsed to the held figures. This is a
+   *     **fallback, not a real zero** — do not render it as "nothing to migrate".
+   */
+  migratableProbe: "ok" | "skipped" | "failed";
+  /**
    * Per-token personal-CRC breakdown: every personal CRC the avatar holds
-   * (human + non-group-token group/org CRC), with each form's amount reduced
-   * by the migration's outgoing flow that spent that form — i.e. what's left
-   * transferable after the migration this `balance()` accounts for in
-   * {@link scoreGroupMigratable}. One entry per issuing token; forms with a
-   * positive remaining balance only (fully-spent forms are clamped to 0 but the
-   * entry still appears if any form remains). See {@link PersonalTokenBalance}.
+   * (human + non-group-token group/org CRC). Each entry carries both a stable
+   * `heldTotal` (raw held) and a live `total` (held minus the migration's
+   * outgoing flow that spent that token). One entry per issuing token; an entry
+   * appears whenever the avatar holds any of that token (`heldTotal > 0`), even
+   * if the migration would spend all of it. Excludes the configured group's own
+   * token (counted as score-group CRC). See {@link PersonalTokenBalance}.
    */
   personalBreakdown: PersonalTokenBalance[];
   /**
-   * Sum of {@link personalBreakdown} across every token and form, normalized to
-   * **demurraged** atto-CRC (inflationary entries converted down first) — the
-   * avatar's total transferable personal CRC after the migration's outgoing
-   * flow is subtracted. Excludes the group's own token (counted as score-group CRC).
+   * Sum of the per-token `total`s in {@link personalBreakdown} (demurraged) —
+   * personal CRC left transferable after the migration's outgoing flow is
+   * subtracted. **Live estimate** (tracks the pathfinder); use
+   * {@link personalHeldTotal} for the stable held figure. Excludes the group's
+   * own token (counted as score-group CRC).
    */
   personalTotal: bigint;
+  /**
+   * Sum of the per-token `heldTotal`s in {@link personalBreakdown} (demurraged)
+   * — the avatar's total held personal CRC, before any migration subtraction.
+   * **Deterministic**: depends only on the avatar's own holdings. Excludes the
+   * group's own token (counted as score-group CRC).
+   */
+  personalHeldTotal: bigint;
+  /**
+   * Outcome of the `circles_getTokenBalances` read backing
+   * {@link personalBreakdown}:
+   *   - `'ok'`: balances were read; the personal figures are valid.
+   *   - `'failed'`: the read errored and was caught — `personalBreakdown` is empty
+   *     and `personalTotal`/`personalHeldTotal` are `0n` as a **fallback, not a
+   *     real zero**. Do not render it as "no personal CRC".
+   */
+  personalProbe: "ok" | "failed";
 }
 
 /**
@@ -269,10 +345,13 @@ export interface MigrationParams {
    */
   excludeFromTokens?: Address[];
   /**
-   * Cap the number of flow edges in the resulting `operateFlowMatrix`,
-   * forwarded directly to the pathfinder's `maxTransfers`. Lower values give
-   * a smaller, cheaper batch at a marginal cost to the migrated amount.
-   * Defaults to 40 when omitted.
+   * Forwarded directly to the pathfinder's `maxTransfers`. Influences how the
+   * pathfinder searches and splits the flow, but is **not** a hard cap on the
+   * number of edges returned — observed results carry slightly more transfer
+   * steps than this value, and raising it does not necessarily increase the
+   * routed amount. Higher values let the search fan out further (potentially a
+   * larger, costlier `operateFlowMatrix`); lower values steer it toward a
+   * smaller batch. Defaults to 40 when omitted.
    */
   maxEdges?: number;
   /**
@@ -300,7 +379,108 @@ export interface MigrationResult {
   txs: TransactionRequest[];
   /** Atto-CRC the pathfinder routed into the SinkWrapper. */
   amount: bigint;
+  /**
+   * Number of flow edges (transitive transfer hops) in the routed path. `0`
+   * when the batch is empty. More edges ⇒ a larger `operateFlowMatrix` and more
+   * exposure to intermediary balance changes between build and execution (each
+   * edge must still hold its baked amount on-chain or the tx reverts). Useful to
+   * gauge how fragile a migration is — see {@link MigrationRetryOptions}.
+   */
+  edges: number;
 }
+
+/**
+ * One attempt made by {@link PermissionlessGroup.migrateWithRetry}.
+ */
+export interface MigrationAttempt {
+  /** 1-based attempt number. */
+  attempt: number;
+  /** `maxEdges` cap the pathfinder was queried with for this attempt. */
+  maxEdges: number;
+  /** Atto-CRC the built batch would migrate (`0` if the batch was empty). */
+  amount: bigint;
+  /** Flow-edge count of the built batch. */
+  edges: number;
+}
+
+/**
+ * Options for {@link PermissionlessGroup.migrateWithRetry}.
+ *
+ * The migration path is a live network max-flow that goes stale within blocks
+ * (intermediary balances move), so a batch built even seconds early can revert.
+ * `migrateWithRetry` mitigates this by re-querying the pathfinder fresh on every
+ * attempt AND shrinking the edge cap after a failure — a shorter route touches
+ * fewer intermediaries and is less likely to be stale, at the cost of migrating
+ * a little less.
+ */
+export interface MigrationRetryOptions {
+  /** Maximum attempts (each one re-queries the pathfinder). Must be ≥ 1. Default 4. */
+  maxAttempts?: number;
+  /** Edge cap for the first attempt. Must be ≥ `minEdges`. Default `params.maxEdges` ?? 40. */
+  startEdges?: number;
+  /** Lower bound for the shrinking edge cap. Must be ≥ 1. Default 5. */
+  minEdges?: number;
+  /**
+   * After a failed attempt, the next edge cap is `floor(edgesUsed × factor)`
+   * (clamped to `minEdges`), where `edgesUsed` is the failed route's actual edge
+   * count. Must be in the open interval `(0, 1)`. Default 0.6.
+   */
+  reductionFactor?: number;
+  /**
+   * Classifies a thrown `submit` error: `true` ⇒ retryable revert (shrink hops &
+   * retry), `false` ⇒ fatal (rethrow immediately, abort the loop). Default:
+   * treat `Error`s as retryable EXCEPT user-rejection / cancellation messages,
+   * and treat non-`Error` throws (e.g. a bug in `submit`) as fatal. Override to
+   * match your runner's revert shape so a user cancel or a programmer error
+   * isn't re-prompted with a smaller migration.
+   */
+  isRetryable?: (error: unknown) => boolean;
+}
+
+/**
+ * A {@link MigrationAttempt} annotated with the failure message when that attempt
+ * failed. `error` is absent on the attempt that succeeded.
+ */
+export interface MigrationAttemptLog extends MigrationAttempt {
+  error?: string;
+}
+
+/**
+ * Result of {@link PermissionlessGroup.migrateWithRetry} — a discriminated union
+ * on `success`, so `result` narrows without a non-null assertion.
+ *
+ * The method **returns** (does not throw) for the two *normal* failure outcomes:
+ * `reason: 'empty'` (nothing migratable / only dust) and `reason: 'exhausted'`
+ * (every attempt's submit reverted). It **throws** only on a non-retryable
+ * `submit` error (e.g. a user rejection — see
+ * {@link MigrationRetryOptions.isRetryable}); pathfinder/build errors are treated
+ * as retryable and logged into `attempts`, not thrown.
+ *
+ * @typeParam T - the submit callback's return type (e.g. a tx hash / receipt).
+ */
+export type MigrationRetryResult<T> =
+  | {
+      success: true;
+      /** The successful submit's return value. */
+      result: T;
+      /** Atto-CRC migrated by the successful attempt. */
+      amount: bigint;
+      /** Every attempt in order; the last one succeeded. */
+      attempts: MigrationAttemptLog[];
+    }
+  | {
+      success: false;
+      /**
+       * Why it failed: `'empty'` = nothing to migrate (benign, like
+       * {@link migration} returning an empty batch); `'exhausted'` = real value
+       * but every attempt's submit reverted (worth surfacing/retrying later).
+       */
+      reason: "empty" | "exhausted";
+      /** Always `0n` — nothing was migrated. */
+      amount: bigint;
+      /** Every attempt in order, each annotated with its `error`. */
+      attempts: MigrationAttemptLog[];
+    };
 
 /**
  * A score-attested transaction batch: the txs to submit, the backend proof

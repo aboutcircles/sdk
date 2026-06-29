@@ -39,6 +39,10 @@ import type {
   MintResult,
   MigrationParams,
   MigrationResult,
+  MigrationAttempt,
+  MigrationAttemptLog,
+  MigrationRetryOptions,
+  MigrationRetryResult,
   TransferGroupCrcParams,
   TransferGroupCrcResult,
   ProofResponse,
@@ -60,6 +64,25 @@ const clampScore = (raw: bigint): bigint => (raw > MAX_SCORE ? MAX_SCORE : raw);
 
 /** `a - b`, floored at 0 — never report a negative transferable balance. */
 const clampSub = (a: bigint, b: bigint): bigint => (a > b ? a - b : 0n);
+
+/**
+ * Default {@link MigrationRetryOptions.isRetryable}: a thrown `submit` error is
+ * retryable (a stale-route revert worth re-querying) UNLESS it's a user
+ * rejection/cancellation, or it isn't an `Error` at all (e.g. a programmer error
+ * in the callback) — those are fatal and rethrown rather than re-prompting the
+ * user with a smaller migration.
+ */
+function defaultIsRetryableSubmitError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const m = error.message.toLowerCase();
+  const userCancelled =
+    m.includes("user rejected") ||
+    m.includes("user denied") ||
+    m.includes("rejected the request") ||
+    m.includes("request rejected") ||
+    m.includes("user cancel");
+  return !userCancelled;
+}
 
 /**
  * Default number of flow edges (`maxTransfers`) we ask the pathfinder for in
@@ -496,12 +519,14 @@ export class PermissionlessGroup {
    * Pathfinder → flow-matrix → tx batch. `params.amount` is forwarded
    * verbatim as the pathfinder `targetFlow`; omit it to request the
    * pathfinder's `MAX_FLOW` sentinel (everything the trust graph can route
-   * in one shot). `params.maxEdges` caps the number of flow edges (forwarded
-   * to the pathfinder's `maxTransfers`).
+   * in one shot). `params.maxEdges` is forwarded to the pathfinder's
+   * `maxTransfers` (it steers the search/splitting; it is not a hard cap on the
+   * returned edges — see {@link MigrationParams.maxEdges}).
    *
    * When nothing can be migrated (the pathfinder finds no route) — or only a
    * dust amount below {@link MigrationParams.dustThreshold} (default 0.1 CRC) —
-   * this returns an empty batch `{ txs: [], amount: 0n }` rather than throwing.
+   * this returns an empty batch `{ txs: [], amount: 0n, edges: 0 }` rather than
+   * throwing.
    * Migration being impossible (or not worth the gas) is a normal state, so
    * callers can simply check `txs.length`/`amount`. Submission is the caller's
    * job; the returned `txs` are meant to be sent atomically through a Safe runner.
@@ -509,13 +534,13 @@ export class PermissionlessGroup {
   async migration(params: MigrationParams): Promise<MigrationResult> {
     const path = await this.migrationPath(params);
     if (!path.transfers || path.transfers.length === 0) {
-      return { txs: [], amount: 0n };
+      return { txs: [], amount: 0n, edges: 0 };
     }
     // Skip dust: routing a sub-threshold amount through operateFlowMatrix costs
     // more gas than it's worth and only bloats the batch.
     const dustThreshold = params.dustThreshold ?? DEFAULT_MIGRATION_DUST_THRESHOLD;
     if (path.maxFlow < dustThreshold) {
-      return { txs: [], amount: 0n };
+      return { txs: [], amount: 0n, edges: 0 };
     }
 
     const scoreGroup = PERMISSIONLESS_GROUPS_MIGRATION.scoreGroupAddress;
@@ -531,7 +556,140 @@ export class PermissionlessGroup {
         useWrappedBalances: true,
       },
     );
-    return { txs: txs as TransactionRequest[], amount: path.maxFlow };
+    return {
+      txs: txs as TransactionRequest[],
+      amount: path.maxFlow,
+      edges: path.transfers.length,
+    };
+  }
+
+  /**
+   * Build + submit a migration with automatic re-query and hop-reduction retries.
+   *
+   * Migration routes through *intermediary* avatars' balances (transitive
+   * transfers), and that route goes stale within blocks — a batch built even
+   * seconds early can revert with `ERC20/ERC1155InsufficientBalance` once an
+   * intermediary moves. This helper hardens that on every attempt:
+   *
+   *   1. **Re-query fresh** — {@link migration} is called again right before each
+   *      submit, shrinking the staleness window to (ideally) one block.
+   *   2. **Shrink the edge cap on a retryable failure** — the next attempt caps
+   *      `maxEdges` at `floor(edgesUsed × reductionFactor)` (≥ `minEdges`),
+   *      routing a shorter path through fewer intermediaries: a little less
+   *      migrated for a much higher chance of landing.
+   *
+   * Submission stays runner-agnostic: `submit` sends the batch and must
+   * **throw/reject on revert**. Whether a thrown error is a *retryable* revert
+   * or a *fatal* error (user rejection, a bug in `submit`) is decided by
+   * {@link MigrationRetryOptions.isRetryable}; fatal errors are **rethrown
+   * immediately** rather than re-prompting the user with a smaller migration. A
+   * pathfinder/build error inside the loop is treated as retryable (logged, then
+   * retried), so it never discards the attempt log.
+   *
+   * Returns a discriminated {@link MigrationRetryResult}: `success: true` with the
+   * submit return value, or `success: false` with `reason: 'empty'` (nothing
+   * migratable / only dust — a smaller cap can't find more) or
+   * `reason: 'exhausted'` (real value, but every attempt reverted).
+   *
+   * @typeParam T - the submit callback's return type.
+   * @throws if an option is out of range, or on a non-retryable `submit` error.
+   */
+  async migrateWithRetry<T>(
+    params: MigrationParams,
+    submit: (txs: TransactionRequest[], attempt: MigrationAttempt) => Promise<T>,
+    options?: MigrationRetryOptions,
+  ): Promise<MigrationRetryResult<T>> {
+    const maxAttempts = options?.maxAttempts ?? 4;
+    const minEdges = options?.minEdges ?? 5;
+    const reductionFactor = options?.reductionFactor ?? 0.6;
+    const startEdges = options?.startEdges ?? params.maxEdges ?? DEFAULT_MAX_EDGES;
+    const isRetryable = options?.isRetryable ?? defaultIsRetryableSubmitError;
+
+    if (maxAttempts < 1) {
+      throw PermissionlessGroupError.invalidInput(
+        "migrateWithRetry() maxAttempts must be >= 1",
+        { maxAttempts },
+      );
+    }
+    if (minEdges < 1) {
+      throw PermissionlessGroupError.invalidInput(
+        "migrateWithRetry() minEdges must be >= 1",
+        { minEdges },
+      );
+    }
+    if (!(reductionFactor > 0 && reductionFactor < 1)) {
+      throw PermissionlessGroupError.invalidInput(
+        "migrateWithRetry() reductionFactor must be in the open interval (0, 1)",
+        { reductionFactor },
+      );
+    }
+    if (startEdges < minEdges) {
+      throw PermissionlessGroupError.invalidInput(
+        "migrateWithRetry() startEdges must be >= minEdges",
+        { startEdges, minEdges },
+      );
+    }
+
+    let nextEdges = startEdges;
+    const attempts: MigrationAttemptLog[] = [];
+
+    for (let i = 1; i <= maxAttempts; i++) {
+      const maxEdges = Math.max(minEdges, Math.floor(nextEdges));
+
+      // Fresh pathfinder query + rebuild on every attempt — the route is only
+      // valid for the current chain state, so we build as late as possible. A
+      // build/pathfinder error is transient-friendly: log it and retry rather
+      // than throw mid-loop and discard the attempt log.
+      let built: MigrationResult;
+      try {
+        built = await this.migration({ ...params, maxEdges });
+      } catch (err) {
+        attempts.push({
+          attempt: i,
+          maxEdges,
+          amount: 0n,
+          edges: 0,
+          error: err instanceof Error ? err.message : String(err),
+        });
+        nextEdges = Math.floor(maxEdges * reductionFactor);
+        continue;
+      }
+
+      const info: MigrationAttempt = {
+        attempt: i,
+        maxEdges,
+        amount: built.amount,
+        edges: built.edges,
+      };
+
+      if (built.txs.length === 0) {
+        // Nothing migratable at this cap (no route, or only dust). A smaller cap
+        // can't find more, so stop rather than burn the remaining attempts.
+        attempts.push({ ...info, error: "no migratable route (empty batch)" });
+        return { success: false, reason: "empty", amount: 0n, attempts };
+      }
+
+      try {
+        const result = await submit(built.txs, info);
+        attempts.push(info);
+        return { success: true, result, amount: built.amount, attempts };
+      } catch (err) {
+        if (!isRetryable(err)) {
+          // Fatal (user rejection, a bug in `submit`, …): don't re-prompt with a
+          // smaller migration — surface the real error to the caller.
+          throw err;
+        }
+        attempts.push({
+          ...info,
+          error: err instanceof Error ? err.message : String(err),
+        });
+        // Shrink based on the edges this failed route actually used, so the next
+        // attempt is a genuinely shorter (more robust) path.
+        nextEdges = Math.floor((built.edges || maxEdges) * reductionFactor);
+      }
+    }
+
+    return { success: false, reason: "exhausted", amount: 0n, attempts };
   }
 
   /**
@@ -559,36 +717,85 @@ export class PermissionlessGroup {
    * {@link DEFAULT_MAX_EDGES}`). Group-CRC figures are normalized to
    * **demurraged** atto-CRC so they're summable.
    *
-   * Also returns `personalBreakdown`: the avatar's held personal CRC (from
-   * `circles_getTokenBalances`, excluding the group's own token) with each
-   * form's amount reduced by the migration's outgoing flow that spent that
-   * form — i.e. what stays transferable after the migration counted in
-   * `migratable`. See {@link PersonalTokenBalance}.
+   * Returns both **deterministic** figures (`scoreGroupHeldTotal`,
+   * `personalHeldTotal`, and each breakdown entry's `heldTotal`) that depend
+   * only on the avatar's own holdings, and **live estimates**
+   * (`scoreGroupMigratable`, `scoreGroupTotal`, `personalTotal`, and the
+   * per-entry `total`) derived from the migration pathfinder — a network
+   * max-flow that tracks the indexer block (`migratableAtBlock`) and so changes
+   * between calls even when the avatar's holdings don't. See
+   * {@link GroupCrcBalance} for the full field-by-field contract.
+   *
+   * `personalBreakdown` lists the avatar's held personal CRC (from
+   * `circles_getTokenBalances`, excluding the group's own token); each entry's
+   * `total` is reduced by the migration's outgoing flow, while `heldTotal` is
+   * the raw held amount. See {@link PersonalTokenBalance}.
    *
    * Reads `balanceBreakdown(avatar)`, the migration pathfinder probe, and the
    * personal token balances in parallel. "Nothing migratable" (no path) counts
    * as `0`, not an error. For the raw per-form group-CRC breakdown + wrapper
    * addresses, use {@link balanceBreakdown}.
+   *
+   * @param options.includeMigratable - default `true`. Pass `false` to **skip
+   *   the migration pathfinder probe entirely** — faster, and avoids pulling a
+   *   live network max-flow you don't intend to show. With it off, the result is
+   *   fully deterministic: `scoreGroupMigratable` is `0n`, `scoreGroupTotal`
+   *   equals `scoreGroupHeldTotal`, `personalTotal` equals `personalHeldTotal`
+   *   (no outgoing flow is subtracted), and `migratableAtBlock` is omitted. Use
+   *   this for a stable balance display; only run with migratable on the
+   *   migrate/cashback action.
    */
-  async balance(avatar: Address): Promise<GroupCrcBalance> {
-    // Run the migration probe once and reuse its result for both the headline
+  async balance(
+    avatar: Address,
+    options?: { includeMigratable?: boolean },
+  ): Promise<GroupCrcBalance> {
+    const includeMigratable = options?.includeMigratable ?? true;
+
+    // One wall-clock reference for every demurrage conversion in this call, so
+    // the held figures and the migration estimate are normalized against the
+    // same instant. `CirclesConverter` otherwise samples `Date.now()` per call,
+    // which would let the parallel reads below drift apart by a few wei.
+    const nowUnixSeconds = BigInt(Math.floor(Date.now() / 1000));
+
+    // Run the migration probe once and reuse its result for both the
     // `migratable` figure AND the per-token personal breakdown — the path's
     // outgoing edges (the flow this migration would spend) are exactly what we
     // subtract from the held personal balances. "No path" is a normal empty
-    // state, not an error: fall back to an empty path.
-    const [bal, path, personalBalances] = await Promise.all([
+    // state, not an error: fall back to an empty path. When the caller opts out
+    // of migratable we skip the pathfinder call altogether (no round-trip) and
+    // use an empty path, so every figure collapses to its held (stable) form.
+    const emptyPath: PathfindingResult = { maxFlow: 0n, transfers: [] };
+    // Tag each fallible read with its outcome so a swallowed RPC failure is
+    // distinguishable from a genuine zero — `findPath`/`getTokenBalances` THROW
+    // on transport/server errors (a true "no path"/"no balance" is a normal
+    // non-error result), so a bare catch would otherwise mask an outage as a real
+    // zero. Surfaced via `migratableProbe` / `personalProbe`.
+    const probePromise: Promise<{
+      path: PathfindingResult;
+      probe: "ok" | "skipped" | "failed";
+    }> = includeMigratable
+      ? this.migrationPath({ avatar, maxEdges: DEFAULT_MAX_EDGES })
+          .then((p) => ({ path: p, probe: "ok" as const }))
+          .catch(() => ({ path: emptyPath, probe: "failed" as const }))
+      : Promise.resolve({ path: emptyPath, probe: "skipped" as const });
+
+    const [bal, probeResult, personalRead] = await Promise.all([
       this.balanceBreakdown(avatar),
-      this.migrationPath({ avatar, maxEdges: DEFAULT_MAX_EDGES }).catch(
-        (): PathfindingResult => ({ maxFlow: 0n, transfers: [] }),
-      ),
+      probePromise,
       new CirclesRpc(this.config.circlesConfig.circlesRpcUrl).balance
         .getTokenBalances(avatar)
-        .catch((): TokenBalance[] => []),
+        .then((b) => ({ balances: b, probe: "ok" as const }))
+        .catch(() => ({ balances: [] as TokenBalance[], probe: "failed" as const })),
     ]);
+    const path = probeResult.path;
+    const migratableProbe = probeResult.probe;
+    const personalBalances = personalRead.balances;
+    const personalProbe = personalRead.probe;
 
     // inflationary balance is in inflationary units — convert down to demurraged.
     const inflationaryErc20 = CirclesConverter.attoStaticCirclesToAttoCircles(
       bal.inflationaryWrapper,
+      nowUnixSeconds,
     );
     const scoreGroupHeldTotal =
       bal.erc1155 + bal.demurrageWrapper + inflationaryErc20;
@@ -597,9 +804,19 @@ export class PermissionlessGroup {
       avatar,
       personalBalances,
       path.transfers,
+      nowUnixSeconds,
     );
-    // Each entry's `total` is already the demurraged per-token sum.
+    // `total` is the post-migration estimate; `heldTotal` is the raw held figure.
     const personalTotal = personalBreakdown.reduce((sum, p) => sum + p.total, 0n);
+    const personalHeldTotal = personalBreakdown.reduce(
+      (sum, p) => sum + p.heldTotal,
+      0n,
+    );
+
+    // The migratable max-flow is computed at a specific indexer block; surface it
+    // so callers know which block the live estimate reflects (bigint, normalized
+    // at the RPC boundary).
+    const migratableAtBlock = path.graphBlock;
 
     return {
       scoreGroupBreakdown: {
@@ -610,8 +827,12 @@ export class PermissionlessGroup {
       scoreGroupHeldTotal,
       scoreGroupMigratable: path.maxFlow,
       scoreGroupTotal: scoreGroupHeldTotal + path.maxFlow,
+      ...(migratableAtBlock !== undefined ? { migratableAtBlock } : {}),
+      migratableProbe,
       personalBreakdown,
       personalTotal,
+      personalHeldTotal,
+      personalProbe,
     };
   }
 
@@ -629,15 +850,22 @@ export class PermissionlessGroup {
    *     (both are demurraged atto-CRC, same unit as the row).
    *   - inflationary-ERC20 rows: the row balance is in static units, so convert
    *     the edge's demurraged `value` to static before subtracting.
-   * Each form is clamped at 0 (the pathfinder figure and the indexer snapshot
-   * can disagree at the margin), and a token is emitted only if some form
-   * remains. Circles v1 balances (`version === 1`) are skipped — they're not
-   * migratable into a v2 score group.
+   * Each transferable form is clamped at 0 (the pathfinder figure and the
+   * indexer snapshot can disagree at the margin). Every entry also carries the
+   * raw held amount per form (before the subtraction) so the caller can read a
+   * stable `heldTotal` alongside the live `total`. A token is emitted whenever
+   * the avatar holds any of it (`heldTotal > 0`), even if the migration would
+   * spend all of it. Circles v1 balances (`version === 1`) are skipped — they're
+   * not migratable into a v2 score group.
+   *
+   * @param nowUnixSeconds - shared timestamp for the demurrage rollup so every
+   *   entry is normalized to the same instant.
    */
   private buildPersonalBreakdown(
     avatar: Address,
     held: TokenBalance[],
     transfers: TransferStep[],
+    nowUnixSeconds: bigint,
   ): PersonalTokenBalance[] {
     const group = this.config.groupAddress;
 
@@ -650,8 +878,15 @@ export class PermissionlessGroup {
       outgoingByToken.set(key, (outgoingByToken.get(key) ?? 0n) + BigInt(t.value));
     }
 
-    // Accumulate transferable amounts per issuer, bucketed by form.
-    const byOwner = new Map<string, PersonalTokenBalance>();
+    // Accumulate per issuer, bucketed by form. We track BOTH the raw held amount
+    // (`held*`, stable) and the amount left after subtracting the migration's
+    // outgoing flow (the public per-form fields, a live estimate).
+    type Acc = PersonalTokenBalance & {
+      heldErc1155: bigint;
+      heldDemurrageErc20: bigint;
+      heldInflationaryErc20: bigint;
+    };
+    const byOwner = new Map<string, Acc>();
     for (const row of held) {
       // Personal CRC means Circles v2 only. v1 tokens (`version === 1`) live in
       // the old Hub, can't be migrated into a v2 score group, and aren't
@@ -672,45 +907,70 @@ export class PermissionlessGroup {
           demurrageErc20: 0n,
           inflationaryErc20: 0n,
           total: 0n,
-        } satisfies PersonalTokenBalance);
+          heldTotal: 0n,
+          heldErc1155: 0n,
+          heldDemurrageErc20: 0n,
+          heldInflationaryErc20: 0n,
+        } satisfies Acc);
 
       const outgoing = outgoingByToken.get(row.tokenAddress.toLowerCase()) ?? 0n;
 
       if (row.isInflationary) {
         // Row balance is static; the outgoing edge value is demurraged.
-        const outgoingStatic =
-          CirclesConverter.attoCirclesToAttoStaticCircles(outgoing);
+        const outgoingStatic = CirclesConverter.attoCirclesToAttoStaticCircles(
+          outgoing,
+          nowUnixSeconds,
+        );
+        entry.heldInflationaryErc20 += row.staticAttoCircles;
         entry.inflationaryErc20 += clampSub(row.staticAttoCircles, outgoingStatic);
       } else if (row.isErc20) {
+        entry.heldDemurrageErc20 += row.attoCircles;
         entry.demurrageErc20 += clampSub(row.attoCircles, outgoing);
       } else {
+        entry.heldErc1155 += row.attoCircles;
         entry.erc1155 += clampSub(row.attoCircles, outgoing);
       }
 
       byOwner.set(ownerKey, entry);
     }
 
-    // Roll up each token's forms into a single demurraged `total` (the
-    // inflationary form is static, so convert it down before adding).
+    // Roll up each token's forms into demurraged totals (the inflationary form is
+    // static, so convert it down before adding). `total` is post-migration (a
+    // live estimate); `heldTotal` is the raw held figure (stable). Emit any token
+    // the avatar holds, even if the migration would spend all of it.
     return Array.from(byOwner.values())
-      .map((e) => ({
-        ...e,
-        total:
-          e.erc1155 +
-          e.demurrageErc20 +
-          CirclesConverter.attoStaticCirclesToAttoCircles(e.inflationaryErc20),
-      }))
-      .filter(
-        (e) => e.erc1155 > 0n || e.demurrageErc20 > 0n || e.inflationaryErc20 > 0n,
-      );
+      .map(
+        (e) =>
+          ({
+            tokenOwner: e.tokenOwner,
+            erc1155: e.erc1155,
+            demurrageErc20: e.demurrageErc20,
+            inflationaryErc20: e.inflationaryErc20,
+            total:
+              e.erc1155 +
+              e.demurrageErc20 +
+              CirclesConverter.attoStaticCirclesToAttoCircles(
+                e.inflationaryErc20,
+                nowUnixSeconds,
+              ),
+            heldTotal:
+              e.heldErc1155 +
+              e.heldDemurrageErc20 +
+              CirclesConverter.attoStaticCirclesToAttoCircles(
+                e.heldInflationaryErc20,
+                nowUnixSeconds,
+              ),
+          }) satisfies PersonalTokenBalance,
+      )
+      .filter((e) => e.heldTotal > 0n);
   }
 
   /**
    * Shared pathfinder lookup behind {@link migration} and
    * {@link migratableAmount}: routes `avatar`'s CRC into the SinkWrapper with
    * the migration constraints (destination = score group only, never sourcing
-   * the score group token, edge cap defaulting to 100). Validates params and
-   * throws if no path is found.
+   * the score group token, `maxEdges` defaulting to {@link DEFAULT_MAX_EDGES}).
+   * Validates params and throws on invalid input.
    */
   private async migrationPath(
     params: MigrationParams,
@@ -754,9 +1014,9 @@ export class PermissionlessGroup {
       // The migration must arrive at the sink as the ScoreGroup's CRC.
       toTokens: [scoreGroup],
       ...(params.fromTokens?.length ? { fromTokens: params.fromTokens } : {}),
-      // `maxEdges` is forwarded straight to the pathfinder's `maxTransfers`,
-      // which caps the number of flow edges it returns. Default to 40 so every
-      // migration probe asks for the same generous cap unless overridden.
+      // `maxEdges` is forwarded straight to the pathfinder's `maxTransfers` — it
+      // steers the search, not a hard cap on the returned edges. Default to 40 so
+      // every migration probe asks for the same generous value unless overridden.
       maxTransfers: params.maxEdges ?? DEFAULT_MAX_EDGES,
       useWrappedBalances: true,
     });

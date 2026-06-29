@@ -33,6 +33,13 @@ export class PathfinderMethods {
     );
 
     const parsed = parseStringsToBigInt(result) as unknown as PathfindingResult;
+    // `parseStringsToBigInt` converts numeric *strings* to bigint but leaves JSON
+    // *numbers* as-is, so `graphBlock` arrives as bigint | number depending on how
+    // the RPC serialized it. Normalize to bigint once here so the type can be a
+    // plain `bigint` and consumers don't each re-coerce.
+    if (parsed.graphBlock !== undefined) {
+      parsed.graphBlock = BigInt(parsed.graphBlock);
+    }
     return checksumAddresses(parsed);
   }
 
