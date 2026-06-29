@@ -56,6 +56,14 @@ export interface TransferStep {
 export interface PathfindingResult {
   maxFlow: bigint;
   transfers: TransferStep[];
+  /**
+   * Indexer block the pathfinder computed this result against, when the RPC
+   * reports it (normalized to `bigint` at the RPC boundary). `maxFlow` is a
+   * network max-flow over the trust graph at this block — it moves as the block
+   * advances even when the source avatar's own holdings don't, so it's only
+   * meaningful relative to this block.
+   */
+  graphBlock?: bigint;
 }
 
 /**
