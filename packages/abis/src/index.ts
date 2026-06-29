@@ -12,3 +12,4 @@ export { invitationFarmAbi } from './invitationFarm.js';
 export { referralsModuleAbi } from './referralsModule.js';
 export { scoreGatedMintPolicyAbi } from './scoreGatedMintPolicy.js';
 export { affiliateGroupRegistryAbi } from './affiliateGroupRegistry.js';
+export { multiAffiliateGroupRegistryAbi } from './multiAffiliateGroupRegistry.js';

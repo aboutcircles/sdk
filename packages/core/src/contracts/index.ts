@@ -13,4 +13,5 @@ export { InvitationFarmContract } from './invitationFarm.js';
 export { ReferralsModuleContract } from './referralsModule.js';
 export { ScoreGatedMintPolicyContract } from './scoreGatedMintPolicy.js';
 export { AffiliateGroupRegistryContract } from './affiliateGroupRegistry.js';
+export { MultiAffiliateGroupRegistryContract } from './multiAffiliateGroupRegistry.js';
 export { Contract } from './contract.js';
