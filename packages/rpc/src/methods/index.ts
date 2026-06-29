@@ -8,4 +8,5 @@ export { TokenMethods } from './token.js';
 export { InvitationMethods } from './invitation.js';
 export { TransactionMethods } from './transaction.js';
 export { GroupMethods } from './group.js';
+export { AffiliateMethods } from './affiliate.js';
 export { SdkMethods } from './sdk.js';
