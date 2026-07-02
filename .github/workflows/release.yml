@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version bump type'
+        description: 'Version bump type (prerelease = RC published to the `next` dist-tag)'
         required: true
         default: 'patch'
         type: choice
@@ -12,6 +12,7 @@ on:
           - patch
           - minor
           - major
+          - prerelease
 
 jobs:
   release:
@@ -39,9 +40,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump versions
-        run: |
-          VERSION_TYPE="${{ github.event.inputs.version_type }}"
-          bun run version:$VERSION_TYPE
+        env:
+          VERSION_TYPE: ${{ github.event.inputs.version_type }}
+        run: bun run version:"$VERSION_TYPE"
 
       - name: Setup Node.js for npm
         uses: actions/setup-node@v4
