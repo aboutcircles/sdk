@@ -37,7 +37,23 @@ export interface FindPathParams {
   excludeToTokens?: Address[];
   simulatedBalances?: SimulatedBalance[];
   simulatedTrusts?: SimulatedTrust[];
+  /**
+   * Addresses to treat as having consented to advanced usage (ERC-1155 operator
+   * approval). Affects which intermediate transfer paths are considered valid.
+   */
+  simulatedConsentedAvatars?: Address[];
   maxTransfers?: number;
+  /**
+   * When true, enforces 96 CRC quantization for sink-bound transfers (invitation
+   * module): each sink-bound transfer is exactly N × 96 CRC and the number of invites
+   * is derived from `targetFlow` (invites = targetFlow / 96 CRC).
+   */
+  quantizedMode?: boolean;
+  /**
+   * When true, the result includes {@link PathfindingResult.debug} with the pipeline
+   * transformation stages (raw paths → collapsed → router-inserted → sorted).
+   */
+  debugShowIntermediateSteps?: boolean;
 }
 
 /**
@@ -51,11 +67,28 @@ export interface TransferStep {
 }
 
 /**
+ * Debug pipeline stages, returned only when `debugShowIntermediateSteps` is set.
+ * Each stage lists the transfer steps at a point in the transformation pipeline.
+ */
+export interface PathfindingDebugStages {
+  /** Raw solver output, with token-pool intermediary nodes. */
+  rawPaths?: TransferStep[];
+  /** Token pools collapsed to direct avatar → avatar flows. */
+  collapsed?: TransferStep[];
+  /** Group mints routed (avatar → router → group). */
+  routerInserted?: TransferStep[];
+  /** Final on-chain execution order (collateral before mints). */
+  sorted?: TransferStep[];
+}
+
+/**
  * Result of pathfinding computation
  */
 export interface PathfindingResult {
   maxFlow: bigint;
   transfers: TransferStep[];
+  /** Pipeline transformation stages; present only when `debugShowIntermediateSteps` was set. */
+  debug?: PathfindingDebugStages;
 }
 
 /**
