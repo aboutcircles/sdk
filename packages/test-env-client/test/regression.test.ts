@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
+import { describe, test, expect, beforeAll, afterAll, setDefaultTimeout } from 'bun:test';
 import { TestEnvClient, type Session } from '../src/index.js';
 import fixtures from './fixtures.json';
 
@@ -17,7 +17,7 @@ import fixtures from './fixtures.json';
 
 const baseUrl =
   process.env.TEST_ENV_URL ?? 'http://localhost:5200';
-const TIMEOUT = 120_000;
+setDefaultTimeout(120_000);
 
 const HUB = fixtures.hub;
 const BALANCE_OF = '0x00fdd58e'; // ERC1155.balanceOf(address,uint256)
@@ -38,50 +38,38 @@ for (const fx of fixtures.blocks) {
         features: ['anvil', 'pathfinder'],
         ttlMinutes: 10,
       });
-    }, TIMEOUT);
+    });
 
     afterAll(async () => {
       await session?.release();
     });
 
-    test(
-      'anvil fork reports the expected chainId',
-      async () => {
-        const chainId = await session.anvil!.call<string>('eth_chainId', []);
-        expect(chainId).toBe(fx.anvil.chainId);
-      },
-      TIMEOUT,
-    );
+    test('anvil fork reports the expected chainId', async () => {
+      const chainId = await session.anvil!.call<string>('eth_chainId', []);
+      expect(chainId).toBe(fx.anvil.chainId);
+    });
 
     for (const b of fx.anvil.balanceOf) {
-      test(
-        `anvil balanceOf — ${b.label}`,
-        async () => {
-          const data = encodeBalanceOf(b.account, BigInt(b.tokenOwner).toString());
-          const hex = await session.anvil!.call<string>('eth_call', [
-            { to: HUB, data },
-            'latest',
-          ]);
-          expect(BigInt(hex).toString()).toBe(b.expectedWei);
-        },
-        TIMEOUT,
-      );
+      test(`anvil balanceOf — ${b.label}`, async () => {
+        const data = encodeBalanceOf(b.account, BigInt(b.tokenOwner).toString());
+        const hex = await session.anvil!.call<string>('eth_call', [
+          { to: HUB, data },
+          'latest',
+        ]);
+        expect(BigInt(hex).toString()).toBe(b.expectedWei);
+      });
     }
 
     for (const p of fx.pathfinder.findPath) {
-      test(
-        `pathfinder findPath — ${p.label}`,
-        async () => {
-          const path = await session.pathfinder!.findPath({
-            source: p.source,
-            sink: p.sink,
-            targetFlow: BigInt(p.amountWei),
-          });
-          expect(path.transfers.length).toBe(p.expectTransfers);
-          expect(String(path.maxFlow)).toBe(p.expectMaxFlowWei);
-        },
-        TIMEOUT,
-      );
+      test(`pathfinder findPath — ${p.label}`, async () => {
+        const path = await session.pathfinder!.findPath({
+          source: p.source,
+          sink: p.sink,
+          targetFlow: BigInt(p.amountWei),
+        });
+        expect(path.transfers.length).toBe(p.expectTransfers);
+        expect(String(path.maxFlow)).toBe(p.expectMaxFlowWei);
+      });
     }
   });
 }
