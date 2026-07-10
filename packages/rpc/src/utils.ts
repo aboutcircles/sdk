@@ -90,7 +90,10 @@ export function normalizeFindPathParams(params: FindPathParams): Record<string, 
       Truster: normalizeAddress(trust.truster),
       Trustee: normalizeAddress(trust.trustee),
     })),
+    SimulatedConsentedAvatars: params.simulatedConsentedAvatars?.map(normalizeAddress),
     MaxTransfers: params.maxTransfers,
+    QuantizedMode: params.quantizedMode,
+    DebugShowIntermediateSteps: params.debugShowIntermediateSteps,
   };
 }
 

@@ -112,9 +112,9 @@ const events = await rpc.query.events(
 - `getTotalBalanceV1(address, asTimeCircles?): Promise<bigint>` - Get total v1 Circles balance
 - `getTotalBalance(address, asTimeCircles?): Promise<bigint>` - Get total v2 Circles balance
 - `findPath(params): Promise<PathResponse>` - Calculate transfer path between addresses
-  - **params**: `{ from, to, targetFlow, useWrappedBalances?, fromTokens?, toTokens?, excludeFromTokens?, excludeToTokens?, simulatedBalances? }`
+  - **params**: `{ from, to, targetFlow, useWrappedBalances?, fromTokens?, toTokens?, excludeFromTokens?, excludeToTokens?, simulatedBalances?, simulatedTrusts?, simulatedConsentedAvatars?, maxTransfers?, quantizedMode?, debugShowIntermediateSteps? }`
   - All amounts are `bigint`, addresses normalized to lowercase
-  - Returns path with `flow` and `transfers` (all amounts as `bigint`)
+  - Returns path with `maxFlow` and `transfers` (all amounts as `bigint`); with `debugShowIntermediateSteps`, also `debug` with the pipeline stages
 
 ### Query Methods
 
