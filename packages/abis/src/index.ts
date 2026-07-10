@@ -1,13 +1,14 @@
 /**
  * Export all ABIs
  */
-export { hubV2Abi } from './hubV2';
-export { baseGroupAbi } from './baseGroup';
-export { baseGroupFactoryAbi } from './baseGroupFactory';
-export { nameRegistryAbi } from './nameRegistry';
-export { inflationaryCirclesAbi } from './inflationaryCircles';
-export { demurrageCirclesAbi } from './demurrageCircles';
-export { liftERC20Abi } from './liftERC20';
-export { invitationEscrowAbi } from './invitationEscrow';
-export { invitationFarmAbi } from './invitationFarm';
-export { referralsModuleAbi } from './referralsModule';
+export { hubV2Abi } from './hubV2.js';
+export { baseGroupAbi } from './baseGroup.js';
+export { baseGroupFactoryAbi } from './baseGroupFactory.js';
+export { nameRegistryAbi } from './nameRegistry.js';
+export { inflationaryCirclesAbi } from './inflationaryCircles.js';
+export { demurrageCirclesAbi } from './demurrageCircles.js';
+export { liftERC20Abi } from './liftERC20.js';
+export { invitationFarmAbi } from './invitationFarm.js';
+export { referralsModuleAbi } from './referralsModule.js';
+export { scoreGatedMintPolicyAbi } from './scoreGatedMintPolicy.js';
+export { affiliateGroupRegistryAbi } from './affiliateGroupRegistry.js';

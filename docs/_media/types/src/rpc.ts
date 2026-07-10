@@ -36,6 +36,17 @@ export interface CirclesQueryResponse {
 }
 
 /**
+ * Paginated query response from circles_paginated_query.
+ * Server returns columns, rows, hasMore flag, and an opaque cursor for next page.
+ */
+export interface PaginatedQueryResponse {
+  columns: string[];
+  rows: any[][];
+  hasMore: boolean;
+  nextCursor: string | null;
+}
+
+/**
  * Generic query response wrapper
  * Used for internal query transformations and type-safe responses
  */

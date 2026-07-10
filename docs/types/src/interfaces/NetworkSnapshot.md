@@ -6,7 +6,7 @@
 
 # Interface: NetworkSnapshot
 
-Defined in: [packages/types/src/network.ts:26](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L26)
+Defined in: [packages/types/src/network.ts:26](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/network.ts#L26)
 
 Network snapshot structure
 
@@ -18,7 +18,7 @@ Network snapshot structure
 trustRelations: TrustRelation[];
 ```
 
-Defined in: [packages/types/src/network.ts:27](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L27)
+Defined in: [packages/types/src/network.ts:27](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/network.ts#L27)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/network.ts:27](https://github.com/aboutcircles/s
 balances: TokenBalance[];
 ```
 
-Defined in: [packages/types/src/network.ts:28](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L28)
+Defined in: [packages/types/src/network.ts:28](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/network.ts#L28)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/types/src/network.ts:28](https://github.com/aboutcircles/s
 blockNumber: number;
 ```
 
-Defined in: [packages/types/src/network.ts:29](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L29)
+Defined in: [packages/types/src/network.ts:29](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/network.ts#L29)
 
 ***
 
@@ -48,4 +48,4 @@ Defined in: [packages/types/src/network.ts:29](https://github.com/aboutcircles/s
 timestamp: number;
 ```
 
-Defined in: [packages/types/src/network.ts:30](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/network.ts#L30)
+Defined in: [packages/types/src/network.ts:30](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/network.ts#L30)

@@ -10,4 +10,6 @@ export { DemurrageCirclesContract } from './demurrageCircles';
 export { LiftERC20Contract } from './liftERC20';
 export { CirclesType } from '@aboutcircles/sdk-types';
 export { InvitationEscrowContract } from './invitationEscrow';
+export { InvitationFarmContract } from './invitationFarm';
+export { ReferralsModuleContract } from './referralsModule';
 export { Contract } from './contract';

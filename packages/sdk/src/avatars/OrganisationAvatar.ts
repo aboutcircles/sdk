@@ -8,9 +8,9 @@ import type {
 import type { TransactionReceipt } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import { ValidationError } from '@aboutcircles/sdk-utils';
-import { SdkError } from '../errors';
+import { SdkError } from '../errors.js';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
-import { CommonAvatar, type PathfindingOptions } from './CommonAvatar';
+import { CommonAvatar } from './CommonAvatar.js';
 
 /**
  * OrganisationAvatar class implementation
@@ -45,74 +45,6 @@ export class OrganisationAvatar extends CommonAvatar {
 
     getTotalSupply: async (): Promise<bigint> => {
       throw SdkError.unsupportedOperation('getTotalSupply', 'This method is not yet implemented');
-    },
-
-    /**
-     * Get the maximum amount that can be replenished (converted to unwrapped personal CRC)
-     * This calculates how much of your wrapped tokens and other tokens can be converted
-     * into your own unwrapped ERC1155 personal CRC tokens using pathfinding
-     *
-     * @param options Optional pathfinding options
-     * @returns Maximum replenishable amount in atto-circles
-     *
-     * @example
-     * ```typescript
-     * const maxReplenishable = await avatar.balances.getMaxReplenishable();
-     * console.log('Can replenish:', CirclesConverter.attoCirclesToCircles(maxReplenishable), 'CRC');
-     * ```
-     */
-    getMaxReplenishable: async (options?: PathfindingOptions): Promise<bigint> => {
-      const addr = this.address.toLowerCase() as Address;
-
-      // Find maximum flow from avatar to itself, targeting personal tokens as destination
-      // This effectively asks: "How much can I convert to my own personal tokens?"
-      const maxFlow = await this.rpc.pathfinder.findMaxFlow({
-        from: addr,
-        to: addr,
-        toTokens: [addr], // Destination token is sender's own personal CRC
-        useWrappedBalances: true, // Include wrapped tokens
-        ...options,
-      });
-
-      return maxFlow;
-    },
-
-    /**
-     * Replenish unwrapped personal CRC tokens by converting wrapped/other tokens
-     *
-     * This method uses pathfinding to find the best way to convert your available tokens
-     * (including wrapped tokens) into unwrapped ERC1155 personal CRC tokens.
-     *
-     * Useful when you have wrapped tokens or other people's tokens and want to
-     * convert them to your own personal unwrapped tokens for transfers.
-     *
-     * @param options Optional pathfinding options
-     * @returns Transaction receipt
-     *
-     * @example
-     * ```typescript
-     * // Convert all available wrapped/other tokens to unwrapped personal CRC
-     * const receipt = await avatar.balances.replenish();
-     * console.log('Replenished personal tokens, tx hash:', receipt.hash);
-     * ```
-     */
-    replenish: async (options?: PathfindingOptions): Promise<TransactionReceipt> => {
-      // Construct replenish transactions using TransferBuilder
-      const transactions = await this.transferBuilder.constructReplenish(
-        this.address,
-        options
-      );
-
-      // If no transactions needed, return early
-      if (transactions.length === 0) {
-        throw SdkError.configError(
-          'No tokens available to replenish',
-          { message: 'You may not have any wrapped tokens or convertible tokens' }
-        );
-      }
-
-      // Execute the constructed transactions
-      return await this.runner.sendTransaction!(transactions);
     },
   };
 

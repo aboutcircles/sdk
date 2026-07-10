@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { encodeFunctionData, decodeFunctionResult } from '../abi';
+import { encodeFunctionData, decodeFunctionResult } from '../abi.js';
 import {
   encodeFunctionData as viemEncodeFunctionData,
   decodeFunctionResult as viemDecodeFunctionResult

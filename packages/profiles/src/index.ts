@@ -3,12 +3,20 @@ import type { Profile, GroupProfile } from '@aboutcircles/sdk-types';
 export type { Profile, GroupProfile };
 
 export class Profiles {
-  constructor(private readonly profileServiceUrl: string) {}
+  private readonly baseUrl: string;
+
+  constructor(circlesRpcUrl: string, profileServiceUrl?: string) {
+    if (profileServiceUrl) {
+      const base = profileServiceUrl.endsWith('/') ? profileServiceUrl : `${profileServiceUrl}/`;
+      this.baseUrl = base;
+    } else {
+      const base = circlesRpcUrl.endsWith('/') ? circlesRpcUrl : `${circlesRpcUrl}/`;
+      this.baseUrl = `${base}profiles/`;
+    }
+  }
 
   private getProfileServiceUrl(): string {
-    return this.profileServiceUrl.endsWith('/')
-      ? this.profileServiceUrl
-      : `${this.profileServiceUrl}/`;
+    return this.baseUrl;
   }
 
   /**

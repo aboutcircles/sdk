@@ -7,12 +7,14 @@ import type {
   GroupRow,
   AggregatedTrustRelation
 } from '@aboutcircles/sdk-types';
-import type { TransactionReceipt } from 'viem';
+import type { TransactionReceipt, Hex } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import { ValidationError } from '@aboutcircles/sdk-utils';
 import { SdkError } from '../errors';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
-import { encodeAbiParameters, parseAbiParameters } from 'viem';
+import { encodeAbiParameters, parseAbiParameters, encodeFunctionData } from 'viem';
+import { referralsModuleAbi } from '@aboutcircles/sdk-abis';
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { CommonAvatar, type PathfindingOptions } from './CommonAvatar';
 
 /**
@@ -300,6 +302,137 @@ export class HumanAvatar extends CommonAvatar {
      */
     getEscrowedAmount: async (inviter: Address, invitee: Address) => {
       return await this.core.invitationEscrow.getEscrowedAmountAndDays(inviter, invitee);
+    },
+
+    /**
+     * Generate new invitations and return associated secrets and signer addresses
+     *
+     * This function:
+     * 1. Calls invitationFarm.claimInvites() to get invitation IDs via eth_call
+     * 2. Generates random secrets for each invitation
+     * 3. Derives signer addresses from the secrets using ECDSA
+     * 4. Batches the claimInvites write call with safeBatchTransferFrom to transfer
+     *    invitation tokens (96 CRC each) to the invitation module
+     * 5. Returns the list of secrets and corresponding signers
+     *
+     * The data field in the batch transfer contains the count of generated secrets,
+     * which the contract uses to validate the transfer.
+     *
+     * @param numberOfInvites The number of invitations to generate
+     * @returns Promise containing arrays of secrets and signers for each generated invitation
+     *
+     * @throws {SdkError} If the transaction fails or invitations cannot be claimed
+     *
+     * @example
+     * ```typescript
+     * // Generate 5 invitations
+     * const result = await avatar.invite.generateInvites(5n);
+     *
+     * console.log('Generated invitations:');
+     * result.secrets.forEach((secret, index) => {
+     *   console.log(`Invitation ${index + 1}:`);
+     *   console.log(`  Secret: ${secret}`);
+     *   console.log(`  Signer: ${result.signers[index]}`);
+     * });
+     * ```
+     */
+    generateInvites: async (
+      numberOfInvites: bigint
+    ): Promise<{
+      secrets: Hex[];
+      signers: Address[];
+      transactionReceipt: TransactionReceipt;
+    }> => {
+      if (numberOfInvites <= 0n) {
+        throw SdkError.operationFailed(
+          'generateInvites',
+          'numberOfInvites must be greater than 0'
+        );
+      }
+
+      // Step 1: Call eth_call to claimInvites to get invitation IDs (read-only simulation)
+      // This simulates the claimInvites call without actually modifying state
+      // to get the IDs that would be returned
+      const ids = (await this.core.invitationFarm.read('claimInvites', [numberOfInvites], {
+        from: this.address
+      })) as unknown as bigint[];
+      console.log("ids", ids)
+      if (!ids || ids.length === 0) {
+        throw SdkError.operationFailed(
+          'generateInvites',
+          'No invitation IDs returned from claimInvites'
+        );
+      }
+
+      // Step 2: Generate random secrets and derive signers
+      const secrets: Hex[] = [];
+      const signers: Address[] = [];
+
+      for (let i = 0; i < numberOfInvites; i++) {
+        // Generate a random private key
+        const privateKey = generatePrivateKey();
+        secrets.push(privateKey);
+
+        // Derive the signer address from the private key
+        const account = privateKeyToAccount(privateKey);
+        signers.push(account.address.toLowerCase() as Address);
+      }
+
+      // Step 3: Get invitation module address
+      const invitationModuleAddress = await this.core.invitationFarm.invitationModule();
+
+      // Step 4: Referrals module address
+      const referralsModuleAddress = this.core.config.referralsModuleAddress;
+
+      // Step 5: Build the batch transaction
+      // - claimInvites write call (to actually claim the invites)
+      // - safeBatchTransferFrom to transfer invitation tokens to the invitation module
+
+      // Create the claimInvites write transaction
+      const claimInvitesWriteTx = this.core.invitationFarm.claimInvites(numberOfInvites);
+
+      // Step 6: Encode the createAccounts function call to the referrals module
+      // This call will be executed by the invitation module via the generic call proxy
+      const createAccountsCallData = encodeFunctionData({
+        abi: referralsModuleAbi,
+        functionName: 'createAccounts',
+        args: [signers],
+      });
+
+      // Step 7: Create safeBatchTransferFrom transaction to transfer invitation tokens to the invitation module
+      // - from: this avatar
+      // - to: invitation module
+      // - ids: the invitation IDs returned from claimInvites
+      // - amounts: all 96 CRC (96 * 10^18) per invitation
+      // - data: encoded as (address referralsModule, bytes callData) for the invitation module to execute
+
+      const amounts: bigint[] = [];
+      for (let i = 0; i < ids.length; i++) {
+        amounts.push(BigInt(96e18)); // 96 CRC in atto-circles
+      }
+
+      // Encode the data as (address, bytes) - referrals module address + createAccounts call data
+      const encodedData = encodeAbiParameters(
+        parseAbiParameters('address, bytes'),
+        [referralsModuleAddress, createAccountsCallData]
+      );
+
+      const batchTransferTx = this.core.hubV2.safeBatchTransferFrom(
+        this.address,
+        invitationModuleAddress,
+        ids,
+        amounts,
+        encodedData
+      );
+
+      // Step 7: Execute the batch transaction
+      const receipt = await this.runner.sendTransaction!([claimInvitesWriteTx, batchTransferTx]);
+
+      return {
+        secrets,
+        signers,
+        transactionReceipt: receipt,
+      };
     },
   };
 
@@ -678,8 +811,8 @@ export class HumanAvatar extends CommonAvatar {
      * }
      * ```
      */
-    getGroupMemberships: (limit: number = 50, sortOrder: 'ASC' | 'DESC' = 'DESC') => {
-      return this.rpc.group.getGroupMemberships(this.address, limit, sortOrder);
+    getGroupMemberships: (limit: number = 50) => {
+      return this.rpc.group.getGroupMemberships(this.address, limit);
     },
 
     /**
@@ -706,28 +839,21 @@ export class HumanAvatar extends CommonAvatar {
      */
     getGroupMembershipsWithDetails: async (limit: number = 50): Promise<GroupRow[]> => {
       // Get memberships for this avatar using pagination
-      const query = this.rpc.group.getGroupMemberships(this.address, limit);
-      const memberships: GroupMembershipRow[] = [];
+      const memberships = await this.rpc.group.getGroupMemberships(this.address, limit);
 
-      // Fetch all memberships
-      while (await query.queryNextPage()) {
-        memberships.push(...query.currentPage!.results);
-        if (!query.currentPage!.hasMore) break;
-      }
-
-      if (memberships.length === 0) {
+      if (memberships.results.length === 0) {
         return [];
       }
 
       // Extract group addresses
-      const groupAddresses = memberships.map((m: GroupMembershipRow) => m.group);
+      const groupAddresses = memberships.results.map((m: GroupMembershipRow) => m.group);
 
       // Fetch group details using groupAddressIn filter
       const groups = await this.rpc.group.findGroups(groupAddresses.length, {
         groupAddressIn: groupAddresses,
       });
 
-      return groups;
+      return groups.results;
     },
   };
 

@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-pathfinder",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Pathfinding utilities for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",
@@ -23,6 +23,10 @@
     "circles",
     "pathfinding"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-rpc": "*",

@@ -10,7 +10,7 @@
 function packCoordinates(coords): string;
 ```
 
-Defined in: [packages/pathfinder/src/packing.ts:7](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/pathfinder/src/packing.ts#L7)
+Defined in: [packages/pathfinder/src/packing.ts:7](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/pathfinder/src/packing.ts#L7)
 
 Pack a uint16 array into a hex string (big‑endian, no padding).
 

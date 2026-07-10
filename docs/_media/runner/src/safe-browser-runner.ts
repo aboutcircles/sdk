@@ -1,17 +1,12 @@
 import type { Address, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
 import type { ContractRunner, BatchRun } from './runner';
-import type { PublicClient, TransactionReceipt, Chain } from 'viem';
-import type { EIP1193Provider } from 'viem';
+import type { PublicClient, TransactionReceipt } from 'viem';
 import { createPublicClient, http } from 'viem';
 import { type MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types';
+import type { Eip1193Provider } from '@safe-global/protocol-kit';
+import Safe from '@safe-global/protocol-kit';
 import { RunnerError } from './errors';
-
-// Use require for Safe to ensure compatibility with bun's CJS/ESM interop
-// Safe Protocol Kit v5 uses CommonJS exports, so we use require() for proper interop
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-//@todo double check the import format
-const SafeModule = require('@safe-global/protocol-kit');
-const Safe = SafeModule.default || SafeModule;
+import { type ChainLike, asViemChain } from './chain-types';
 
 /**
  * Safe browser contract runner implementation using Safe Protocol Kit
@@ -24,9 +19,9 @@ export class SafeBrowserRunner implements ContractRunner {
   public address?: Address;
   public publicClient: PublicClient;
 
-  private eip1193Provider: EIP1193Provider;
+  private eip1193Provider: Eip1193Provider;
   private safeAddress?: Address;
-  private safe?: any;
+  private safe?: InstanceType<typeof Safe>;
 
   /**
    * Creates a new SafeBrowserRunner
@@ -56,7 +51,7 @@ export class SafeBrowserRunner implements ContractRunner {
    */
   constructor(
     publicClient: PublicClient,
-    eip1193Provider: EIP1193Provider,
+    eip1193Provider: Eip1193Provider,
     safeAddress?: Address
   ) {
     this.publicClient = publicClient;
@@ -69,30 +64,39 @@ export class SafeBrowserRunner implements ContractRunner {
    * @param rpcUrl - The RPC URL to connect to
    * @param eip1193Provider - The EIP-1193 provider from the browser (e.g., window.ethereum)
    * @param safeAddress - The address of the Safe wallet
-   * @param chain - The viem chain configuration (e.g., gnosis from 'viem/chains')
+   * @param chain - Chain configuration (accepts viem Chain or ChainConfig object)
    * @returns An initialized SafeBrowserRunner instance
    *
    * @example
    * ```typescript
    * import { gnosis } from 'viem/chains';
-   * import { SafeBrowserRunner } from '@aboutcircles/sdk-runner';
+   * import { SafeBrowserRunner, chains } from '@aboutcircles/sdk-runner';
    *
+   * // Using viem chain (for backward compatibility)
    * const runner = await SafeBrowserRunner.create(
    *   'https://rpc.gnosischain.com',
    *   window.ethereum,
    *   '0xYourSafeAddress...',
    *   gnosis
    * );
+   *
+   * // Using built-in chain config (no viem import needed)
+   * const runner = await SafeBrowserRunner.create(
+   *   'https://rpc.gnosischain.com',
+   *   window.ethereum,
+   *   '0xYourSafeAddress...',
+   *   chains.gnosis
+   * );
    * ```
    */
   static async create(
     rpcUrl: string,
-    eip1193Provider: EIP1193Provider,
+    eip1193Provider: Eip1193Provider,
     safeAddress: Address,
-    chain: Chain
+    chain: ChainLike
   ): Promise<SafeBrowserRunner> {
     const publicClient = createPublicClient({
-      chain,
+      chain: asViemChain(chain),
       transport: http(rpcUrl),
     });
 
@@ -132,7 +136,7 @@ export class SafeBrowserRunner implements ContractRunner {
    * Ensures the Safe is initialized
    * @private
    */
-  private ensureSafe(): any {
+  private ensureSafe(): InstanceType<typeof Safe> {
     if (!this.safe) {
       throw RunnerError.initializationFailed('SafeBrowserRunner', new Error('SafeBrowserRunner not initialized. Call init() first.'));
     }
@@ -258,7 +262,7 @@ export class SafeBrowserBatchRun implements BatchRun {
   private readonly transactions: TransactionRequest[] = [];
 
   constructor(
-    private readonly safe: any,
+    private readonly safe: InstanceType<typeof Safe>,
     private readonly publicClient: PublicClient
   ) {}
 

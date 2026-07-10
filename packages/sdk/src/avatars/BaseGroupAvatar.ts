@@ -8,9 +8,10 @@ import type {
 import type { TransactionReceipt } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import { BaseGroupContract } from '@aboutcircles/sdk-core';
-import { cidV0ToHex, ValidationError } from '@aboutcircles/sdk-utils';
-import { SdkError } from '../errors';
-import { CommonAvatar } from './CommonAvatar';
+import { cidV0ToHex } from '@aboutcircles/sdk-utils/cid';
+import { ValidationError } from '@aboutcircles/sdk-utils/errors';
+import { SdkError } from '../errors.js';
+import { CommonAvatar } from './CommonAvatar.js';
 
 /**
  * BaseGroupAvatar class implementation

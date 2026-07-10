@@ -36,6 +36,14 @@ lerna-debug.log*
 
 # Testing
 coverage/
+.playwright-test/
+.playwright-cli/
 
 # Misc
 .cache/
+
+# AI
+CLAUDE.md
+
+# Examples
+examples/

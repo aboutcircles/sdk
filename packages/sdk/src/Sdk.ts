@@ -11,14 +11,15 @@ import type {
 import type { GroupTokenHolderRow } from '@aboutcircles/sdk-rpc';
 import { circlesConfig, Core, CirclesType, BaseGroupContract } from '@aboutcircles/sdk-core';
 import { Profiles } from '@aboutcircles/sdk-profiles';
+import { Referrals } from '@aboutcircles/sdk-invitations';
 import { CirclesRpc, PagedQuery } from '@aboutcircles/sdk-rpc';
 import { cidV0ToHex } from '@aboutcircles/sdk-utils';
-import { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars';
-import { SdkError } from './errors';
+import { HumanAvatar, OrganisationAvatar, BaseGroupAvatar } from './avatars/index.js';
+import { SdkError } from './errors.js';
 import { decodeEventLog } from 'viem';
 import { baseGroupFactoryAbi } from '@aboutcircles/sdk-abis';
 import type { GroupType } from '@aboutcircles/sdk-types';
-import type { CirclesData } from './types';
+import type { CirclesData } from './types.js';
 
 
 /**
@@ -54,6 +55,7 @@ export class Sdk {
   public readonly core: Core;
   public readonly rpc: CirclesRpc;
   private readonly profilesClient: Profiles;
+  private readonly referralsClient?: Referrals;
 
   public readonly data: CirclesData = {
     getAvatar: async (address: Address): Promise<AvatarInfo | undefined> => {
@@ -64,6 +66,9 @@ export class Sdk {
     },
     getBalances: async (address: Address): Promise<TokenBalance[]> => {
       return await this.rpc.balance.getTokenBalances(address);
+    },
+    getAllInvitations: async (address: Address, minimumBalance?: string) => {
+      return await this.rpc.invitation.getAllInvitations(address, minimumBalance);
     },
   };
 
@@ -79,7 +84,16 @@ export class Sdk {
     this.contractRunner = contractRunner;
     this.core = new Core(config);
     this.rpc = new CirclesRpc(config.circlesRpcUrl);
-    this.profilesClient = new Profiles(config.profileServiceUrl);
+    this.profilesClient = new Profiles(config.circlesRpcUrl, config.profileServiceUrl);
+
+    // Initialize referrals client if service URL is configured
+    if (config.referralsServiceUrl) {
+      this.referralsClient = new Referrals(
+        config.referralsServiceUrl,
+        config.referralsModuleAddress,
+        config.chainRpcUrl ?? config.circlesRpcUrl
+      );
+    }
 
     // Validate and extract sender address from contract runner
     if (contractRunner) {
@@ -123,10 +137,13 @@ export class Sdk {
         avatar = new HumanAvatar(avatarAddress, this.core, this.contractRunner, avatarInfo as any);
       }
 
+      // Set the SDK reference on the avatar for access to SDK-level RPC methods
+      avatar.setSdk(this);
+
       // If auto-subscription is enabled, wait for it to complete before returning
       // This prevents race conditions where stores subscribe to avatar.events before it's ready
       if (autoSubscribeEvents) {
-        console.log('🔔 Sdk.getAvatar: Auto-subscribing to events for', avatarAddress);
+        console.log('[Sdk.getAvatar] Auto-subscribing to events for', avatarAddress);
         await avatar.subscribeToEvents();
       }
 
@@ -144,18 +161,15 @@ export class Sdk {
      * Register as a human in the Circles ecosystem
      *
      * This function:
-     * 1. Checks for pending invitations from inviters in the InvitationEscrow
-     * 2. If invitations exist, redeems one to claim escrowed tokens
-     * 3. Otherwise, checks if the specified inviter has enough unwrapped CRC
-     * 4. Creates and uploads profile data to IPFS
-     * 5. Registers the human with the profile CID
-     * 6. Returns a HumanAvatar instance for the registered account
+     * 1. Creates and uploads profile data to IPFS
+     * 2. Registers the human with the profile CID
+     * 3. Returns a HumanAvatar instance for the registered account
      *
      * Requirements:
      * - Contract runner must be configured to execute transactions
-     * - Either: pending invitations from inviters, OR inviter has 96+ CRC unwrapped
+     * - An inviter address must be provided
      *
-     * @param inviter Address of the inviting avatar (fallback if no invitations found)
+     * @param inviter Address of the inviting avatar
      * @param profile Profile data with name, description, etc.
      * @returns HumanAvatar instance for the newly registered human
      *
@@ -178,37 +192,7 @@ export class Sdk {
       const contractRunner: ContractRunner = this.contractRunner;
       const senderAddress: Address = this.senderAddress;
 
-      // List of transactions to execute
-      const transactions: any[] = [];
-
-      // Step 1: Check for pending invitations in the InvitationEscrow
-      const inviters = await this.core.invitationEscrow.getInviters(senderAddress);
-
-      if (inviters.length > 0) {
-        // Redeem the invitation from the first available inviter
-        const redeemTx = this.core.invitationEscrow.redeemInvitation(inviters[0]);
-        transactions.push(redeemTx);
-      } else {
-        // No invitations found, check if inviter has enough unwrapped CRC
-        // Minimum required: 96 CRC (after demurrage it becomes valid amount)
-        const minRequiredCRC = BigInt(96e18); // 96 CRC in atto-circles
-
-        // Get the token ID for the inviter's personal token
-        const tokenId = await this.core.hubV2.toTokenId(inviter);
-
-        // Check balance at the Inviter address
-        const balance = await this.core.hubV2.balanceOf(inviter, tokenId);
-
-        if (balance < minRequiredCRC) {
-          throw SdkError.insufficientBalance(
-            '96 CRC',
-            `${Number(balance) / 1e18} CRC`,
-            'unwrapped CRC'
-          );
-        }
-      }
-
-      // Step 2: Create and upload profile to IPFS
+      // Step 1: Create and upload profile to IPFS
       let profileCid: string;
 
       if (typeof profile === 'string') {
@@ -222,14 +206,13 @@ export class Sdk {
       // Convert CID to metadata digest hex (format expected by registerHuman)
       const metadataDigest = cidV0ToHex(profileCid);
 
-      // Step 3: Call registerHuman with profile data
+      // Step 2: Call registerHuman with profile data
       const registerTx = this.core.hubV2.registerHuman(inviter, metadataDigest as `0x${string}`);
-      transactions.push(registerTx);
 
-      // Step 4: Execute all transactions
-      await contractRunner.sendTransaction!(transactions);
+      // Step 3: Execute the transaction
+      await contractRunner.sendTransaction!([registerTx]);
 
-      // Step 5: Return a HumanAvatar instance for the newly registered account
+      // Step 4: Return a HumanAvatar instance for the newly registered account
       const avatarInfo = await this.rpc.avatar.getAvatarInfo(senderAddress);
       return new HumanAvatar(
         senderAddress,
@@ -457,6 +440,64 @@ export class Sdk {
   };
 
   /**
+   * Referral/invitation management methods
+   *
+   * The referrals backend enables users to invite others via referral links.
+   * Requires referralsServiceUrl to be configured in CirclesConfig.
+   */
+  public readonly referrals = {
+    /**
+     * Store a referral private key
+     *
+     * The private key is validated on-chain via ReferralsModule.accounts() to ensure
+     * the account exists and has not been claimed. The inviter address is self-declared
+     * for dashboard visibility only.
+     *
+     * @param privateKey - The referral private key (0x-prefixed, 64 hex chars)
+     * @param inviter - Self-declared inviter address for dashboard visibility
+     * @throws Error if referrals service not configured or validation fails
+     */
+    store: async (privateKey: string, inviter: Address): Promise<void> => {
+      if (!this.referralsClient) {
+        throw SdkError.configError('Referrals service not configured. Set referralsServiceUrl in CirclesConfig.');
+      }
+      return await this.referralsClient.store(privateKey, inviter);
+    },
+
+    /**
+     * Retrieve referral info by private key
+     *
+     * This is a public endpoint - no authentication required.
+     * Used by invitees to look up who invited them.
+     *
+     * @param privateKey - The referral private key
+     * @returns Referral info including inviter and status
+     * @throws Error if referrals service not configured or referral not found
+     */
+    retrieve: async (privateKey: string) => {
+      if (!this.referralsClient) {
+        throw SdkError.configError('Referrals service not configured. Set referralsServiceUrl in CirclesConfig.');
+      }
+      return await this.referralsClient.retrieve(privateKey);
+    },
+
+    /**
+     * List all referrals created by the authenticated user
+     *
+     * Requires authentication - must configure a token provider.
+     *
+     * @returns List of referrals with their status and metadata
+     * @throws Error if referrals service not configured or not authenticated
+     */
+    listMine: async () => {
+      if (!this.referralsClient) {
+        throw SdkError.configError('Referrals service not configured. Set referralsServiceUrl in CirclesConfig.');
+      }
+      return await this.referralsClient.listMine();
+    },
+  };
+
+  /**
    * Token utilities
    */
   public readonly tokens = {
@@ -500,10 +541,9 @@ export class Sdk {
      */
     getHolders: (
       tokenAddress: Address,
-      limit: number = 100,
-      sortOrder: SortOrder = 'DESC'
+      limit: number = 100
     ) => {
-      return this.rpc.token.getTokenHolders(tokenAddress, limit, sortOrder);
+      return this.rpc.token.getTokenHolders(tokenAddress, limit);
     },
   };
 
@@ -528,7 +568,6 @@ export class Sdk {
      *
      * @param groupAddress The address of the group to query members for
      * @param limit Number of members per page (default: 100)
-     * @param sortOrder Sort order for results (default: 'DESC')
      * @returns PagedQuery instance for iterating through group members
      *
      * @example
@@ -550,10 +589,9 @@ export class Sdk {
      */
     getMembers: (
       groupAddress: Address,
-      limit: number = 100,
-      sortOrder: 'ASC' | 'DESC' = 'DESC'
+      limit: number = 100
     ) => {
-      return this.rpc.group.getGroupMembers(groupAddress, limit, sortOrder);
+      return this.rpc.group.getGroupMembers(groupAddress, limit);
     },
 
     /**

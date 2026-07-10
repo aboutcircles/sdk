@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-runner",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Contract runner implementations for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist  --format esm && tsc --emitDeclarationOnly",
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm && tsc --emitDeclarationOnly && bun run patch:esm",
+    "patch:esm": "node -e \"const fs=require('fs');const f='dist/index.js';let c=fs.readFileSync(f,'utf8');c=c.replace(/__toESM\\(require_src3\\(\\), 1\\)/g,'__toESM(require_src3(), 0)');fs.writeFileSync(f,c);console.log('Patched ESM interop for protocol-kit');\"",
     "dev": "tsc --build --watch",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
@@ -25,6 +26,10 @@
     "ethereum",
     "viem"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-types": "*",

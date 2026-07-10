@@ -23,8 +23,11 @@
     { "path": "./packages/profiles" },
     { "path": "./packages/pathfinder" },
     { "path": "./packages/transfers" },
+    { "path": "./packages/invitations" },
+    { "path": "./packages/permissionless-groups" },
     { "path": "./packages/sdk" },
     { "path": "./packages/runner" },
+    { "path": "./packages/miniapp-sdk" },
     { "path": "./packages/test-env-client" }
   ]
 }

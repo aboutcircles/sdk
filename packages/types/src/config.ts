@@ -1,4 +1,4 @@
-import type { Address } from './base';
+import type { Address } from './base.js';
 
 /**
  * Configuration types
@@ -10,12 +10,16 @@ import type { Address } from './base';
 export interface CirclesConfig {
   /** RPC URL for Circles-specific endpoints */
   circlesRpcUrl: string;
-  /** Pathfinder service URL for computing transfer paths */
-  pathfinderUrl: string;
-  /** Profile service URL for user profiles and metadata */
+  /** RPC URL for direct chain calls (eth_call, etc). Defaults to circlesRpcUrl if not provided */
+  chainRpcUrl?: string;
+  /** @deprecated Pathfinder is now served via the main circlesRpcUrl */
+  pathfinderUrl?: string;
+  /** Profile service URL for IPFS profile pinning (defaults to circlesRpcUrl + 'profiles/') */
   profileServiceUrl: string;
+  /** Referrals service URL for referral/invitation links (optional) */
+  referralsServiceUrl?: string;
   /** Circles V1 Hub contract address */
-  v1HubAddress: Address;
+  v1HubAddress?: Address;
   /** Circles V2 Hub contract address */
   v2HubAddress: Address;
   /** Name Registry contract address */
@@ -30,10 +34,27 @@ export interface CirclesConfig {
   baseGroupFactoryAddress: Address;
   /** Lift ERC20 contract address */
   liftERC20Address: Address;
-  /** Invitation Escrow contract address */
-  invitationEscrowAddress: Address;
   /** Invitation Farm contract address */
   invitationFarmAddress: Address;
   /** Referrals Module contract address */
   referralsModuleAddress: Address;
+  /** Invitation Module contract address */
+  invitationModuleAddress: Address;
+  /**
+   * GnosisPayInviteQuotaGrantee contract address (optional). When set, the
+   * invitation flow checks `claimableFreeInvites(inviter)` first and, if the
+   * inviter is an eligible Gnosis Pay user, claims a free invite to fund the
+   * invitation instead of using proxy inviters or buying farm quota.
+   */
+  gnosisPayInviteQuotaGranteeAddress?: Address;
+  /**
+   * Base URL of the score-groups backend (permissionless / score-gated groups).
+   * Example: `https://<host>/score-groups`. No trailing slash.
+   */
+  scoreGroupsBackendUrl?: string;
+  /**
+   * Score-gated permissionless group avatar address. The mint policy is
+   * resolved at runtime from `Hub.mintPolicies(scoreGatedGroupAddress)`.
+   */
+  scoreGatedGroupAddress?: Address;
 }

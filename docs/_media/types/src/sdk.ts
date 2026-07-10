@@ -5,14 +5,34 @@ import type { Address } from './base';
  */
 
 /**
+ * Avatar type string literals from Circles protocol
+ * These correspond to the registration events in the Circles V1/V2 contracts
+ */
+export type AvatarType =
+  | 'CrcV1_Signup'
+  | 'CrcV2_RegisterHuman'
+  | 'CrcV2_RegisterGroup'
+  | 'CrcV2_RegisterOrganization';
+
+/**
  * Avatar row data from RPC
  */
 export interface AvatarRow {
+  /** The avatar's address (canonical field name from RPC) */
+  avatar: Address;
+  /**
+   * The avatar's address (alias for backward compatibility)
+   * @deprecated Use `avatar` instead. This field will be removed in a future version.
+   */
   address: Address;
+  /** Circles version (1 or 2) */
   version: number;
-  type: string;
-  cidV0?: string; // Profile CID stored in the name registry
-  // Additional fields as needed
+  /** Avatar type indicating how it was registered */
+  type: AvatarType;
+  /** Profile CID stored in the name registry */
+  cidV0?: string;
+  /** Name from the name registry */
+  name?: string;
 }
 
 /**

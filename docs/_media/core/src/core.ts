@@ -1,4 +1,4 @@
-import { HubV2Contract, BaseGroupFactoryContract, NameRegistryContract, LiftERC20Contract, InvitationEscrowContract } from './contracts';
+import { HubV2Contract, BaseGroupFactoryContract, NameRegistryContract, LiftERC20Contract, InvitationEscrowContract, InvitationFarmContract, ReferralsModuleContract } from './contracts';
 import type { CirclesConfig } from '@aboutcircles/sdk-types';
 import { circlesConfig } from './config';
 
@@ -45,6 +45,8 @@ export class Core {
   public readonly nameRegistry: NameRegistryContract;
   public readonly liftERC20: LiftERC20Contract;
   public readonly invitationEscrow: InvitationEscrowContract;
+  public readonly invitationFarm: InvitationFarmContract;
+  public readonly referralsModule: ReferralsModuleContract;
 
   /**
    * Create a new Core SDK instance
@@ -55,7 +57,8 @@ export class Core {
     config: CirclesConfig = circlesConfig[100]
   ) {
     this.config = config;
-    this.rpcUrl = config.circlesRpcUrl;
+    // Use chainRpcUrl for contract reads (eth_call), fallback to circlesRpcUrl
+    this.rpcUrl = config.chainRpcUrl ?? config.circlesRpcUrl;
 
     this.hubV2 = new HubV2Contract({
       address: config.v2HubAddress,
@@ -79,6 +82,16 @@ export class Core {
 
     this.invitationEscrow = new InvitationEscrowContract({
       address: config.invitationEscrowAddress,
+      rpcUrl: this.rpcUrl,
+    });
+
+    this.invitationFarm = new InvitationFarmContract({
+      address: config.invitationFarmAddress,
+      rpcUrl: this.rpcUrl,
+    });
+
+    this.referralsModule = new ReferralsModuleContract({
+      address: config.referralsModuleAddress,
       rpcUrl: this.rpcUrl,
     });
   }

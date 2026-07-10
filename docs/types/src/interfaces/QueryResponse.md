@@ -6,7 +6,7 @@
 
 # Interface: QueryResponse\<T\>
 
-Defined in: [packages/types/src/rpc.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L42)
+Defined in: [packages/types/src/rpc.ts:42](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L42)
 
 Generic query response wrapper
 Used for internal query transformations and type-safe responses
@@ -25,7 +25,7 @@ Used for internal query transformations and type-safe responses
 result: T;
 ```
 
-Defined in: [packages/types/src/rpc.ts:43](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L43)
+Defined in: [packages/types/src/rpc.ts:43](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L43)
 
 ***
 
@@ -35,4 +35,4 @@ Defined in: [packages/types/src/rpc.ts:43](https://github.com/aboutcircles/sdk-v
 optional error: unknown;
 ```
 
-Defined in: [packages/types/src/rpc.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L44)
+Defined in: [packages/types/src/rpc.ts:44](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L44)

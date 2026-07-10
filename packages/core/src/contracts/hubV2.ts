@@ -1,5 +1,5 @@
-import { Contract } from './contract';
-import { hubV2Abi } from '@aboutcircles/sdk-abis';
+import { Contract } from './contract.js';
+import { hubV2Abi } from '@aboutcircles/sdk-abis/hubV2';
 import type { Address, TransactionRequest, Hex } from '@aboutcircles/sdk-types';
 
 /**
@@ -83,6 +83,14 @@ export class HubV2Contract extends Contract<typeof hubV2Abi> {
   // @todo check how this function works with the static call
   async calculateIssuance(human: Address): Promise<readonly [bigint, bigint, bigint]> {
     return this.read('calculateIssuance', [human]) as Promise<readonly [bigint, bigint, bigint]>;
+  }
+
+  /**
+   * Look up the mint policy registered for a group avatar.
+   * Returns the zero address if the group is not registered.
+   */
+  async mintPolicies(group: Address): Promise<Address> {
+    return this.read('mintPolicies', [group]) as Promise<Address>;
   }
 
   /**

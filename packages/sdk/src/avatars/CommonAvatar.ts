@@ -11,9 +11,11 @@ import type { TransactionReceipt } from 'viem';
 import type { Core } from '@aboutcircles/sdk-core';
 import type { CirclesEvent, Observable } from '@aboutcircles/sdk-rpc';
 import { Observable as ObservableClass, CirclesRpc } from '@aboutcircles/sdk-rpc';
-import { cidV0ToHex, bytesToHex, ValidationError } from '@aboutcircles/sdk-utils';
+import { cidV0ToHex } from '@aboutcircles/sdk-utils/cid';
+import { bytesToHex } from '@aboutcircles/sdk-utils/bytes';
+import { ValidationError } from '@aboutcircles/sdk-utils/errors';
 import { Profiles } from '@aboutcircles/sdk-profiles';
-import { SdkError } from '../errors';
+import { SdkError } from '../errors.js';
 import {
   CirclesType,
   DemurrageCirclesContract,
@@ -26,6 +28,15 @@ import { TransferBuilder } from '@aboutcircles/sdk-transfers';
  * Advanced pathfinding options (reuses FindPathParams optional fields)
  */
 export type PathfindingOptions = Omit<FindPathParams, 'from' | 'to' | 'targetFlow'>;
+
+/**
+ * Forward reference to Sdk type to avoid circular imports
+ * The actual Sdk instance is set via setSdk() after avatar creation
+ */
+interface SdkReference {
+  readonly rpc: CirclesRpc;
+  readonly circlesConfig: any;
+}
 
 /**
  * CommonAvatar abstract class
@@ -44,6 +55,33 @@ export abstract class CommonAvatar {
   public readonly core: Core;
   public readonly contractRunner?: ContractRunner;
   public events: Observable<CirclesEvent>;
+
+  /**
+   * Reference to the parent SDK instance.
+   * Set automatically when avatar is created via Sdk.getAvatar().
+   * Provides access to SDK-level RPC methods like getTransactionHistoryEnriched.
+   */
+  private _sdk?: SdkReference;
+
+  /**
+   * Get the parent SDK instance.
+   * Throws if the avatar was not created via Sdk.getAvatar().
+   */
+  public get sdk(): SdkReference {
+    if (!this._sdk) {
+      throw new Error('SDK reference not set. Avatar must be created via Sdk.getAvatar()');
+    }
+    return this._sdk;
+  }
+
+  /**
+   * Set the parent SDK reference.
+   * Called internally by Sdk.getAvatar().
+   * @internal
+   */
+  public setSdk(sdk: SdkReference): void {
+    this._sdk = sdk;
+  }
 
   protected readonly runner: ContractRunner;
   protected readonly profiles: Profiles;
@@ -79,14 +117,14 @@ export abstract class CommonAvatar {
 
     this.runner = contractRunner;
 
-    // Initialize profiles client with the profile service URL from config
-    this.profiles = new Profiles(core.config.profileServiceUrl);
+    // Initialize profiles client using the main RPC URL (profiles/ path is derived automatically)
+    this.profiles = new Profiles(core.config.circlesRpcUrl, core.config.profileServiceUrl);
 
     // Initialize RPC client
     this.rpc = new CirclesRpc(core.config.circlesRpcUrl);
 
     // Initialize transfer builder
-    this.transferBuilder = new TransferBuilder(core);
+    this.transferBuilder = new TransferBuilder(core.config);
 
     // Event subscription is optional - initialize with stub observable
     // Actual subscription is handled by Sdk.getAvatar() when autoSubscribeEvents is enabled
@@ -429,8 +467,8 @@ export abstract class CommonAvatar {
      * }
      * ```
      */
-    getTransactions: (limit: number = 50, sortOrder: 'ASC' | 'DESC' = 'DESC') => {
-      return this.rpc.transaction.getTransactionHistory(this.address, limit, sortOrder);
+    getTransactions: (limit: number = 50) => {
+      return this.rpc.transaction.getTransactionHistory(this.address, limit);
     },
   };
 
@@ -464,6 +502,7 @@ export abstract class CommonAvatar {
      * const receipt = await avatar.transfer.direct('0x123...', BigInt(100e18), '0xWrappedTokenAddress...');
      * ```
      */
+    // @todo allow batch
     direct: async (
       to: Address,
       amount: bigint,

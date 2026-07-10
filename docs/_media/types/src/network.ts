@@ -1,6 +1,3 @@
-import type { TrustRelation } from './trust';
-import type { TokenBalance } from './token';
-
 /**
  * Network and event types
  */
@@ -21,11 +18,10 @@ export type EventType =
   | 'CrcV2_TransferBatch';
 
 /**
- * Network snapshot structure
+ * Network snapshot from circles_getNetworkSnapshot (proxied to pathfinder).
+ * PascalCase matches the RPC response format.
  */
 export interface NetworkSnapshot {
-  trustRelations: TrustRelation[];
-  balances: TokenBalance[];
-  blockNumber: number;
-  timestamp: number;
+  BlockNumber: number;
+  Addresses: string[];
 }

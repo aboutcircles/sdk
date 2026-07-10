@@ -1,12 +1,12 @@
 [**Circles SDK**](../../../README.md)
 
-***
+---
 
 [Circles SDK](../../../modules.md) / [rpc/src](../README.md) / InvitationMethods
 
 # Class: InvitationMethods
 
-Defined in: [packages/rpc/src/methods/invitation.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L12)
+Defined in: [packages/rpc/src/methods/invitation.ts:12](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L12)
 
 Invitation RPC methods
 
@@ -18,7 +18,7 @@ Invitation RPC methods
 new InvitationMethods(client): InvitationMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:13](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L13)
+Defined in: [packages/rpc/src/methods/invitation.ts:13](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L13)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/invitation.ts:13](https://github.com/about
 getInvitedBy(address): Promise<`0x${string}` | undefined>;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:38](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L38)
+Defined in: [packages/rpc/src/methods/invitation.ts:38](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L38)
 
 Get the avatar that invited a specific avatar
 
@@ -59,11 +59,13 @@ The address of the inviting avatar or undefined if not found
 #### Example
 
 ```typescript
-const inviter = await rpc.invitation.getInvitedBy('0xde374ece6fa50e781e81aac78e811b33d16912c7');
-console.log(inviter); // '0x...'
+const inviter = await rpc.invitation.getInvitedBy(
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7"
+)
+console.log(inviter) // '0x...'
 ```
 
-***
+---
 
 ### getInvitations()
 
@@ -71,10 +73,13 @@ console.log(inviter); // '0x...'
 getInvitations(address): Promise<AvatarInfo[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:83](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L83)
+Defined in: [packages/rpc/src/methods/invitation.ts:83](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L83)
 
 Get the list of avatars who have invited this avatar
 Checks v2 trust relations and validates that inviters have enough balance
+
+Uses the native RPC method for efficient server-side filtering and validation.
+Replaces 6-7 separate RPC calls with a single optimized query.
 
 #### Parameters
 
@@ -93,11 +98,13 @@ Array of avatar info for valid inviters
 #### Example
 
 ```typescript
-const invitations = await rpc.invitation.getInvitations('0xde374ece6fa50e781e81aac78e811b33d16912c7');
-console.log(invitations); // Array of AvatarInfo
+const invitations = await rpc.invitation.getInvitations(
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7"
+)
+console.log(invitations) // Array of AvatarInfo
 ```
 
-***
+---
 
 ### getInvitationsFrom()
 
@@ -105,7 +112,7 @@ console.log(invitations); // Array of AvatarInfo
 getInvitationsFrom(address, accepted): Promise<`0x${string}`[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/invitation.ts:190](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/invitation.ts#L190)
+Defined in: [packages/rpc/src/methods/invitation.ts:190](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/invitation.ts#L190)
 
 Get the list of accounts that were invited by a specific avatar
 
@@ -134,13 +141,13 @@ Array of invited addresses
 ```typescript
 // Get accepted invitations
 const accepted = await rpc.invitation.getInvitationsFrom(
-  '0xde374ece6fa50e781e81aac78e811b33d16912c7',
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7",
   true
-);
+)
 
 // Get pending invitations
 const pending = await rpc.invitation.getInvitationsFrom(
-  '0xde374ece6fa50e781e81aac78e811b33d16912c7',
+  "0xde374ece6fa50e781e81aac78e811b33d16912c7",
   false
-);
+)
 ```

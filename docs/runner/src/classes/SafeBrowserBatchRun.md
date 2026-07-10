@@ -6,7 +6,7 @@
 
 # Class: SafeBrowserBatchRun
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:257](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L257)
+Defined in: [packages/runner/src/safe-browser-runner.ts:257](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L257)
 
 Batch transaction runner for Safe browser operations
 Allows multiple transactions to be batched and executed together
@@ -23,7 +23,7 @@ Allows multiple transactions to be batched and executed together
 new SafeBrowserBatchRun(safe, publicClient): SafeBrowserBatchRun;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:260](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L260)
+Defined in: [packages/runner/src/safe-browser-runner.ts:260](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L260)
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: [packages/runner/src/safe-browser-runner.ts:260](https://github.com/
 addTransaction(tx): void;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:268](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L268)
+Defined in: [packages/runner/src/safe-browser-runner.ts:268](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L268)
 
 Add a transaction to the batch
 
@@ -73,7 +73,7 @@ BatchRun.addTransaction
 getSafeTransaction(): Promise<any>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:275](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L275)
+Defined in: [packages/runner/src/safe-browser-runner.ts:275](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L275)
 
 Get the Safe transaction data for all batched transactions
 
@@ -89,7 +89,7 @@ Get the Safe transaction data for all batched transactions
 run(): Promise<TransactionReceipt>;
 ```
 
-Defined in: [packages/runner/src/safe-browser-runner.ts:296](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/runner/src/safe-browser-runner.ts#L296)
+Defined in: [packages/runner/src/safe-browser-runner.ts:296](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/runner/src/safe-browser-runner.ts#L296)
 
 Execute all batched transactions and wait for confirmation
 The user will be prompted to sign the transaction through their Web3 wallet

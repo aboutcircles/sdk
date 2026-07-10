@@ -6,7 +6,7 @@
 
 # Class: TrustMethods
 
-Defined in: [packages/rpc/src/methods/trust.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L9)
+Defined in: [packages/rpc/src/methods/trust.ts:9](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L9)
 
 Trust relation RPC methods
 
@@ -18,7 +18,7 @@ Trust relation RPC methods
 new TrustMethods(client): TrustMethods;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L10)
+Defined in: [packages/rpc/src/methods/trust.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L10)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/methods/trust.ts:10](https://github.com/aboutcircl
 getCommonTrust(address1, address2): Promise<`0x${string}`[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:40](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L40)
+Defined in: [packages/rpc/src/methods/trust.ts:40](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L40)
 
 Query the common trust relations of two addresses
 (only common outgoing trust relations are considered)
@@ -83,7 +83,7 @@ getTrustRelations(
 sortOrder): PagedQuery<TrustRelation>;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:69](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L69)
+Defined in: [packages/rpc/src/methods/trust.ts:69](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L69)
 
 Get trust relations for an address using cursor-based pagination
 
@@ -135,7 +135,7 @@ query.currentPage.results.forEach(relation => {
 getAggregatedTrustRelations(avatar): Promise<AggregatedTrustRelation[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:153](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L153)
+Defined in: [packages/rpc/src/methods/trust.ts:153](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L153)
 
 Get aggregated trust relations for an address
 Groups trust relations by counterpart and determines relationship type
@@ -176,7 +176,7 @@ const aggregated = await rpc.trust.getAggregatedTrustRelations(
 getTrustedBy(avatar): Promise<AggregatedTrustRelation[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:221](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L221)
+Defined in: [packages/rpc/src/methods/trust.ts:221](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L221)
 
 Get addresses that trust the given avatar (incoming trust)
 
@@ -210,7 +210,7 @@ const trustedBy = await rpc.trust.getTrustedBy(
 getTrusts(avatar): Promise<AggregatedTrustRelation[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:241](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L241)
+Defined in: [packages/rpc/src/methods/trust.ts:241](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L241)
 
 Get addresses that the given avatar trusts (outgoing trust)
 
@@ -244,7 +244,7 @@ const trusts = await rpc.trust.getTrusts(
 getMutualTrusts(avatar): Promise<AggregatedTrustRelation[]>;
 ```
 
-Defined in: [packages/rpc/src/methods/trust.ts:261](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/methods/trust.ts#L261)
+Defined in: [packages/rpc/src/methods/trust.ts:261](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/methods/trust.ts#L261)
 
 Get mutual trust relations for the given avatar
 

@@ -6,7 +6,7 @@
 
 # Interface: SearchResultProfile
 
-Defined in: [packages/rpc/src/types.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L41)
+Defined in: [packages/rpc/src/types.ts:41](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L41)
 
 Search result profile with additional metadata
 
@@ -18,7 +18,7 @@ Search result profile with additional metadata
 address: `0x${string}`;
 ```
 
-Defined in: [packages/rpc/src/types.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L42)
+Defined in: [packages/rpc/src/types.ts:42](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L42)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/rpc/src/types.ts:42](https://github.com/aboutcircles/sdk-v
 name: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:43](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L43)
+Defined in: [packages/rpc/src/types.ts:43](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L43)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/rpc/src/types.ts:43](https://github.com/aboutcircles/sdk-v
 optional description: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:44](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L44)
+Defined in: [packages/rpc/src/types.ts:44](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L44)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/rpc/src/types.ts:44](https://github.com/aboutcircles/sdk-v
 optional previewImageUrl: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:45](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L45)
+Defined in: [packages/rpc/src/types.ts:45](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L45)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/rpc/src/types.ts:45](https://github.com/aboutcircles/sdk-v
 optional imageUrl: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:46](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L46)
+Defined in: [packages/rpc/src/types.ts:46](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L46)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/rpc/src/types.ts:46](https://github.com/aboutcircles/sdk-v
 optional location: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:47](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L47)
+Defined in: [packages/rpc/src/types.ts:47](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L47)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [packages/rpc/src/types.ts:47](https://github.com/aboutcircles/sdk-v
 optional geoLocation: [number, number];
 ```
 
-Defined in: [packages/rpc/src/types.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L48)
+Defined in: [packages/rpc/src/types.ts:48](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L48)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [packages/rpc/src/types.ts:48](https://github.com/aboutcircles/sdk-v
 optional extensions: Record<string, any>;
 ```
 
-Defined in: [packages/rpc/src/types.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L49)
+Defined in: [packages/rpc/src/types.ts:49](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L49)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [packages/rpc/src/types.ts:49](https://github.com/aboutcircles/sdk-v
 optional avatarType: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L50)
+Defined in: [packages/rpc/src/types.ts:50](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L50)
 
 ***
 
@@ -108,7 +108,7 @@ Defined in: [packages/rpc/src/types.ts:50](https://github.com/aboutcircles/sdk-v
 optional CID: string;
 ```
 
-Defined in: [packages/rpc/src/types.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L51)
+Defined in: [packages/rpc/src/types.ts:51](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L51)
 
 ***
 
@@ -118,7 +118,7 @@ Defined in: [packages/rpc/src/types.ts:51](https://github.com/aboutcircles/sdk-v
 optional lastUpdatedAt: number;
 ```
 
-Defined in: [packages/rpc/src/types.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L52)
+Defined in: [packages/rpc/src/types.ts:52](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L52)
 
 ***
 
@@ -128,4 +128,4 @@ Defined in: [packages/rpc/src/types.ts:52](https://github.com/aboutcircles/sdk-v
 optional registeredName: string | null;
 ```
 
-Defined in: [packages/rpc/src/types.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/types.ts#L53)
+Defined in: [packages/rpc/src/types.ts:53](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/types.ts#L53)

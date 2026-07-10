@@ -14,9 +14,10 @@
     { "path": "../core" },
     { "path": "../rpc" },
     { "path": "../profiles" },
-    { "path": "../utils" },
+{ "path": "../utils" },
     { "path": "../runner" },
     { "path": "../pathfinder" },
-    { "path": "../transfers" }
+    { "path": "../transfers" },
+    { "path": "../invitations" }
   ]
 }

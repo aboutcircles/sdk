@@ -1,4 +1,19 @@
-import type { Address } from '@aboutcircles/sdk-types';
+import type { Address, Hex } from '@aboutcircles/sdk-types';
+import { ZERO_ADDRESS } from './constants.js';
+
+/**
+ * True when `a` is the zero address (case-insensitive).
+ */
+export function isZeroAddress(a: Address): boolean {
+  return a.toLowerCase() === ZERO_ADDRESS;
+}
+
+/**
+ * Case-insensitive equality for hex strings (addresses, hashes, calldata).
+ */
+export function hexEq(a: Hex, b: Hex): boolean {
+  return a.toLowerCase() === b.toLowerCase();
+}
 
 /**
  * Converts a uint256 value to an Ethereum address

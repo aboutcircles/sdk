@@ -6,7 +6,7 @@
 
 # Class: NetworkError
 
-Defined in: [packages/core/src/errors.ts:110](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L110)
+Defined in: [packages/core/src/errors.ts:110](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/errors.ts#L110)
 
 Network-related errors
 
@@ -22,7 +22,7 @@ Network-related errors
 new NetworkError(message, options?): NetworkError;
 ```
 
-Defined in: [packages/core/src/errors.ts:111](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L111)
+Defined in: [packages/core/src/errors.ts:111](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/errors.ts#L111)
 
 #### Parameters
 
@@ -62,7 +62,7 @@ CirclesError<CoreErrorSource>.constructor
 static wrongNetwork(expectedChainId, actualChainId): NetworkError;
 ```
 
-Defined in: [packages/core/src/errors.ts:125](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L125)
+Defined in: [packages/core/src/errors.ts:125](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/errors.ts#L125)
 
 Create error for wrong network
 
@@ -88,7 +88,7 @@ Create error for wrong network
 static connectionFailed(reason, cause?): NetworkError;
 ```
 
-Defined in: [packages/core/src/errors.ts:138](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L138)
+Defined in: [packages/core/src/errors.ts:138](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/errors.ts#L138)
 
 Create error for network connection issues
 
@@ -114,7 +114,7 @@ Create error for network connection issues
 static unsupportedNetwork(chainId): NetworkError;
 ```
 
-Defined in: [packages/core/src/errors.ts:149](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/core/src/errors.ts#L149)
+Defined in: [packages/core/src/errors.ts:149](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/core/src/errors.ts#L149)
 
 Create error for unsupported network
 

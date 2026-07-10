@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-abis",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Circles Contract ABIs",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,6 +15,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --format esm --splitting && tsc --emitDeclarationOnly",
     "dev": "tsc --watch"

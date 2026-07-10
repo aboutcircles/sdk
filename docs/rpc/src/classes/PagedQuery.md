@@ -6,7 +6,7 @@
 
 # Class: PagedQuery\<TRow\>
 
-Defined in: [packages/rpc/src/pagedQuery.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L50)
+Defined in: [packages/rpc/src/pagedQuery.ts:50](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/pagedQuery.ts#L50)
 
 A class for querying Circles RPC nodes with cursor-based pagination.
 Supports both event-based pagination (default) and custom cursor pagination (for view tables).
@@ -55,7 +55,7 @@ new PagedQuery<TRow>(
 rowTransformer?): PagedQuery<TRow>;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:67](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L67)
+Defined in: [packages/rpc/src/pagedQuery.ts:67](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/pagedQuery.ts#L67)
 
 #### Parameters
 
@@ -87,7 +87,7 @@ get currentPage():
   | undefined;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:61](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L61)
+Defined in: [packages/rpc/src/pagedQuery.ts:61](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/pagedQuery.ts#L61)
 
 ##### Returns
 
@@ -102,7 +102,7 @@ Defined in: [packages/rpc/src/pagedQuery.ts:61](https://github.com/aboutcircles/
 queryNextPage(): Promise<boolean>;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:271](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L271)
+Defined in: [packages/rpc/src/pagedQuery.ts:271](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/pagedQuery.ts#L271)
 
 Queries the next page of results.
 
@@ -120,7 +120,7 @@ True if results were found, false otherwise
 reset(): void;
 ```
 
-Defined in: [packages/rpc/src/pagedQuery.ts:304](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/pagedQuery.ts#L304)
+Defined in: [packages/rpc/src/pagedQuery.ts:304](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/pagedQuery.ts#L304)
 
 Resets the query to start from the beginning
 

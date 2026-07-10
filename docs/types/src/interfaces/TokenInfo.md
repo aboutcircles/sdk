@@ -6,7 +6,7 @@
 
 # Interface: TokenInfo
 
-Defined in: [packages/types/src/token.ts:32](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L32)
+Defined in: [packages/types/src/token.ts:32](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L32)
 
 Token information
 
@@ -18,7 +18,7 @@ Token information
 blockNumber: number;
 ```
 
-Defined in: [packages/types/src/token.ts:33](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L33)
+Defined in: [packages/types/src/token.ts:33](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L33)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/types/src/token.ts:33](https://github.com/aboutcircles/sdk
 timestamp: number;
 ```
 
-Defined in: [packages/types/src/token.ts:34](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L34)
+Defined in: [packages/types/src/token.ts:34](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L34)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/types/src/token.ts:34](https://github.com/aboutcircles/sdk
 transactionIndex: number;
 ```
 
-Defined in: [packages/types/src/token.ts:35](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L35)
+Defined in: [packages/types/src/token.ts:35](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L35)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/types/src/token.ts:35](https://github.com/aboutcircles/sdk
 logIndex: number;
 ```
 
-Defined in: [packages/types/src/token.ts:36](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L36)
+Defined in: [packages/types/src/token.ts:36](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L36)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/types/src/token.ts:36](https://github.com/aboutcircles/sdk
 transactionHash: string;
 ```
 
-Defined in: [packages/types/src/token.ts:37](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L37)
+Defined in: [packages/types/src/token.ts:37](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L37)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/types/src/token.ts:37](https://github.com/aboutcircles/sdk
 version: number;
 ```
 
-Defined in: [packages/types/src/token.ts:38](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L38)
+Defined in: [packages/types/src/token.ts:38](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L38)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [packages/types/src/token.ts:38](https://github.com/aboutcircles/sdk
 optional type: string;
 ```
 
-Defined in: [packages/types/src/token.ts:39](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L39)
+Defined in: [packages/types/src/token.ts:39](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L39)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [packages/types/src/token.ts:39](https://github.com/aboutcircles/sdk
 tokenType: string;
 ```
 
-Defined in: [packages/types/src/token.ts:40](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L40)
+Defined in: [packages/types/src/token.ts:40](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L40)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [packages/types/src/token.ts:40](https://github.com/aboutcircles/sdk
 token: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/token.ts:41](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L41)
+Defined in: [packages/types/src/token.ts:41](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L41)
 
 ***
 
@@ -108,4 +108,4 @@ Defined in: [packages/types/src/token.ts:41](https://github.com/aboutcircles/sdk
 tokenOwner: `0x${string}`;
 ```
 
-Defined in: [packages/types/src/token.ts:42](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/token.ts#L42)
+Defined in: [packages/types/src/token.ts:42](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/token.ts#L42)

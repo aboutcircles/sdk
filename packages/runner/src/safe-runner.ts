@@ -1,16 +1,12 @@
 import type { Address, Hex, TransactionRequest } from '@aboutcircles/sdk-types';
-import type { ContractRunner, BatchRun } from './runner';
+import type { ContractRunner, BatchRun } from './runner.js';
 import type { PublicClient, TransactionReceipt, Chain } from 'viem';
 import type { SafeTransaction } from '@safe-global/types-kit';
 import { createPublicClient, http } from 'viem';
 import { type MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types';
-import { RunnerError } from './errors';
-
-// Use require for Safe to ensure compatibility with bun's CJS/ESM interop
-// Safe Protocol Kit v5 uses CommonJS exports, so we use require() for proper interop
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const SafeModule = require('@safe-global/protocol-kit');
-const Safe = SafeModule.default || SafeModule;
+import { RunnerError } from './errors.js';
+import { type ChainLike, asViemChain } from './chain-types.js';
+import Safe from '@safe-global/protocol-kit';
 
 /**
  * Batch transaction runner for Safe
@@ -20,7 +16,7 @@ export class SafeBatchRun implements BatchRun {
   private readonly transactions: TransactionRequest[] = [];
 
   constructor(
-    private readonly safe: any,
+    private readonly safe: InstanceType<typeof Safe>,
     private readonly publicClient: PublicClient
   ) {}
 
@@ -92,7 +88,7 @@ export class SafeContractRunner implements ContractRunner {
   private privateKey: Hex;
   private rpcUrl: string;
   private safeAddress?: Address;
-  private safe?: any;
+  private safe?: InstanceType<typeof Safe>;
 
   /**
    * Creates a new SafeContractRunner
@@ -119,19 +115,28 @@ export class SafeContractRunner implements ContractRunner {
    * @param rpcUrl - The RPC URL to connect to
    * @param privateKey - The private key of one of the Safe signers
    * @param safeAddress - The address of the Safe wallet
-   * @param chain - The viem chain configuration (e.g., gnosis from 'viem/chains')
+   * @param chain - Chain configuration (accepts viem Chain or ChainConfig object)
    * @returns An initialized SafeContractRunner instance
    *
    * @example
    * ```typescript
    * import { gnosis } from 'viem/chains';
-   * import { SafeContractRunner } from '@aboutcircles/sdk-runner';
+   * import { SafeContractRunner, chains } from '@aboutcircles/sdk-runner';
    *
+   * // Using viem chain (for backward compatibility)
    * const runner = await SafeContractRunner.create(
    *   'https://rpc.gnosischain.com',
    *   '0xYourPrivateKey...',
    *   '0xYourSafeAddress...',
    *   gnosis
+   * );
+   *
+   * // Using built-in chain config (no viem import needed)
+   * const runner = await SafeContractRunner.create(
+   *   'https://rpc.gnosischain.com',
+   *   '0xYourPrivateKey...',
+   *   '0xYourSafeAddress...',
+   *   chains.gnosis
    * );
    * ```
    */
@@ -139,10 +144,10 @@ export class SafeContractRunner implements ContractRunner {
     rpcUrl: string,
     privateKey: Hex,
     safeAddress: Address,
-    chain: Chain
+    chain: ChainLike
   ): Promise<SafeContractRunner> {
     const publicClient = createPublicClient({
-      chain,
+      chain: asViemChain(chain),
       transport: http(rpcUrl),
     });
 
@@ -177,7 +182,7 @@ export class SafeContractRunner implements ContractRunner {
   /**
    * Ensures the Safe is initialized
    */
-  private ensureSafe(): any {
+  private ensureSafe(): InstanceType<typeof Safe> {
     if (!this.safe) {
       throw new Error('SafeContractRunner not initialized. Call init() first.');
     }
@@ -239,6 +244,38 @@ export class SafeContractRunner implements ContractRunner {
    *
    * @throws {RunnerError} If transaction reverts or execution fails
    */
+  /**
+   * Build the Safe `execTransaction` calldata for `txs` *without* sending it.
+   *
+   * Useful for debugging (e.g. pasting into Tenderly's simulator) when the
+   * Safe execution reverts but the underlying error is hidden inside the
+   * multisend. The returned calldata includes a real signature from the
+   * configured signer, so it's directly submittable / simulatable.
+   *
+   * `from` is the signer address (the owner that would broadcast), `to` is
+   * the Safe itself, `data` is the encoded `execTransaction` call.
+   */
+  encodeTransaction = async (
+    txs: TransactionRequest[]
+  ): Promise<{ from: Address; to: Address; data: Hex; value: '0' }> => {
+    const safe = this.ensureSafe();
+    if (txs.length === 0) {
+      throw RunnerError.executionFailed('No transactions provided');
+    }
+    const metaTransactions: MetaTransactionData[] = txs.map((tx) => ({
+      operation: OperationType.Call,
+      to: tx.to!,
+      value: (tx.value?.toString() ?? '0'),
+      data: tx.data ?? '0x',
+    }));
+    const safeTransaction = await safe.createTransaction({ transactions: metaTransactions });
+    const signed = await safe.signTransaction(safeTransaction);
+    const data = (await safe.getEncodedTransaction(signed)) as Hex;
+    const to = (await safe.getAddress()) as Address;
+    if (!this.address) throw RunnerError.executionFailed('signer address not initialized');
+    return { from: this.address, to, data, value: '0' };
+  };
+
   sendTransaction = async (txs: TransactionRequest[]): Promise<TransactionReceipt> => {
     const safe = this.ensureSafe();
 
@@ -258,8 +295,13 @@ export class SafeContractRunner implements ContractRunner {
       transactions: metaTransactions,
     });
 
+    // Sign before executing. Without an explicit owner signature, protocol-kit
+    // falls back to a pre-validated (approved-hash) signature, which the Safe's
+    // checkSignatures rejects during gas estimation (GS013).
+    const signed = await safe.signTransaction(safeTransaction);
+
     // Execute the batched transaction
-    const txResult = await safe.executeTransaction(safeTransaction);
+    const txResult = await safe.executeTransaction(signed);
 
     if (!txResult.hash) {
       throw RunnerError.executionFailed('No transaction hash returned from Safe execution');

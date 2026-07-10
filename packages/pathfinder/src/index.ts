@@ -1,3 +1,3 @@
-export * from './flowMatrix';
-export * from './path';
-export * from './packing';
+export * from './flowMatrix.js';
+export * from './path.js';
+export * from './packing.js';

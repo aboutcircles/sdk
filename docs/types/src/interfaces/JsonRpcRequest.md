@@ -6,7 +6,7 @@
 
 # Interface: JsonRpcRequest\<TParams\>
 
-Defined in: [packages/types/src/rpc.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L8)
+Defined in: [packages/types/src/rpc.ts:8](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L8)
 
 JSON-RPC request structure
 
@@ -24,7 +24,7 @@ JSON-RPC request structure
 jsonrpc: "2.0";
 ```
 
-Defined in: [packages/types/src/rpc.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L9)
+Defined in: [packages/types/src/rpc.ts:9](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L9)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [packages/types/src/rpc.ts:9](https://github.com/aboutcircles/sdk-v2
 id: string | number;
 ```
 
-Defined in: [packages/types/src/rpc.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L10)
+Defined in: [packages/types/src/rpc.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L10)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [packages/types/src/rpc.ts:10](https://github.com/aboutcircles/sdk-v
 method: string;
 ```
 
-Defined in: [packages/types/src/rpc.ts:11](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L11)
+Defined in: [packages/types/src/rpc.ts:11](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L11)
 
 ***
 
@@ -54,4 +54,4 @@ Defined in: [packages/types/src/rpc.ts:11](https://github.com/aboutcircles/sdk-v
 params: TParams;
 ```
 
-Defined in: [packages/types/src/rpc.ts:12](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/rpc.ts#L12)
+Defined in: [packages/types/src/rpc.ts:12](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/rpc.ts#L12)

@@ -1,4 +1,4 @@
-import { CirclesError } from '@aboutcircles/sdk-utils';
+import { CirclesError } from '@aboutcircles/sdk-utils/errors';
 import type { Address } from '@aboutcircles/sdk-types';
 
 /**

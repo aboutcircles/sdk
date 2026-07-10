@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { checksumAddress } from '../abi';
+import { checksumAddress } from '../abi.js';
 
 describe('checksumAddress', () => {
   test('checksums lowercase address correctly', () => {

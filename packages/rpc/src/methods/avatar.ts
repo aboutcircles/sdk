@@ -1,6 +1,6 @@
-import type { RpcClient } from '../client';
+import type { RpcClient } from '../client.js';
 import type { Address, AvatarInfo, NetworkSnapshot } from '@aboutcircles/sdk-types';
-import { normalizeAddress, checksumAddresses } from '../utils';
+import { normalizeAddress, checksumAddresses } from '../utils.js';
 
 /**
  * Avatar and network RPC methods

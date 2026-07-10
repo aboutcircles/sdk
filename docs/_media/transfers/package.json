@@ -1,6 +1,6 @@
 {
   "name": "@aboutcircles/sdk-transfers",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Transfer data construction for Circles SDK",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,10 @@
     "pathfinding",
     "web3"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
   "license": "MIT",
   "dependencies": {
     "@aboutcircles/sdk-types": "*",

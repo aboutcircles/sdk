@@ -6,7 +6,7 @@
 
 # Interface: DecodedContractError
 
-Defined in: [packages/types/src/errors.ts:5](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/errors.ts#L5)
+Defined in: [packages/types/src/errors.ts:5](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/errors.ts#L5)
 
 Decoded contract error information
 Contains parsed error data from failed contract transactions
@@ -19,7 +19,7 @@ Contains parsed error data from failed contract transactions
 errorName: string;
 ```
 
-Defined in: [packages/types/src/errors.ts:6](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/errors.ts#L6)
+Defined in: [packages/types/src/errors.ts:6](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/errors.ts#L6)
 
 ***
 
@@ -29,7 +29,7 @@ Defined in: [packages/types/src/errors.ts:6](https://github.com/aboutcircles/sdk
 optional args: any[];
 ```
 
-Defined in: [packages/types/src/errors.ts:7](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/errors.ts#L7)
+Defined in: [packages/types/src/errors.ts:7](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/errors.ts#L7)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [packages/types/src/errors.ts:7](https://github.com/aboutcircles/sdk
 selector: string;
 ```
 
-Defined in: [packages/types/src/errors.ts:8](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/errors.ts#L8)
+Defined in: [packages/types/src/errors.ts:8](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/errors.ts#L8)
 
 ***
 
@@ -49,7 +49,7 @@ Defined in: [packages/types/src/errors.ts:8](https://github.com/aboutcircles/sdk
 rawData: string;
 ```
 
-Defined in: [packages/types/src/errors.ts:9](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/errors.ts#L9)
+Defined in: [packages/types/src/errors.ts:9](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/errors.ts#L9)
 
 ***
 
@@ -59,4 +59,4 @@ Defined in: [packages/types/src/errors.ts:9](https://github.com/aboutcircles/sdk
 formattedMessage: string;
 ```
 
-Defined in: [packages/types/src/errors.ts:10](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/types/src/errors.ts#L10)
+Defined in: [packages/types/src/errors.ts:10](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/types/src/errors.ts#L10)

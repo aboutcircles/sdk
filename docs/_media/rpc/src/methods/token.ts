@@ -1,5 +1,5 @@
 import type { RpcClient } from '../client';
-import type { Address, TokenInfo, TokenHolder, SortOrder } from '@aboutcircles/sdk-types';
+import type { Address, TokenInfo, TokenHolderRow, PagedResponse } from '@aboutcircles/sdk-types';
 import { normalizeAddress, parseStringsToBigInt, checksumAddresses } from '../utils';
 import { PagedQuery } from '../pagedQuery';
 
@@ -59,58 +59,32 @@ export class TokenMethods {
    * Get token holders for a specific token address with pagination
    *
    * @param tokenAddress - The token address to query holders for
-   * @param limit - Maximum number of results per page (default: 100)
-   * @param sortOrder - Sort order for results (default: 'DESC' - highest balance first)
-   * @returns PagedQuery instance for token holders
+   * @param limit - Maximum number of results to return (default: 100, max: 1000)
+   * @returns Array of token holders with their balances
    *
    * @example
    * ```typescript
-   * const holdersQuery = rpc.token.getTokenHolders('0x42cedde51198d1773590311e2a340dc06b24cb37', 10);
-   *
-   * while (await holdersQuery.queryNextPage()) {
-   *   const page = holdersQuery.currentPage!;
-   *   console.log(`Found ${page.size} holders`);
-   *   page.results.forEach(holder => {
-   *     console.log(`${holder.account}: ${holder.demurragedTotalBalance}`);
-   *   });
-   * }
+   * const holders = await rpc.token.getTokenHolders('0x42cedde51198d1773590311e2a340dc06b24cb37', 100);
+   * console.log(`Found ${holders.length} holders`);
+   * holders.forEach(holder => {
+   *   console.log(`${holder.account}: ${holder.balance}`);
+   * });
    * ```
    */
-  getTokenHolders(
+  async getTokenHolders(
     tokenAddress: Address,
     limit: number = 100,
-    sortOrder: SortOrder = 'DESC'
-  ): PagedQuery<TokenHolder> {
-    const normalizedTokenAddress = normalizeAddress(tokenAddress);
-
-    return new PagedQuery<TokenHolder>(
-      this.client,
-      {
-        namespace: 'V_CrcV2',
-        table: 'BalancesByAccountAndToken',
-        columns: ['account', 'tokenAddress', 'demurragedTotalBalance'],
-        filter: [{
-          Type: 'FilterPredicate',
-          FilterType: 'Equals',
-          Column: 'tokenAddress',
-          Value: normalizedTokenAddress
-        }],
-        cursorColumns: [
-          { name: 'demurragedTotalBalance', sortOrder },
-          { name: 'account', sortOrder: 'ASC' } // Secondary sort for deterministic ordering
-        ],
-        orderColumns: [
-          { Column: 'demurragedTotalBalance', SortOrder: sortOrder },
-          { Column: 'account', SortOrder: 'ASC' }
-        ],
-        limit,
-        sortOrder
-      },
-      (row: any) => ({
-        account: row.account,
-        tokenAddress: row.tokenAddress,
-        demurragedTotalBalance: row.demurragedTotalBalance
-      })
+    cursor?: string | null
+  ): Promise<PagedResponse<TokenHolderRow>> {
+    const response = await this.client.call<[Address, number, string | null], PagedResponse<TokenHolderRow>>(
+      'circles_getTokenHolders',
+      [normalizeAddress(tokenAddress), limit, cursor ?? null]
     );
+
+    return {
+      hasMore: response.hasMore,
+      nextCursor: response.nextCursor,
+      results: checksumAddresses(response.results),
+    };
   }
 }

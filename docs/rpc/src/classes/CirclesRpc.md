@@ -6,7 +6,7 @@
 
 # Class: CirclesRpc
 
-Defined in: [packages/rpc/src/rpc.ts:46](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L46)
+Defined in: [packages/rpc/src/rpc.ts:46](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L46)
 
 Main RPC class for Circles protocol RPC interactions
 
@@ -47,7 +47,7 @@ const profile = await rpc.profile.getProfileByAddress('0xc3a1428c04c426cdf513c6f
 new CirclesRpc(rpcUrl): CirclesRpc;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:64](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L64)
+Defined in: [packages/rpc/src/rpc.ts:64](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L64)
 
 Create a new CirclesRpc instance
 
@@ -71,7 +71,7 @@ RPC URL to use (defaults to https://rpc.circlesubi.network/)
 readonly client: RpcClient;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:47](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L47)
+Defined in: [packages/rpc/src/rpc.ts:47](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L47)
 
 ***
 
@@ -81,7 +81,7 @@ Defined in: [packages/rpc/src/rpc.ts:47](https://github.com/aboutcircles/sdk-v2/
 readonly pathfinder: PathfinderMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:48](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L48)
+Defined in: [packages/rpc/src/rpc.ts:48](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L48)
 
 ***
 
@@ -91,7 +91,7 @@ Defined in: [packages/rpc/src/rpc.ts:48](https://github.com/aboutcircles/sdk-v2/
 readonly query: QueryMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:49](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L49)
+Defined in: [packages/rpc/src/rpc.ts:49](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L49)
 
 ***
 
@@ -101,7 +101,7 @@ Defined in: [packages/rpc/src/rpc.ts:49](https://github.com/aboutcircles/sdk-v2/
 readonly trust: TrustMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:50](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L50)
+Defined in: [packages/rpc/src/rpc.ts:50](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L50)
 
 ***
 
@@ -111,7 +111,7 @@ Defined in: [packages/rpc/src/rpc.ts:50](https://github.com/aboutcircles/sdk-v2/
 readonly balance: BalanceMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:51](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L51)
+Defined in: [packages/rpc/src/rpc.ts:51](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L51)
 
 ***
 
@@ -121,7 +121,7 @@ Defined in: [packages/rpc/src/rpc.ts:51](https://github.com/aboutcircles/sdk-v2/
 readonly avatar: AvatarMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:52](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L52)
+Defined in: [packages/rpc/src/rpc.ts:52](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L52)
 
 ***
 
@@ -131,7 +131,7 @@ Defined in: [packages/rpc/src/rpc.ts:52](https://github.com/aboutcircles/sdk-v2/
 readonly profile: ProfileMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:53](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L53)
+Defined in: [packages/rpc/src/rpc.ts:53](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L53)
 
 ***
 
@@ -141,7 +141,7 @@ Defined in: [packages/rpc/src/rpc.ts:53](https://github.com/aboutcircles/sdk-v2/
 readonly token: TokenMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:54](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L54)
+Defined in: [packages/rpc/src/rpc.ts:54](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L54)
 
 ***
 
@@ -151,7 +151,7 @@ Defined in: [packages/rpc/src/rpc.ts:54](https://github.com/aboutcircles/sdk-v2/
 readonly invitation: InvitationMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:55](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L55)
+Defined in: [packages/rpc/src/rpc.ts:55](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L55)
 
 ***
 
@@ -161,7 +161,7 @@ Defined in: [packages/rpc/src/rpc.ts:55](https://github.com/aboutcircles/sdk-v2/
 readonly transaction: TransactionMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:56](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L56)
+Defined in: [packages/rpc/src/rpc.ts:56](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L56)
 
 ***
 
@@ -171,7 +171,7 @@ Defined in: [packages/rpc/src/rpc.ts:56](https://github.com/aboutcircles/sdk-v2/
 readonly group: GroupMethods;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:57](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L57)
+Defined in: [packages/rpc/src/rpc.ts:57](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L57)
 
 ## Methods
 
@@ -181,7 +181,7 @@ Defined in: [packages/rpc/src/rpc.ts:57](https://github.com/aboutcircles/sdk-v2/
 setRpcUrl(rpcUrl): void;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:82](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L82)
+Defined in: [packages/rpc/src/rpc.ts:82](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L82)
 
 Update the RPC URL
 
@@ -203,7 +203,7 @@ Update the RPC URL
 getRpcUrl(): string;
 ```
 
-Defined in: [packages/rpc/src/rpc.ts:89](https://github.com/aboutcircles/sdk-v2/blob/aed3c8bf419f1e90d91722752d3f29c8257367c2/packages/rpc/src/rpc.ts#L89)
+Defined in: [packages/rpc/src/rpc.ts:89](https://github.com/aboutcircles/sdk-v2/blob/d93c5485243505702cd4737e16431eb294109cdb/packages/rpc/src/rpc.ts#L89)
 
 Get the current RPC URL
 

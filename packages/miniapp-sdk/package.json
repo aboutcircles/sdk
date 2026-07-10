@@ -1,0 +1,33 @@
+{
+  "name": "@aboutcircles/miniapp-sdk",
+  "version": "0.1.57",
+  "description": "Tiny SDK for mini apps running inside the Circles miniapps iframe host",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --format esm && tsc --emitDeclarationOnly",
+    "dev": "tsc --build --watch",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "circles",
+    "miniapp",
+    "iframe",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aboutcircles/sdk"
+  },
+  "license": "MIT"
+}
