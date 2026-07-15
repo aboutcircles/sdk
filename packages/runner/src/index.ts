@@ -13,6 +13,13 @@ export { SafeContractRunner, SafeBatchRun } from './safe-runner.js';
 // Safe Browser Runner (client-side with Web3 wallet)
 export { SafeBrowserRunner, SafeBrowserBatchRun } from './safe-browser-runner.js';
 
+// Miniapp Runner (client-side embedded in the Circles miniapps iframe host)
+export { MiniappRunner, MiniappBatchRun } from './miniapp-runner.js';
+export type {
+  MiniappHostTransaction,
+  MiniappSendTransactions,
+} from './miniapp-runner.js';
+
 // Chain configuration types and presets
 export type { ChainConfig, ChainLike } from './chain-types';
 export { chains, asViemChain } from './chain-types';
