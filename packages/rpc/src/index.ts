@@ -16,7 +16,7 @@ export {
   InvitationMethods,
   TransactionMethods,
   GroupMethods,
-  AffiliateMethods,
+  CommunityMethods,
 } from './methods/index.js';
 
 // RPC-specific types
@@ -30,7 +30,7 @@ export type {
 
 // Re-export shared types from @aboutcircles/sdk-types for convenience
 export type { TrustRelationType, AggregatedTrustRelation, TransferDataRow } from '@aboutcircles/sdk-types';
-export type { AffiliateGroupRow, AffiliateGroupListResponse, AffiliateGroupMemberRow } from '@aboutcircles/sdk-types';
+export type { CommunityRow, CommunityListResponse, CommunityMemberRow } from '@aboutcircles/sdk-types';
 
 // Error handling
 export { RpcError } from './errors.js';

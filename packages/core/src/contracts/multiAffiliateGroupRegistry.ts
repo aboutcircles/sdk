@@ -17,12 +17,12 @@ const MAX_LIST_WALK = 1000;
  * Lets a human avatar maintain its own list of affiliate groups it has signalled
  * on-chain intent to join. The registry stores **intent only** — it does not enforce
  * the membership-fee cap or any group criteria (those are computed off-chain: fees from
- * the group profile, served by `circles_getAffiliateGroup*`, and trust by the TMS).
+ * the group profile, served by `circles_getAvatarCommunityFeesPercentage`, and trust by the TMS).
  *
  * This wrapper produces the write calldata ({@link addAffiliateGroup} /
  * {@link removeAffiliateGroup}) and offers thin on-chain reads ({@link isAffiliated},
  * {@link affiliateGroups}) straight from the registry. For an enriched / paginated read
- * (group names, fees, trusted-subset), prefer the RPC methods on `CirclesRpc.affiliate`,
+ * (group names, fees, trusted-subset), prefer the RPC methods on `CirclesRpc.communities`,
  * which hit the indexer instead of walking the list one `eth_call` at a time.
  *
  * The on-chain Hub is a hardcoded constant (the Gnosis production Hub), so the registry
@@ -44,7 +44,7 @@ export class MultiAffiliateGroupRegistryContract extends Contract<typeof multiAf
    * group, or the tx reverts (`OnlyHuman` / `AffiliateGroupNotExist`). Idempotent on-chain:
    * re-adding a group already in the caller's list is a no-op — the tx still succeeds, but
    * emits no event and changes no state. The membership-fee 100% cap is **not** enforced
-   * here; gate it client-side via `CirclesRpc.affiliate.getAffiliateGroupFeesPercentage`.
+   * here; gate it client-side via `CirclesRpc.communities.getAvatarCommunityFeesPercentage`.
    *
    * @param group The Circles group to affiliate the caller with
    * @returns Transaction request (caller signs & sends from the avatar)
@@ -95,7 +95,7 @@ export class MultiAffiliateGroupRegistryContract extends Contract<typeof multiAf
    * first (the list is prepend-ordered). Returns `[]` for an empty list.
    *
    * Walks the per-avatar linked list one `eth_call` per entry (head + one per group),
-   * so it's chattier than the indexer-backed `CirclesRpc.affiliate.getAffiliateGroupWishlist`
+   * so it's chattier than the indexer-backed `CirclesRpc.communities.getAvatarCommunitiesWishlist`
    * — use this only when you need the unindexed on-chain truth (e.g. before the indexer
    * has caught up, or with no RPC). The walk is bounded by {@link MAX_LIST_WALK}.
    *
