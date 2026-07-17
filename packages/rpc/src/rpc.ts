@@ -10,6 +10,7 @@ import {
   InvitationMethods,
   TransactionMethods,
   GroupMethods,
+  CommunityMethods,
   SdkMethods,
 } from './methods/index.js';
 
@@ -63,6 +64,7 @@ export class CirclesRpc {
   private _invitation?: InvitationMethods;
   private _transaction?: TransactionMethods;
   private _group?: GroupMethods;
+  private _communities?: CommunityMethods;
   private _sdk?: SdkMethods;
 
   /**
@@ -142,6 +144,13 @@ export class CirclesRpc {
       this._group = new GroupMethods(this.client);
     }
     return this._group;
+  }
+
+  get communities(): CommunityMethods {
+    if (!this._communities) {
+      this._communities = new CommunityMethods(this.client);
+    }
+    return this._communities;
   }
 
   get sdk(): SdkMethods {

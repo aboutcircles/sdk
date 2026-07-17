@@ -61,3 +61,21 @@ export const AFFILIATE_GROUP_REGISTRY: Address = '0xca8222e780d046707083f51377B5
  * back to the zero address when reading.
  */
 export const AFFILIATE_GROUP_NONE_SENTINEL: Address = '0x6CF165a39263984827d8C13829C60bd047B089E6';
+
+/**
+ * MultiAffiliateGroupRegistry contract address (GA 2.0 "communities"), Gnosis Chain.
+ *
+ * Per-avatar registry of affiliate-group *intent* — distinct from the legacy
+ * single-group {@link AFFILIATE_GROUP_REGISTRY}. Its Hub is a hardcoded constant
+ * (the Gnosis production Hub), so this deployment is Gnosis-mainnet only. The
+ * registry holds no public getter for its own address, so the SDK carries it directly.
+ */
+export const MULTI_AFFILIATE_GROUP_REGISTRY: Address = '0x4a25a7cf216351963f1637ad965d77b3ae277ef3';
+
+/**
+ * Sentinel node (`address(0x01)`) bounding each avatar's affiliate-group linked
+ * list in the MultiAffiliateGroupRegistry. `affiliateGroupList[avatar][SENTINEL]`
+ * is the list head; the tail points back to the sentinel; an empty list reads as
+ * the zero address. Used when walking the list on-chain (never a real group).
+ */
+export const AFFILIATE_GROUP_LIST_SENTINEL: Address = '0x0000000000000000000000000000000000000001';

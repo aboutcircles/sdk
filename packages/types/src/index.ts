@@ -73,6 +73,9 @@ export type { TrustRelation, TrustRelationType, AggregatedTrustRelation } from '
 // Group types
 export type { GroupRow, GroupMembershipRow, GroupQueryParams } from './group.js';
 
+// Community (GA 2.0) types
+export type { CommunityRow, CommunityListResponse, CommunityMemberRow } from './communities.js';
+
 // Pathfinding types
 export type {
   SimulatedBalance,
