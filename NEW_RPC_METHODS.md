@@ -209,11 +209,11 @@ const suggestions = await rpc.sdk.searchProfileByAddressOrName(
 
 ```ts
 // Circles events
-const circlesWs = new WebSocket('wss://rpc.circlesubi.network/ws/subscribe');
+const circlesWs = new WebSocket('wss://rpc.aboutcircles.com/ws/subscribe');
 circlesWs.send(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'circles_subscribe', params: [] }));
 
 // Ethereum new blocks
-const chainWs = new WebSocket('wss://rpc.circlesubi.network/ws/chain');
+const chainWs = new WebSocket('wss://rpc.aboutcircles.com/ws/chain');
 chainWs.send(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_subscribe', params: ['newHeads'] }));
 ```
 

@@ -11,7 +11,7 @@ console.log('=== Basic RPC Configuration ===\n');
 // Example 1: Create RPC instance with default endpoint
 console.log('Example 1: Default RPC Endpoint\n');
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 console.log('Using RPC:', rpc.getRpcUrl());
 
 // Example 2: Use alternative RPC endpoint

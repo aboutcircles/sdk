@@ -22,7 +22,7 @@ import {
  * const rpc = new CirclesRpc();
  *
  * // Use custom RPC endpoint
- * const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+ * const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
  *
  * // Find a path
  * const path = await rpc.pathfinder.findPath({
@@ -64,9 +64,9 @@ export class CirclesRpc {
   /**
    * Create a new CirclesRpc instance
    *
-   * @param rpcUrl RPC URL to use (defaults to https://rpc.circlesubi.network/)
+   * @param rpcUrl RPC URL to use (defaults to https://rpc.aboutcircles.com/)
    */
-  constructor(rpcUrl: string = 'https://rpc.circlesubi.network/') {
+  constructor(rpcUrl: string = 'https://rpc.aboutcircles.com/') {
     this.client = new RpcClient(rpcUrl);
 
     this.pathfinder = new PathfinderMethods(this.client);

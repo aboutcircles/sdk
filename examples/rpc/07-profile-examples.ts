@@ -10,7 +10,7 @@ import { CirclesRpc } from '@aboutcircles/sdk-rpc';
  * - Searching profiles
  */
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Example 1: Get profile by CID
 async function exampleGetProfileByCid() {

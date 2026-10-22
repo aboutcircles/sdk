@@ -13,7 +13,7 @@ bun install
 ```typescript
 import { CirclesRpc } from '@aboutcircles/sdk-rpc';
 
-// Create RPC instance with default endpoint (https://rpc.circlesubi.network/)
+// Create RPC instance with default endpoint (https://rpc.aboutcircles.com/)
 const rpc = new CirclesRpc();
 
 // Or use custom RPC endpoint
