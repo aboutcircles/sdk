@@ -6,7 +6,7 @@ import { CirclesRpc } from '@aboutcircles/sdk-rpc';
  * This example demonstrates how to query token balances for an address.
  */
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Example: Get token balances for an address (V2 tokens only)
 async function exampleGetTokenBalances() {

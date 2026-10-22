@@ -39,7 +39,7 @@ const tx = core.hubV2.groupMint(
 ```typescript
 import { CirclesRpc } from '@aboutcircles/sdk-rpc';
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Get balance
 const balance = await rpc.circlesV2.getTotalBalance('0xYourAddress');

@@ -17,7 +17,7 @@ Main RPC class for Circles protocol RPC interactions
 const rpc = new CirclesRpc();
 
 // Use custom RPC endpoint
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Find a path
 const path = await rpc.pathfinder.findPath({
@@ -55,9 +55,9 @@ Create a new CirclesRpc instance
 
 ##### rpcUrl
 
-`string` = `'https://rpc.circlesubi.network/'`
+`string` = `'https://rpc.aboutcircles.com/'`
 
-RPC URL to use (defaults to https://rpc.circlesubi.network/)
+RPC URL to use (defaults to https://rpc.aboutcircles.com/)
 
 #### Returns
 

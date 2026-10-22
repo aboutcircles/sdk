@@ -6,7 +6,7 @@ import { CirclesRpc } from '@aboutcircles/sdk-rpc';
  * This example demonstrates how to work with trust relationships in the Circles network.
  */
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Example: Get common trust between two addresses
 async function exampleGetCommonTrust() {

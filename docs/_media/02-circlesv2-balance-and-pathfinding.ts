@@ -9,7 +9,7 @@ import { CirclesRpc } from '@aboutcircles/sdk-rpc';
  * - Circular paths (token swaps)
  */
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Example 2: Find a path between two addresses
 async function exampleFindPath() {

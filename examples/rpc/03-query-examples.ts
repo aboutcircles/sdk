@@ -10,7 +10,7 @@ import { CirclesRpc } from '@aboutcircles/sdk-rpc';
  * - Sorting and filtering results
  */
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Example 1: Get available tables
 async function exampleGetTables() {

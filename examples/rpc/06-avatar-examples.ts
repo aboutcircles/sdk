@@ -8,7 +8,7 @@ import { CirclesRpc } from '@aboutcircles/sdk-rpc';
  * - Getting network snapshots
  */
 
-const rpc = new CirclesRpc('https://rpc.circlesubi.network/');
+const rpc = new CirclesRpc('https://rpc.aboutcircles.com/');
 
 // Example 1: Get avatar info
 async function exampleGetAvatarInfo() {
